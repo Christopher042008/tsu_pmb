@@ -1,0 +1,382 @@
+@extends('admin::template/admin/header')
+@section('title', $title)
+@section('link_href')
+
+@endsection
+
+@section('content')
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>{{$menu}}</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item active"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item active">{{$menu}}</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- /.col-md-6 -->
+                <div class="col-md-12">
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
+                            <h5 class="m-0">{{$menu}}</h5>
+                        </div>
+                        <div class="card-body">
+                            <table id="example2" class="table table-bordered table-hover" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th>No Registrasi</th>
+                                        <th>Batch Daftar</th>
+                                        <th>Jalur Daftar</th>
+                                        <th>Prodi Pilihan 1</th>
+                                        <th>Prodi Pilihan 2</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.col-md-6 -->
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+
+    <div class="modal fade" id="modal-detail">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="judul-modal">Detail Pendaftaran</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table id="tabel-detail" class="table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th colspan="4" class="text-center" style="background-color: rgb(0, 255, 42);">Data Pendaftaran Calon Mahasiswa Baru</th>
+                            </tr>
+                            <tr>
+                                <th>No Registrasi</th>
+                                <th id="o-noregist" class="o-detaildaftar"></th>
+                                <th>Nama Calon Mahasiswa</th>
+                                <th id="o-nama" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Batch Daftar</th>
+                                <th id="o-batch" class="o-detaildaftar"></th>
+                                <th>Tahun Lulus</th>
+                                <th id="o-tahunlulus" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Jalur Daftar</th>
+                                <th id="o-jalur" class="o-detaildaftar"></th>
+                                <th>Jurusan Sekolah</th>
+                                <th id="o-jurusansekolah" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Program Studi Pilihan 1</th>
+                                <th id="o-prodi1" class="o-detaildaftar"></th>
+                                <th>Program Studi Pilihan 2</th>
+                                <th id="o-prodi2" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>UKT Program Studi 1</th>
+                                <th id="o-uktprodi1" class="o-detaildaftar"></th>
+                                <th>UKT Program Studi 2</th>
+                                <th id="o-uktprodi2" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Konfirmasi Daftar</th>
+                                <th id="o-konfirmdaftar" class="o-detaildaftar"></th>
+                                <th>Biaya Pendaftaran</th>
+                                <th id="o-biayadaftar" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Tanggal Daftar</th>
+                                <th id="o-tgldaftar" class="o-detaildaftar"></th>
+                                <th>Waktu Kuliah</th>
+                                <th id="o-waktukuliah" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Status UKT</th>
+                                <th id="o-statusukt" class="o-detaildaftar"></th>
+                                <th>
+                                    <code>*Khusus Beasiswa</code>
+                                    <br>
+                                    Kategori Beasiswa
+                                </th>
+                                <th id="o-beasiswa" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <code>*Khusus Beasiswa</code>
+                                    <br>
+                                    Tingkat Kejuaraan
+                                </th>
+                                <th id="o-juarabea" class="o-detaildaftar"></th>
+                                <th>
+                                    <code>*Khusus Beasiswa</code>
+                                    <br>
+                                    Keterangan
+                                </th>
+                                <th id="o-keteranganbea" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <code>*Khusus Beasiswa</code>
+                                    <br>
+                                    Durasi Beasiswa D3
+                                </th>
+                                <th id="o-durasid3" class="o-detaildaftar"></th>
+                                <th>
+                                    <code>*Khusus Beasiswa</code>
+                                    <br>
+                                    Durasi Beasiswa S1
+                                </th>
+                                <th id="o-durasis1" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th colspan="4" style="background-color: rgb(251, 255, 0);"><code>*Berkas yang diperlukan</code></th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-berkas" class="o-detaildaftar">
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default float-right" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+@endsection
+@section('script')
+    <script>
+        $(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            loadEvent()
+
+            function loadEvent()
+            {
+                tabelBeasiswa()
+            }
+
+
+            function tabelBeasiswa()
+            {
+                let otable = $('#example2').DataTable({
+                    destroy: true,
+                    processing: true,
+                    paging: false,
+                    scrollX: true,
+                    scrollY: '500px',
+                    scrollCollapse: true,
+                    serverSide: true,
+                    searchDelay: 500,
+                    responsive: true,
+                    order: [],
+                    ajax: {
+                        url: '{!! route('admin.datanonbeasiswa.Tabel') !!}',
+                        type: 'GET',
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'nama'
+                        },
+                        {
+                            data: 'noreg'
+                        },
+                        {
+                            data: 'batch'
+                        },
+                        {
+                            data: 'jalur'
+                        },
+                        {
+                            data: 'prodi1'
+                        },
+                        {
+                            data: 'prodi2'
+                        },
+                        {
+                            data: 'status'
+                        },
+                        {
+                            data: 'action',
+                            orderable: false,
+                            searchable: false
+                        },
+                    ],
+                    language: {
+                        processing: '<i class="fa fa-spinner fa-lg fa-spin"></i>'
+                    },
+                    drawCallback: function(settings) {
+                        ShowDetail()
+                    }
+                });
+
+                otable.on('draw', function(event) {
+                    $('[data-toggle="tooltip"]').tooltip({trigger: "hover"});
+                    $('[data-tooltip="tooltip"]').tooltip({trigger: "hover"});
+
+                });
+            }
+
+            function ShowDetail()
+            {
+                $('.btn_detail').click(function (e) {
+                    e.preventDefault();
+                    let param = $(this).data('id')
+                    // $('#modal-detail').modal('show')
+                    $.ajax({
+                        type: "GET",
+                        url: '{!! url('admin/DataPendaftaran/NonBeasiswa/DetailNonBeasiswa') !!}'+'/'+param,
+                        dataType: "JSON",
+                        beforeSend: function(response) {
+                            $('#loading').show()
+                            $('.o-detaildaftar').empty()
+                        },
+                        success: function(data) {
+                            $('#loading').hide()
+                            if(data.hasil==0){
+                                notifalert('Information', 'Data Pendaftaran Tidak Ditemukan','error')
+                            }else{
+                                $('#o-noregist').html(data.daftar.KodePendaftaran)
+                                $('#o-nama').html(data.daftar.biodata.nama)
+                                $('#o-batch').html(data.daftar.batch.nama_batch+' '+data.daftar.batch.tahun_akademik)
+                                $('#o-tahunlulus').html(data.daftar.tahun_lulus)
+                                $('#o-jalur').html(data.daftar.jalur.KodeJenis+'-'+data.daftar.jalur.jenis_pendaftaran)
+                                $('#o-jurusansekolah').html(data.daftar.jurusansekolah.sekolah+'/'+data.daftar.jurusansekolah.jurusan_sekolah)
+                                $('#o-prodi1').html(data.daftar.prodi1.jenjang.jenjang+'-'+data.daftar.prodi1.jurusan)
+                                $('#o-prodi2').html(data.daftar.prodi2.jenjang.jenjang+'-'+data.daftar.prodi2.jurusan)
+                                // let ukt1 = data.ukt1.biaya_ukt.replace(/\D/g, '')
+                                let ukt1 = new Intl.NumberFormat('id-ID').format(data.ukt1.biaya_ukt);
+                                $('#o-uktprodi1').html('Rp '+ukt1)
+                                let ukt2 = new Intl.NumberFormat('id-ID').format(data.ukt2.biaya_ukt);
+                                $('#o-uktprodi2').html('Rp '+ukt2)
+                                let konfirmdaftar = data.daftar.konfirm_pendaftaran=='0' ? 'Belum Konfirmasi' : 'Sudah Konfirmasi';
+                                $('#o-konfirmdaftar').html(konfirmdaftar)
+                                let biayadaftar = data.daftar.jalur.biaya_pendaftaran=='1' ? 'Rp '+new Intl.NumberFormat('id-ID').format(data.daftar.jalur.jml_biaya_pendaftaran) : 'Gratis';
+                                $('#o-biayadaftar').html(biayadaftar)
+                                $('#o-tgldaftar').html(data.daftar.tgl_daftar)
+                                $('#o-waktukuliah').html(data.daftar.waktukuliah.waktu)
+                                let statusUkt = data.daftar.jalur.status_ukt=='0' ? 'Gratis' : 'Bayar';
+                                $('#o-statusukt').html(statusUkt)
+                                let beasiswa = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.jenis_beasiswa
+                                $('#o-beasiswa').html(beasiswa)
+                                let tingkat = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.idtingkat;
+                                $('#o-juarabea').html(tingkat==null||tingkat=='-'?'-':data.daftar.jenisbeasiswa.tingkat.tingkat_kejuaraan)
+                                let ketbea = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.juara_ke
+                                $('#o-keteranganbea').html(ketbea)
+                                let durasid3 = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.durasi_d3+' Semester'
+                                $('#o-durasid3').html(durasid3)
+                                let durasis1 = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.durasi_s1+' Semester'
+                                $('#o-durasis1').html(durasis1)
+
+                                let berkas = ''
+
+                                berkas += '<tr style="background-color: rgb(0, 238, 255);">'+
+                                            '<th colspan="4" class="text-center">'+data.daftar.jalur.berkasumum.jenis_berkas+'</th>'+
+                                          '</tr>'
+                                berkas += '<tr style="background-color: rgb(0, 238, 255);">'+
+                                            '<th>No</td>'+
+                                            '<th>Nama berkas</th>'+
+                                            '<th>Keterangan</th>'+
+                                            '<th>Format File</th>'+
+                                          '</tr>'
+
+                                for(i=0;i<data.daftar.jalur.berkasumum.berkas.length;i++){
+                                    let no = i+1;
+                                    berkas += '<tr>'+
+                                                '<td>'+no+'</td>'+
+                                                '<td>'+data.daftar.jalur.berkasumum.berkas[i].nama_berkas+'</td>'+
+                                                '<td>'+data.daftar.jalur.berkasumum.berkas[i].keterangan+'</td>'+
+                                                '<td>'+data.daftar.jalur.berkasumum.berkas[i].formatfile+'</td>'+
+                                              '</tr>'
+                                }
+
+                                let berkaskhusus = data.daftar.jalur.berkas_khusus ? data.daftar.jalur.berkaskhusus.jenis_berkas : 'Khusus';
+                                berkas += '<tr style="background-color: rgb(0, 238, 255);">'+
+                                            '<th colspan="4" class="text-center">'+berkaskhusus+'</th>'+
+                                          '</tr>'
+                                if(data.daftar.jalur.berkas_khusus){
+                                    berkas += '<tr style="background-color: rgb(0, 238, 255);">'+
+                                                '<th>No</td>'+
+                                                '<th>Nama berkas</th>'+
+                                                '<th>Keterangan</th>'+
+                                                '<th>Format File</th>'+
+                                              '</tr>'
+                                    for(i=0;i<data.daftar.jalur.berkaskhusus.berkas.length;i++){
+                                        let noo = i+1;
+                                        berkas += '<tr>'+
+                                                    '<td>'+noo+'</td>'+
+                                                    '<td>'+data.daftar.jalur.berkaskhusus.berkas[i].nama_berkas+'</td>'+
+                                                    '<td>'+data.daftar.jalur.berkaskhusus.berkas[i].keterangan+'</td>'+
+                                                    '<td>'+data.daftar.jalur.berkaskhusus.berkas[i].formatfile+'</td>'+
+                                                '</tr>'
+                                    }
+
+                                }else{
+                                    berkas += '<tr>'+
+                                            '<th colspan="4" class="text-center">Tidak Ada Berkas Khusus</th>'+
+                                          '</tr>'
+                                }
+
+                                $('#detail-berkas').append(berkas)
+
+                                $('#modal-detail').modal('show')
+                            }
+                        },
+                        error: function(data) {
+                            $('#loading').hide()
+                            Swal.fire({
+                                title: 'Gagal Show Data Pendaftaran !',
+                                text: 'Internal Server Error',
+                                icon: 'error'
+                            }).then((result) => {
+                                window.isEditing = false;
+                            });
+                            return;
+                        }
+                    });
+                    return false;
+                });
+            }
+
+        });
+    </script>
+@endsection

@@ -1,0 +1,375 @@
+@extends('user::login/masterlogin')
+@section('title', $title)
+@section('link_href')
+@endsection
+
+@section('content')
+    <div class="login-box">
+        <div class="card card-outline card-success">
+            <div class="card-header">
+                <i class="fas fa-edit"></i><b> Form Pendaftaran</b>
+            </div>
+            <div class="card-body">
+
+                <form id="form-login" method="POST" action="{{route('register.save')}}">
+                    {{ csrf_field() }}
+                    {{-- Form Data Diri --}}
+                    <div id="form-1" >
+                        <p class="login-box-msg text-bold">Data Pribadi</p>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="Nama Calon Mahasiswa" name="nama"
+                                id="nama">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-user"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <small><code id="warning_nik"></code></small>
+                        <div class="input-group mb-3">
+                            <input type="number" class="form-control" onkeyup="checkNIK()" placeholder="NIK Calon Mahasiswa" name="nik"
+                                id="nik">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-user"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="No HP Aktif Calon Mahasiswa"
+                                name="nohp" id="nohp">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-phone"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <select class="form-control select2" id="provinsi" name="provinsi" style="width: 100%;">
+                                <option value="" selected disabled>-- Pilih Provinsi Tinggal --</option>
+                                @foreach ($provinsi as $p)
+                                    <option value="{{$p->idprov}}">{{$p->nama_provinsi}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <select class="form-control select2" id="kabupaten" name="kabupaten">
+                                <option value="" selected disabled>-- Pilih Kabupaten/Kota Tinggal --</option>
+                            </select>
+                        </div>
+                        <div class="float-right">
+                            <button type="button" id="next-1" class="btn btn-primary btn-block">
+                                Next <i class="fas fa-angle-right"></i>
+                            </button>
+                            <!-- /.col -->
+                        </div>
+                    </div>
+
+                    {{-- Form Akun --}}
+                    <div id="form-2" style="display: none;">
+                        <p class="login-box-msg text-bold">Data Akun</p>
+                        <div class="input-group mb-3">
+                            <input type="email" class="form-control" placeholder="Email Calon Mahasiswa" name="email"
+                                id="email">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-envelope"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <small><code id="warning"></code></small>
+                        <div class="input-group mb-3">
+                            <input type="password" class="form-control" onkeyup="checkPassword()" placeholder="Password"
+                                name="password" id="password">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-lock"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input type="password" class="form-control" onkeyup="checkPassword()"
+                                placeholder="Konfirmasi Password" name="password1" id="password1">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-lock"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="button" id="prev-1" class="btn btn-primary btn-block">
+                                    <i class="fas fa-angle-left"></i> prev
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="submit" class="btn btn-success btn-block">
+                                    <i class="fas fa-paper-plane"></i> Submit
+                                </button>
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <!-- /.card-body -->
+        </div>
+    </div>
+@endsection
+
+@section('script')
+    <script>
+        $(function() {
+            //Initialize Select2 Elements
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            })
+            loadEvent()
+
+            function loadEvent() {
+                Next1()
+                Prev1()
+                submitRegist()
+                KabKota()
+            }
+
+            function Next1() {
+                $('#next-1').click(function(e) {
+                    e.preventDefault();
+                    $('#form-1').hide()
+                    $('#form-2').show()
+                });
+            }
+
+
+
+            function Prev1() {
+                $('#prev-1').click(function(e) {
+                    e.preventDefault();
+                    $('#form-1').show()
+                    $('#form-2').hide()
+                });
+            }
+
+            function KabKota()
+            {
+                $('#provinsi').on('change', function() {
+                    let provId = $(this).val();
+
+                    $.ajax({
+                        type: "GET",
+                        url: '{!! url('GetKabupaten') !!}' + '/' + provId,
+                        dataType: "JSON",
+                        beforeSend: function(response) {
+                            $('#loading').show()
+                            $('#kabupaten').empty().html('<option value="" selected disabled>-- Pilih Kabupaten/Kota Tinggal --</option>');
+                        },
+                        success: function(data) {
+                            $('#loading').hide()
+                            if (data.hasil == 0) {
+                                notifalert('Information', 'Data Kabupaten/Kota Tidak Ditemukan','error')
+                            } else {
+                                let dis1 = ''
+                                for (i = 0; i < data.kab.length; i++) {
+                                    dis1 += '<option value="' + data.kab[i].idkab + '">'+data.kab[i].nama_kabupaten+'</option>'
+                                }
+                                $('#kabupaten').append(dis1);
+                            }
+                        }
+                    });
+                    return false;
+                    // if(provId) {
+                    //     $.get('{{$parameter->api_kab_kota}}'+provId+'.json', function(data) {
+                    //         $.each(data, function(index, item) {
+                    //             $('#kabupaten').append('<option value="'+item.id+'">'+item.name+'</option>');
+                    //         });
+                    //     });
+                    // }
+                });
+            }
+
+            function validation()
+            {
+                let nama   = $('#nama').val()
+                let nik    = $('#nik').val()
+                let nohp   = $('#nohp').val()
+                let prov   = $('#provinsi').val()
+                let kabk   = $('#kabupaten').val()
+                let email  = $('#email').val()
+                let pass   = $('#password').val()
+                let repass = $('#password1').val()
+
+                let notif = ''
+                if(nama==''||nama==null){
+                    notif = 'Nama Calon Mahasiswa Tidak Boleh Kosong';
+                    $('#prev-1').trigger('click');
+                }else if(nik==''||nik==null){
+                    notif = 'NIK Calon Mahasiswa Tidak Boleh Kosong';
+                    $('#prev-1').trigger('click');
+                }else if(nohp==''||nohp==null){
+                    notif = 'No HP Calon Mahasiswa Tidak Boleh Kosong';
+                    $('#prev-1').trigger('click');
+                }else if(prov==''||prov==null){
+                    notif = 'Provinsi Tempat Tinggal Tidak Boleh Kosong';
+                    $('#prev-1').trigger('click');
+                }else if(kabk==''||kabk==null){
+                    notif = 'Kabupaten/Kota Tinggal Tidak Boleh Kosong';
+                    $('#prev-1').trigger('click');
+                }else if(email==''||email==null){
+                    notif = 'Email Tidak Boleh Kosong';
+                    $('#next-1').trigger('click');
+                }else if(pass==''||pass==null){
+                    notif = 'Password Tidak Boleh Kosong';
+                    $('#next-1').trigger('click');
+                }else if(repass==''||repass==null){
+                    notif = 'Konfirmasi Password Tidak Boleh Kosong';
+                    $('#next-1').trigger('click');
+                }else{
+                    notif = 'success'
+                }
+                return notif;
+            }
+
+            function submitRegist()
+            {
+                $('#form-login').on('submit', function(e){
+                    e.preventDefault();
+                    let validasiku = validation()
+                    if(validasiku=='success'){
+                            Swal.fire({
+                            title: 'Information',
+                            text: 'Apakah Data Anda Sudah Benar ?',
+                            icon: 'question',
+                            showConfirmButton: true,
+                            showCancelButton: true,
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                this.submit();
+                            }else{
+                                return false;
+                            }
+                        })
+                    }else{
+                        notifalert('Information',validasiku,'warning')
+                    }
+                });
+            }
+
+            function changeJurusanSekolah() {
+                $('#jurusan_sekolah').on('change', function() {
+                    let params = $(this).val()
+                    // console.log(params)
+                    $.ajax({
+                        type: "GET",
+                        url: '{!! url('showJurusan') !!}' + '/' + params,
+                        dataType: "JSON",
+                        beforeSend: function(response) {
+                            $('#loading').show()
+                            $('#pilihan1').empty()
+                            $('#pilihan2').empty()
+                        },
+                        success: function(data) {
+                            $('#loading').hide()
+                            if (data.hasil == 0) {
+                                notifalert('Information', 'Data Jurusan Tidak Ditemukan',
+                                    'error')
+                            } else {
+                                let dis1 =
+                                    '<option value="" selected disabled>-- Pilihan Jurusan 1 --</option>';
+                                let dis2 =
+                                    '<option value="" selected disabled>-- Pilihan Jurusan 2 --</option>';
+
+                                for (i = 0; i < data.jurusan.length; i++) {
+                                    dis1 += '<option value="' + data.jurusan[i].KodeJurusan + '">'+data.jurusan[i].jenjang.jenjang+' - ' + data
+                                        .jurusan[i].jurusan + '</option>'
+                                    dis2 += '<option value="' + data.jurusan[i].KodeJurusan + '">'+data.jurusan[i].jenjang.jenjang+' - ' + data
+                                        .jurusan[i].jurusan + '</option>'
+                                }
+                                $('#pilihan1').append(dis1);
+                                $('#pilihan2').append(dis2);
+                            }
+                        }
+                    });
+                    return false;
+                });
+            }
+
+            $('#password,#password1').keypress(function(event) {
+                var ew = event.which;
+                if (48 <= ew && ew <= 57)
+                    return true;
+                if (65 <= ew && ew <= 90)
+                    return true;
+                if (97 <= ew && ew <= 122)
+                    return true;
+                return false;
+            });
+
+
+        });
+
+        function checkPassword() {
+            var password = $('#password').val();
+            var password_re = $('#password1').val();
+
+            if (password != '' && password_re != '') {
+                if (password != password_re) {
+                    $('#password1').addClass('is-invalid');
+                    $('#password1').removeClass('is-valid');
+
+                    // $('#submit').attr('disabled', 'disabled');
+                } else {
+                    $('#password1').removeClass('is-invalid');
+                    $('#password1').addClass('is-valid');
+                    // $('#submit').removeAttr('disabled');
+                }
+            }
+
+            if (password.length < 8) {
+                $('#password').addClass('is-invalid');
+                $('#password').removeClass('is-valid');
+
+                $('#warning').html('*Mininum length : 8');
+                // $('#submit').attr('disabled', 'disabled');
+            } else {
+                pass_numb = password.replace(/[^0-9]/g, '').length;
+                pass_char = password.replace(/[0-9]/g, '').length;
+
+                if (pass_numb == 0) {
+                    $('#password').addClass('is-invalid');
+                    $('#password').removeClass('is-valid');
+
+                    $('#warning').html('*Must contain Number');
+                    // $('#submit').attr('disabled', 'disabled');
+                } else if (pass_char == 0) {
+                    $('#password').addClass('is-invalid');
+                    $('#password').removeClass('is-valid');
+
+                    $('#warning').html('*Must contain Letter');
+                    // $('#submit').attr('disabled', 'disabled');
+                } else {
+                    $('#password').removeClass('is-invalid');
+                    $('#password').addClass('is-valid');
+                    $('#warning').html('');
+                }
+            }
+        }
+        function checkNIK() {
+            var password = $('#nik').val()
+
+            if (password.length < 16) {
+                $('#nik').addClass('is-invalid');
+                $('#nik').removeClass('is-valid');
+
+                $('#warning_nik').html('*Mininum length : 16');
+                // $('#submit').attr('disabled', 'disabled');
+            } else {
+                $('#nik').removeClass('is-invalid');
+                $('#nik').addClass('is-valid');
+                $('#warning_nik').html('');
+            }
+        }
+    </script>
+@endsection
