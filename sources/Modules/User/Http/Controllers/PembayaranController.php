@@ -89,16 +89,6 @@ class PembayaranController extends Controller
             if($d->status!='paid'){
                 $edit = '<a href="#" data-id="'.$id.'" class="btn_bayar"><i title="Bayar Sekarang" class="fas fa-money-bill text-green"></i></a>';
             }
-            // if($d->isactive==1){
-            //     if($d->konfirm_pendaftaran==0){
-            //         $aktif = '<a href="#" class="btn_delete" data-id="'.$id.'"><i title="Hapus Pendaftaran" class="fa fa-trash text-red"></i></a>';
-            //         $konfirm = '<a href="#" data-id="'.$id.'" class="btn_konfirm"><i title="Konfirmasi Pendaftaran" class="fas fa-check-circle text-green"></i></a>';
-            //         $edit   = '<a href="#" data-id="'.$id.'" class="btn_edit"><i title="Edit" class="fa fa-edit text-orange"></i></a>';
-            //     }
-            // }
-            // else{
-            //     $aktif  = '<a href="#" class="btn_delete" data-id="'.$id.'" data-status="'.encrypt('1').'"><i title="Aktifkan" class="fas fa-check-circle text-green"></i></a>';
-            // }
             $detail = '<a href="#" data-id="'.$id.'" data-daftarid="'.$daftarId.'" class="btn_detail"><i title="Detail" class="fa fa-info-circle"></i></a>';
 
             return $detail.' '.$edit.' '.$aktif.' '.$konfirm;
@@ -107,7 +97,8 @@ class PembayaranController extends Controller
         ->make(true);
     }
 
-    public function PaymentPMB($params){
+    public function PaymentPMB($params)
+    {
         $id = decrypt($params);
         $transaksi = Transaksi::findOrFail($id);
         $orderID = generateOrderId($transaksi->id);
@@ -197,6 +188,14 @@ class PembayaranController extends Controller
             $data['ukt2'] = $prodi2;
         }
         return response()->json($data, Response::HTTP_OK);
+    }
+
+    public function upload_bayar(Request $post)
+    {
+        dd($post);
+        $id = decrypt($post->idtransaksi);
+        $transaksi = Transaksi::findOrFail($id);
+
     }
 
 

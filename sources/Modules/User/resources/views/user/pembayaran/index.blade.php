@@ -173,6 +173,41 @@
         </div>
         <!-- /.modal-dialog -->
     </div>
+    <div class="modal fade" id="modal-pembayaran">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="judul-modal">Upload Bukti Pembayaran</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{route('Pembayaran.uploadbayar')}}" id="form-upload-bayar" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="idtransaksi" id="idtransaksi" value="">
+                        <div class="col-md-12">
+                            <label><code>*</code> Format File <br> <code>.png</code> <br> <code>.jpg</code> <br> <code>.jpeg</code></label>
+                            <br>
+                            <label><code>*</code> Ukuran File Maksimal 1MB</code></label>
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="bukti_daftar" name="bukti_daftar" accept="image/png, image/jpeg, image/jpg">
+                                    <label class="custom-file-label" for="bukti_daftar">Choose file</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button id="btn-uploadbayar" class="btn btn-success float-right">Upload</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
 @endsection
 @section('script')
 
@@ -189,6 +224,8 @@
             function loadEvent()
             {
                 tabelPayment()
+                closemodal()
+                submit_upload()
             }
 
             function tabelPayment()
@@ -254,64 +291,50 @@
             {
                 $('.btn_bayar').click(function (e) {
                     e.preventDefault();
-                    let params = $(this).data('id')
-                    Swal.fire({
-                        title: "Information",
-                        text: "Bayar Biaya Pendaftaran ??",
-                        icon: "question",
-                        showConfirmButton: true,
-                        showCancelButton: true,
-                    }).then((result) => {
-                        if(result.value){
-                            $.ajax({
-                                type: "GET",
-                                url: '{!! url('Pembayaran/PaymentPMB') !!}' + '/' + params,
-                                dataType: "JSON",
-                                beforeSend: function(response) {
-                                    $('#loading').show()
-                                },
-                                success: function(data) {
-                                    $('#loading').hide()
-                                    if(data.status==false){
-                                        notifalert('Information',data.message,'warning');
-                                    }else{
-                                        notifalert('Information',data.message,'success');
-                                        $('#example2').DataTable().ajax.reload();
-                                        // snap.pay(data.snap_token, {
-                                        //     onSuccess: function(result) {
-                                        //         notifalert('Information','Pembayaran sukses!','success');
-                                        //         console.log(result);
-                                        //     },
-                                        //     onPending: function(result) {
-                                        //         notifalert('Information','Menunggu pembayaran...','warning');
-                                        //         console.log(result);
-                                        //     },
-                                        //     onError: function(result) {
-                                        //         notifalert('Information','Pembayaran gagal!','error');
-                                        //         console.log(result);
-                                        //     },
-                                        //     onClose: function() {
-                                        //         notifalert('Information','Popup ditutup tanpa membayar','warning');
-                                        //     }
-                                        // });
-                                    }
-                                },
-                                error: function(xhr, status, error) {
-                                    $('#loading').hide()
-                                    Swal.fire({
-                                        title: 'Gagal Bayar Pendaftaran',
-                                        text: 'Periksa Data Anda !',
-                                        icon: 'error'
-                                    }).then((result) => {
-                                        $('#example2').DataTable().ajax.reload();
-                                    });
-                                    return;
-                                }
-                            });
-                        }else{
-                            return false;
-                        }
-                    });
+                    $('#modal-pembayaran').modal('show')
+                    let idtransaksi = $(this).data('id')
+                    $('#idtransaksi').val(idtransaksi)
+                    // let params = $(this).data('id')
+                    // Swal.fire({
+                    //     title: "Information",
+                    //     text: "Bayar Biaya Pendaftaran ??",
+                    //     icon: "question",
+                    //     showConfirmButton: true,
+                    //     showCancelButton: true,
+                    // }).then((result) => {
+                    //     if(result.value){
+                    //         $.ajax({
+                    //             type: "GET",
+                    //             url: '{!! url('Pembayaran/PaymentPMB') !!}' + '/' + params,
+                    //             dataType: "JSON",
+                    //             beforeSend: function(response) {
+                    //                 $('#loading').show()
+                    //             },
+                    //             success: function(data) {
+                    //                 $('#loading').hide()
+                    //                 if(data.status==false){
+                    //                     notifalert('Information',data.message,'warning');
+                    //                 }else{
+                    //                     notifalert('Information',data.message,'success');
+                    //                     $('#example2').DataTable().ajax.reload();
+                    //                 }
+                    //             },
+                    //             error: function(xhr, status, error) {
+                    //                 $('#loading').hide()
+                    //                 Swal.fire({
+                    //                     title: 'Gagal Bayar Pendaftaran',
+                    //                     text: 'Periksa Data Anda !',
+                    //                     icon: 'error'
+                    //                 }).then((result) => {
+                    //                     $('#example2').DataTable().ajax.reload();
+                    //                 });
+                    //                 return;
+                    //             }
+                    //         });
+                    //     }else{
+                    //         return false;
+                    //     }
+                    // });
 
                 });
             }
@@ -414,6 +437,46 @@
                     return false;
                 });
             }
+
+            function closemodal()
+            {
+                $('#modal-pembayaran').on('hidden.bs.modal', function() {
+                    $('#form-upload-bayar')[0].reset();
+                });
+            }
+
+            function submit_upload()
+            {
+                $('#btn-uploadbayar').click(function (e) {
+                    let fileupload = $('#bukti_daftar').prop('files')[0];
+                    let btn = $(this);
+                    if(fileupload){
+                        let fileSize = fileupload.size;
+                        if(fileSize > 1 * 1024 * 1024){
+                            notifalert('Information','Ukuran File Tidak Boleh Lebih dari 1MB','warning')
+                        }else{
+                            Swal.fire({
+                                title: "Information",
+                                text: "Apakah Bukti Pembayaran Anda Sudah Yakin Benar ?",
+                                icon: "question",
+                                showConfirmButton: true,
+                                showCancelButton: true,
+                            }).then((result) => {
+                                if(result.value){
+                                    btn.prop('disabled',true)
+                                    $('#form-upload-bayar').submit();
+                                }else{
+                                    return false;
+                                }
+                            });
+                        }
+                    }else{
+                        notifalert('Information','Bukti Pembayaran Pendaftaran Tidak Boleh Kosong','warning')
+                    }
+                });
+            }
+
+
 
             // let testingku = 0;
             // let intervalId = setInterval(function() {

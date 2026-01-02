@@ -77,6 +77,7 @@ Route::prefix('')->group(function() {
                 Route::get('/TabelPembayaran', [PembayaranController::class, 'tabelPembayaran'])->name('Pembayaran.TabelBayar');
                 Route::get('/PaymentPMB/{params}', [PembayaranController::class, 'PaymentPMB']);
                 Route::get('/ShowPayment/{params}', [PembayaranController::class, 'ShowPayment']);
+                Route::post('/uploadbayar', [PembayaranController::class, 'upload_bayar'])->name('Pembayaran.uploadbayar');
                 Route::post('/payment', [PembayaranController::class, 'test_bayar'])->name('payment.create');
             });
 

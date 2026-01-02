@@ -207,13 +207,18 @@ class UserController extends Controller
         $akun = Master_Akun::where('akun_id',$bio->akun)->select('akun_id','verifikasi_email')->first();
         $now = date('Y-m-d');
         $batch = Master_Batch::where('isactive',1)->whereRaw('? BETWEEN tglmulai and tglselesai',[$now])->first();
-        $pendaftaran = Pendaftaran::where('batch_daftar',$batch->id)->where('biodata_id',$bioId)->first();
+        // dd($batch);
+        $pendaftaran = null;
+        if($batch){
+            $pendaftaran = Pendaftaran::where('batch_daftar',$batch->id)->where('biodata_id',$bioId)->first();
+        }
 
         $data = array(
             'title' => 'Dashboard',
             'menu'  => 'Dashboard',
             'biodata' => $bio,
             'akun' => $akun,
+            'batch' => $batch,
             'daftar' => $pendaftaran
         );
         // dd($data);
