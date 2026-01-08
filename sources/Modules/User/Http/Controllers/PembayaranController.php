@@ -192,9 +192,12 @@ class PembayaranController extends Controller
 
     public function upload_bayar(Request $post)
     {
-        dd($post);
         $id = decrypt($post->idtransaksi);
         $transaksi = Transaksi::findOrFail($id);
+        $file = $post->file('bukti_daftar');
+        dd($file);
+        $alert = ['title' => 'Information', 'message' => 'Bukti Pembayaran Sudah diupload ! Silahkan Tunggu Konfirmasi Dari Admin PMB TSU.', 'status' => 'success'];
+        return redirect()->back()->with('alert',$alert);
 
     }
 

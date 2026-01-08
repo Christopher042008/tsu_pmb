@@ -294,6 +294,7 @@
                     $('#modal-pembayaran').modal('show')
                     let idtransaksi = $(this).data('id')
                     $('#idtransaksi').val(idtransaksi)
+
                     // let params = $(this).data('id')
                     // Swal.fire({
                     //     title: "Information",
