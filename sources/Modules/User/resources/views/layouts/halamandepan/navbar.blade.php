@@ -8,7 +8,7 @@
 
         <nav id="navmenu" class="navmenu">
             <ul>
-                <li><a href="#" class="active">Beranda</a></li>
+                <li><a href="{{ route('indexing') }}">Beranda</a></li>
                 <li><a href="#">Jalur Pendaftaran</a></li>
                 <li class="dropdown"><a href="#"><span>Informasi</span> <i
                             class="bi bi-chevron-down toggle-dropdown"></i></a>
@@ -19,9 +19,11 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="{{route('LoginPMB')}}" class="btn btn-outline-success px-2 text-white" style="display:inline-block;">Masuk | Daftar</a>
+                    {{-- <a href="{{route('LoginPMB')}}" class="btn btn-outline-success px-2 text-white" style="display:inline-block;">Masuk | Daftar</a> --}}
+                    <a href="{{route('LoginPMB')}}" class="active">Masuk | Daftar</a>
                 </li>
             </ul>
+            <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
 
     </div>
