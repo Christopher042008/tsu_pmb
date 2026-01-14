@@ -34,7 +34,7 @@
                             <h5 class="m-0">{{$menu}}</h5>
                         </div>
                         <div class="card-body">
-                            <div class="row">
+                            <div class="row" style="display: none;">
                                 <div class="col-lg-2">
                                     <select class="form-control select2" id="kategori" name="kategori" required>
                                         <option value="" selected disabled>-- Pilih Jenis Pembayaran --</option>
@@ -61,6 +61,8 @@
                                             <th>Jenis Pembayaran</th>
                                             <th>Nominal</th>
                                             <th>Status</th>
+                                            <th>Keterangan</th>
+                                            <th>Approval</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -185,6 +187,35 @@
         </div>
         <!-- /.modal-dialog -->
     </div>
+
+    <div class="modal fade" id="modal-approval">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="judul-modal">Revisi Bukti Pembayaran Pendaftaran</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <code>* Jika Masih Ada Bukti Pembayaran Silahkan Input Pada Keterangan.</code><br>
+                    <code>* Bukti Pembayaran yang Sudah Diverifikasi Tidak Dapat diubah lagi</code>
+                    <form id="form-approval" action="{{ route('admin.pembayaranpmb.revisi') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="iddaftar" id="iddaftar" value="">
+                        <label for="keterangan">Keterangan</label>
+                        <textarea name="keterangan" id="keterangan" class="form-control" rows="3" placeholder="Tambahkan Keterangan (Jika Ada Revisi)"></textarea>
+                    </form>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" id="btn-closemodalberkas" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="btn-saverevisi" class="btn btn-success">Simpan</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
 @endsection
 @section('script')
     <script>
@@ -200,7 +231,9 @@
 
             function loadEvent()
             {
-                ShowDataPembayaran()
+                tabelPembayaran()
+                closemodal()
+                submit_notapprove()
             }
 
             function ShowDataPembayaran()
@@ -231,7 +264,7 @@
                     responsive: true,
                     order: [],
                     ajax: {
-                        url: '{!! url('admin/PembayaranPMB/TabelPembayaranPMB') !!}'+'/'+params,
+                        url: '{!! url('admin/PembayaranPMB/TabelPembayaranPMB') !!}', //+'/'+params,
                         type: 'GET',
                     },
                     columns: [{
@@ -258,6 +291,12 @@
                             data: 'status'
                         },
                         {
+                            data: 'keterangan'
+                        },
+                        {
+                            data: 'approve'
+                        },
+                        {
                             data: 'action',
                             orderable: false,
                             searchable: false
@@ -268,6 +307,8 @@
                     },
                     drawCallback: function(settings) {
                         ShowDetail()
+                        approve()
+                        notApprove()
                     }
                 });
 
@@ -320,7 +361,7 @@
                                 for(i=0;i<statusdaftar.length;i++){
                                     if(statusdaftar[i].kategori=='pendaftaran'){
                                         nama1 = statusdaftar[i].status
-                                        if(statusdaftar[i].status=='pending'){
+                                        if(statusdaftar[i].status=='pending'||statusdaftar[i].status=='waiting'){
                                             warna1 = 'warning'
                                         }else if(statusdaftar[i].status=='paid'){
                                             warna1 = 'success'
@@ -329,7 +370,7 @@
                                         }
                                     }else{
                                         nama2 = statusdaftar[i].status
-                                        if(statusdaftar[i].status=='pending'){
+                                        if(statusdaftar[i].status=='pending'||statusdaftar[i].status=='waiting'){
                                             warna2 = 'warning'
                                         }else if(statusdaftar[i].status=='paid'){
                                             warna2 = 'success'
@@ -357,25 +398,25 @@
                                 let durasis1 = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.durasi_s1+' Semester'
                                 $('#o-durasis1').html(durasis1)
 
-                                let history = '<tr>'+
-                                        '<th colspan="4" class="text-center" style="background-color: rgb(0, 204, 255);">History Pembayaran</th>'+
-                                    '</tr>'
-                                    history += '<tr>'+
-                                        '<th>Kode Transaksi</th>'+
-                                        '<th>Jenis Pembayaran</th>'+
-                                        '<th>Status</th>'+
-                                        '<th>Keterangan</th>'+
-                                    '</tr>'
-                                for(i=0;i<data.daftar.bayar.length;i++){
-                                    for(a=0;a<data.daftar.bayar[i].history_transaksi.length;a++){
-                                        history += '<tr>'+
-                                            '<td>'+data.daftar.bayar[i].kode_transaksi+'</td>'+
-                                            '<td>'+data.daftar.bayar[i].kategori+'</td>'+
-                                            '<td>'+data.daftar.bayar[i].history_transaksi[a].status+'</td>'+
-                                            '<td>'+data.daftar.bayar[i].history_transaksi[a].keterangan+'</td>'+
-                                        '</tr>'
-                                    }
-                                }
+                                // let history = '<tr>'+
+                                //         '<th colspan="4" class="text-center" style="background-color: rgb(0, 204, 255);">History Pembayaran</th>'+
+                                //     '</tr>'
+                                //     history += '<tr>'+
+                                //         '<th>Kode Transaksi</th>'+
+                                //         '<th>Jenis Pembayaran</th>'+
+                                //         '<th>Status</th>'+
+                                //         '<th>Keterangan</th>'+
+                                //     '</tr>'
+                                // for(i=0;i<data.daftar.bayar.length;i++){
+                                //     for(a=0;a<data.daftar.bayar[i].history_transaksi.length;a++){
+                                //         history += '<tr>'+
+                                //             '<td>'+data.daftar.bayar[i].kode_transaksi+'</td>'+
+                                //             '<td>'+data.daftar.bayar[i].kategori+'</td>'+
+                                //             '<td>'+data.daftar.bayar[i].history_transaksi[a].status+'</td>'+
+                                //             '<td>'+data.daftar.bayar[i].history_transaksi[a].keterangan+'</td>'+
+                                //         '</tr>'
+                                //     }
+                                // }
                                 $('#detail-bayar').append(history);
                                 $('#modal-detail').modal('show')
                             }
@@ -396,6 +437,97 @@
                 });
             }
 
+            function approve()
+            {
+                $('.approve-bayar').click(function (e) {
+                    e.preventDefault();
+                    let params = $(this).data('id')
+                    Swal.fire({
+                        title: "Information",
+                        text: "Konfirmasi Bukti Pembayaran Pendaftaran ?",
+                        icon: "question",
+                        showConfirmButton: true,
+                        showCancelButton: true,
+                    }).then((result) => {
+                        if(result.value){
+                            $.ajax({
+                                type: "GET",
+                                url: '{!! url('admin/PembayaranPMB/Approve') !!}' + '/' + params,
+                                dataType: "JSON",
+                                beforeSend: function(response) {
+                                    $('#loading').show()
+                                },
+                                success: function(data) {
+                                    $('#loading').hide()
+                                    if(data.status==false){
+                                        notifalert('Information',data.message,'warning');
+                                    }else{
+                                        notifalert('Information',data.message,'success');
+                                    }
+                                    $('#example2').DataTable().ajax.reload();
+                                },
+                                error: function(xhr, status, error) {
+                                    $('#loading').hide()
+                                    Swal.fire({
+                                        title: 'Gagal',
+                                        text: 'Silahkan Hubungi Tim IT !',
+                                        icon: 'error'
+                                    }).then((result) => {
+                                        $('#example2').DataTable().ajax.reload();
+                                    });
+                                    return;
+                                }
+                            });
+                        }else{
+                            return false;
+                        }
+                    });
+                });
+            }
+
+            function notApprove()
+            {
+                $('.revisi-bayar').click(function (e) {
+                    e.preventDefault();
+                    $('#modal-approval').modal('show')
+                    let params = $(this).data('id')
+                    $('#iddaftar').val(params)
+                });
+            }
+
+            function submit_notapprove()
+            {
+                $('#btn-saverevisi').click(function (e) {
+                    e.preventDefault();
+                    let ket = $('#keterangan').val();
+                    let btn = $(this);
+                    if(ket){
+                        Swal.fire({
+                            title: "Information",
+                            text: "Apakah Keterangan Revisi Bukti Pembayaran Sudah Benar ?",
+                            icon: "question",
+                            showConfirmButton: true,
+                            showCancelButton: true,
+                        }).then((result) => {
+                            if(result.value){
+                                btn.prop('disabled',true)
+                                $('#form-approval').submit();
+                            }else{
+                                return false;
+                            }
+                        });
+                    }else{
+                        notifalert('Information','Keterangan Tidak Boleh Kosong','warning')
+                    }
+                });
+            }
+
+            function closemodal()
+            {
+                $('#modal-approval').on('hidden.bs.modal', function() {
+                    $('#form-approval')[0].reset();
+                });
+            }
 
 
         });

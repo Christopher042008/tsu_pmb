@@ -5,6 +5,7 @@ namespace Modules\User\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\MasterData\Master_JenisPendaftaran;
 use App\Models\MasterData\Master_TarifUKT;
+use App\Models\Parameter;
 use App\Models\Transaksi;
 use App\Models\TransaksiHistory;
 use App\Models\User\Biodata;
@@ -12,6 +13,7 @@ use App\Models\User\Maba;
 use App\Models\User\Pendaftaran;
 use Symfony\Component\HttpFoundation\Response;
 use Session, Crypt, DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -68,7 +70,7 @@ class PembayaranController extends Controller
         ->addColumn('status', function ($d) {
             $role = $d->status;
             $warna = 'warning';
-            if($role=='pending'){
+            if($role=='pending'||$role=='waiting'){
                 $warna = 'warning';
             }elseif($role=='paid'){
                 $warna = 'success';
@@ -78,69 +80,36 @@ class PembayaranController extends Controller
             $show = '<span class="badge bg-'.$warna.'">'.$role.'</span>';
             return $show;
         })
+        ->addColumn('keterangan', function ($d) {
+            $ket = '-';
+            if($d->keterangan){
+                $ket = $d->keterangan;
+            }
+            $show = $ket;
+            return $show;
+        })
         ->addColumn('action', function ($d) {
             $id = encrypt($d->id);
             $daftarId = encrypt($d->id_referensi);
 
-            $aktif = '';
+            $show = '';
             $detail = '';
-            $konfirm = '';
-            $edit = '';
+            $bayar = '';
+            $show = '';
             if($d->status!='paid'){
-                $edit = '<a href="#" data-id="'.$id.'" class="btn_bayar"><i title="Bayar Sekarang" class="fas fa-money-bill text-green"></i></a>';
+                $bayar = '<a href="#" data-id="'.$id.'" class="btn_bayar"><i title="Bayar Sekarang" class="fas fa-money-bill text-green"></i></a>';
             }
             $detail = '<a href="#" data-id="'.$id.'" data-daftarid="'.$daftarId.'" class="btn_detail"><i title="Detail" class="fa fa-info-circle"></i></a>';
+            if($d->bukti_pembayaran){
+                $params1 = Parameter::where('id',1)->first();
+                $linkkhusus = asset('sources/storage/app/'.$params1->bukti_bayar_pendaftaran.'/'.$d->bukti_pembayaran);
+                $show = '<a href="'.$linkkhusus.'" target="_blank"><i title="Lihat Bukti Pendaftaran" class="fa fa-eye"></i></a>';
+            }
 
-            return $detail.' '.$edit.' '.$aktif.' '.$konfirm;
+            return $detail.' '.$bayar.' '.$show;
         })
         ->rawColumns(['action','status'])
         ->make(true);
-    }
-
-    public function PaymentPMB($params)
-    {
-        $id = decrypt($params);
-        $transaksi = Transaksi::findOrFail($id);
-        $orderID = generateOrderId($transaksi->id);
-
-        if ($transaksi->status == 'paid') {
-            $data['status'] = false;
-            $data['message'] = 'Sudah dibayar';
-        }else{
-
-            $transaksi->status = 'paid';
-            $transaksi->metode_bayar = 'bank_transfer';
-            $transaksi->midtrans_order_id = $orderID;
-            $transaksi->midtrans_snap_token = uniqid();
-            $transaksi->expired_at = date('Y-m-d H:i:s',strtotime('+1 days'));
-            $transaksi->save();
-
-            TransaksiHistory::insert([
-                'transaksi_id' => $transaksi->id,
-                'status' => 'paid',
-                'keterangan' => 'Pembayaran Lunas',
-                'created_at' => date('Y-m-d H:i:s')
-            ]);
-
-            $cek = Pendaftaran::where('KodePendaftaran',$transaksi->id_referensi)->where('biodata_id',$transaksi->user_id)->select('current_step','jalur_daftar')->first();
-
-            $jalur = Master_JenisPendaftaran::where('id',$cek->jalur_daftar)->first();
-
-            $step = $jalur->berkas_khusus==null ? $cek->current_step+3 : $cek->current_step+1;
-
-
-            Pendaftaran::where('KodePendaftaran',$transaksi->id_referensi)->where('biodata_id',$transaksi->user_id)->update([
-                'current_step' => $step,
-                'bayar_pendaftaran' => '1',
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
-
-            $data['status'] = true;
-            $data['message'] = 'Pembayaran Berhasil';
-        }
-
-        return response()->json($data, Response::HTTP_OK);
-
     }
 
     public function showPayment($params)
@@ -194,10 +163,91 @@ class PembayaranController extends Controller
     {
         $id = decrypt($post->idtransaksi);
         $transaksi = Transaksi::findOrFail($id);
+        // dd($transaksi);
         $file = $post->file('bukti_daftar');
-        dd($file);
+        $ext = $file->getClientOriginalExtension();
+        $filename = 'BUKTI_DAFTAR_'.$transaksi->id_referensi.'_'.date('YmdHis').'.'.$ext;
+
+        $parameter = Parameter::where('id',1)->first();
+
+        $cek = Pendaftaran::where('KodePendaftaran',$transaksi->id_referensi)->where('biodata_id',$transaksi->user_id)->select('current_step','jalur_daftar')->first();
+        $jalur = Master_JenisPendaftaran::where('id',$cek->jalur_daftar)->first();
+
+        if($transaksi->bukti_pembayaran==null){
+            $transaksi->bukti_pembayaran = $filename;
+            $transaksi->status = 'waiting';
+            $transaksi->save();
+
+            $step = $jalur->berkas_khusus==null ? $cek->current_step+3 : $cek->current_step+1;
+            $file->storeAs($parameter->bukti_bayar_pendaftaran, $filename);
+        }else{
+            // if($transaksi->bukti_pembayaran!=null){
+            $path = $parameter->bukti_bayar_pendaftaran.'/'.$transaksi->bukti_pembayaran;
+            if (Storage::exists($path)) {
+                Storage::delete($path);
+            }
+            // }
+            $transaksi->bukti_pembayaran = $filename;
+            $transaksi->save();
+
+            $step = $cek->current_step;
+            $file->storeAs($parameter->bukti_bayar_pendaftaran, $filename);
+        }
+
+        Pendaftaran::where('KodePendaftaran',$transaksi->id_referensi)->where('biodata_id',$transaksi->user_id)->update([
+            'current_step' => $step,
+            // 'bayar_pendaftaran' => '1',
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        // dd($file);
         $alert = ['title' => 'Information', 'message' => 'Bukti Pembayaran Sudah diupload ! Silahkan Tunggu Konfirmasi Dari Admin PMB TSU.', 'status' => 'success'];
         return redirect()->back()->with('alert',$alert);
+
+    }
+
+    //tdk dipake
+    public function PaymentPMB($params)
+    {
+        $id = decrypt($params);
+        $transaksi = Transaksi::findOrFail($id);
+        $orderID = generateOrderId($transaksi->id);
+
+        if ($transaksi->status == 'paid') {
+            $data['status'] = false;
+            $data['message'] = 'Sudah dibayar';
+        }else{
+
+            $transaksi->status = 'paid';
+            $transaksi->metode_bayar = 'bank_transfer';
+            $transaksi->midtrans_order_id = $orderID;
+            $transaksi->midtrans_snap_token = uniqid();
+            $transaksi->expired_at = date('Y-m-d H:i:s',strtotime('+1 days'));
+            $transaksi->save();
+
+            TransaksiHistory::insert([
+                'transaksi_id' => $transaksi->id,
+                'status' => 'paid',
+                'keterangan' => 'Pembayaran Lunas',
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $cek = Pendaftaran::where('KodePendaftaran',$transaksi->id_referensi)->where('biodata_id',$transaksi->user_id)->select('current_step','jalur_daftar')->first();
+            $jalur = Master_JenisPendaftaran::where('id',$cek->jalur_daftar)->first();
+            $step = $jalur->berkas_khusus==null ? $cek->current_step+3 : $cek->current_step+1;
+
+
+            Pendaftaran::where('KodePendaftaran',$transaksi->id_referensi)->where('biodata_id',$transaksi->user_id)->update([
+                'current_step' => $step,
+                'bayar_pendaftaran' => '1',
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $data['status'] = true;
+            $data['message'] = 'Pembayaran Berhasil';
+        }
+
+        return response()->json($data, Response::HTTP_OK);
 
     }
 

@@ -39,7 +39,8 @@
                     $dtbeasiswa = checkmenu('Data Pendaftaran', 'Data Beasiswa');
                     $dtnonbeasiswa = checkmenu('Data Pendaftaran', 'Data Non Beasiswa');
                     $dtberkasbeasiswa = checkmenu('Berkas Beasiswa', 'Data Berkas Beasiswa');
-                    $dtpembayaran = checkmenu('Pembayaran', 'Pembayaran PMB');
+                    $pendaftaran = checkmenu('Pembayaran', 'Pembayaran Pendaftaran');
+                    $ukt = checkmenu('Pembayaran', 'Pembayaran UKT');
                     $dttest = checkmenu('Test Online', 'Data Test Online');
                     $dtfinal = checkmenu('Final PMB', 'Data Final PMB');
                 @endphp
@@ -79,12 +80,32 @@
                     </a>
                 </li>
                 @endif
-                @if ($dtpembayaran>0)
-                <li class="nav-item">
-                    <a href="{{route('admin.pembayaranpmb.show')}}" class="nav-link">
+                @if ($pendaftaran+$ukt>0)
+                <li class="nav-item"> {{-- menu-open --}}
+                    <a href="#" class="nav-link"> {{-- active --}}
                         <i class="nav-icon fas fa-money-check"></i>
-                        <p>Data Pembayaran PMB</p>
+                        <p>Data Pembayaran PMB
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        @if ($pendaftaran>0)
+                        <li class="nav-item">
+                            <a href="{{route('admin.pembayaranpmb.show')}}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                Pendaftaran
+                            </a>
+                        </li>
+                        @endif
+                        @if ($ukt>0)
+                        <li class="nav-item">
+                            <a href="{{ route('admin.pembayaranukt.show') }}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                UKT
+                            </a>
+                        </li>
+                        @endif
+                    </ul>
                 </li>
                 @endif
                 @if ($dttest>0)

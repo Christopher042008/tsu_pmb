@@ -75,18 +75,19 @@ Route::prefix('')->group(function() {
             Route::prefix('Pembayaran')->group(function(){
                 Route::get('/', [PembayaranController::class, 'index'])->name('pembayaran');
                 Route::get('/TabelPembayaran', [PembayaranController::class, 'tabelPembayaran'])->name('Pembayaran.TabelBayar');
-                Route::get('/PaymentPMB/{params}', [PembayaranController::class, 'PaymentPMB']);
                 Route::get('/ShowPayment/{params}', [PembayaranController::class, 'ShowPayment']);
                 Route::post('/uploadbayar', [PembayaranController::class, 'upload_bayar'])->name('Pembayaran.uploadbayar');
-                Route::post('/payment', [PembayaranController::class, 'test_bayar'])->name('payment.create');
+                Route::get('/PaymentPMB/{params}', [PembayaranController::class, 'PaymentPMB']); //tdk dipake
+                Route::post('/payment', [PembayaranController::class, 'test_bayar'])->name('payment.create'); //tdk dipake
             });
 
             Route::prefix('PembayaranUKT')->group(function(){
                 Route::get('/', [PembayaranUKTController::class, 'index'])->name('pembayaranUKT');
                 Route::get('/TabelPembayaranUKT', [PembayaranUKTController::class, 'tabelPembayaran'])->name('PembayaranUKT.TabelBayar');
-                Route::get('/PaymentUKT/{params}', [PembayaranUKTController::class, 'PaymentUKT']);
                 Route::get('/ShowPaymentUKT/{params}', [PembayaranUKTController::class, 'ShowPayment']);
-                Route::post('/paymentUKT', [PembayaranUKTController::class, 'test_bayar'])->name('paymentUKT.create');
+                Route::post('/uploadbayar', [PembayaranUKTController::class, 'upload_bayar'])->name('PembayaranUKT.uploadbayar');
+                Route::get('/PaymentUKT/{params}', [PembayaranUKTController::class, 'PaymentUKT']); //tdk dipake
+                Route::post('/paymentUKT', [PembayaranUKTController::class, 'test_bayar'])->name('paymentUKT.create'); //tdk dipake
             });
 
             Route::prefix('Biodata')->group(function(){

@@ -195,7 +195,7 @@ class PendaftaranController extends Controller
         // }else{
         //     $cek1 = Master_JurusanKuliah::selectRaw('id,KodeJurusan,idfakultas,idjenjang,idjurusansekolah,jurusan')->whereNotIn('idjurusansekolah',[1])->with('jenjang')->where('isactive',1)->get();
         // }
-	$cek1 = Master_JurusanKuliah::selectRaw('id,KodeJurusan,idfakultas,idjenjang,idjurusansekolah,jurusan')->with('jenjang')->where('isactive',1)->get();
+	    $cek1 = Master_JurusanKuliah::selectRaw('id,KodeJurusan,idfakultas,idjenjang,idjurusansekolah,jurusan')->with('jenjang')->where('isactive',1)->get();
 
         $prodi = [];
         foreach($cek1 as $q){
@@ -387,8 +387,6 @@ class PendaftaranController extends Controller
 
         DB::beginTransaction();
 
-
-
         $cek1 = Pendaftaran::where('KodePendaftaran',$kode)->where('isactive',1)->first();
         $jalur = Master_JenisPendaftaran::where('id',$cek1->jalur_daftar)->where('isactive',1)->first();
         $biaya = $jalur->jml_biaya_pendaftaran;
@@ -396,7 +394,7 @@ class PendaftaranController extends Controller
         $updt = Pendaftaran::where('KodePendaftaran',$kode)->where('isactive',1)->update([
             'konfirm_pendaftaran'=>'1',
             'tgl_konfirm' => date('Y-m-d H:i:s'),
-            'current_step' => $biaya == 0 ? $cek1->current_step+2 : $cek1->current_step+1,
+            'current_step' => $biaya == 0 ? $cek1->current_step+3 : $cek1->current_step+1,
             'updated_at' => date('Y-m-d H:i:s')
         ]);
 
@@ -415,16 +413,16 @@ class PendaftaranController extends Controller
             'created_at' => date('Y-m-d H:i:s')
         ]);
 
-        $cek2 = Transaksi::orderby('id','desc')->latest()->first();
+        // $cek2 = Transaksi::orderby('id','desc')->latest()->first();
         // Simpan history
-        $historyTransaksi = TransaksiHistory::insert([
-            'transaksi_id' => $cek2->id,
-            'status' => $cek2->status,
-            'keterangan' => $biaya == 0 ? 'Gratis / Beasiswa' : 'Menunggu pembayaran',
-            'created_at' => date('Y-m-d H:i:s')
-        ]);
+        // $historyTransaksi = TransaksiHistory::insert([
+            // 'transaksi_id' => $cek2->id,
+            // 'status' => $cek2->status,
+            // 'keterangan' => $biaya == 0 ? 'Gratis / Beasiswa' : 'Menunggu pembayaran',
+            // 'created_at' => date('Y-m-d H:i:s')
+        // ]);
 
-        if($updt&&$transaksi&&$historyTransaksi){
+        if($updt&&$transaksi){ //&&$historyTransaksi
            DB::commit();
             $data['title'] = 'Berhasil';
             $data['message'] = 'Konfirmasi Pendaftaran Berhasil';
