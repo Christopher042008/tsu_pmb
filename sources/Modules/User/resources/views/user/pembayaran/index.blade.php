@@ -34,7 +34,7 @@
                         <div class="card-header">
                             <h5 class="m-0">
                                 {{$menu}}
-                                <button type="button" id="pay-button" class="btn btn-success btn-sm float-right">Test Bayar</button>
+                                <button type="button" id="pay-button" class="btn btn-success btn-sm float-right" style="display: none;">Test Bayar</button>
                             </h5>
                         </div>
                         <div class="card-body">
@@ -50,6 +50,7 @@
                                         <th>Jenis Pembayaran</th>
                                         <th>Nominal</th>
                                         <th>Status</th>
+                                        <th>Keterangan (Admin)</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -264,6 +265,9 @@
                         },
                         {
                             data: 'status'
+                        },
+                        {
+                            data: 'keterangan'
                         },
                         {
                             data: 'action',

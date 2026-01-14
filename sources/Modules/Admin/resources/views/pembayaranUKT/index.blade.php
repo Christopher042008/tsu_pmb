@@ -1,4 +1,4 @@
-@extends('user::layouts/halamanbelakang/header')
+@extends('admin::template/admin/header')
 @section('title', $title)
 @section('link_href')
 
@@ -10,11 +10,11 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Selamat Datang di PMB Universitas Tiga Serangkai</h1>
+                    <h1>{{$menu}}</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item active"><a href="{{ route('Dashboard') }}">Dashboard</a></li>
+                        <li class="breadcrumb-item active"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active">{{$menu}}</li>
                     </ol>
                 </div><!-- /.col -->
@@ -29,38 +29,47 @@
             <div class="row">
                 <!-- /.col-md-6 -->
                 <div class="col-md-12">
-                    {{-- @for ($i = 0; $i < 10; $i++) --}}
                     <div class="card card-primary card-outline">
                         <div class="card-header">
-                            <h5 class="m-0">
-                                {{$menu}}
-                                <button type="button" id="pay-button" class="btn btn-success btn-sm float-right" style="display: none;">Test Bayar</button>
-                            </h5>
+                            <h5 class="m-0">{{$menu}}</h5>
                         </div>
                         <div class="card-body">
-                            <code>* Tekan </code> <i title="Bayar Sekarang" class="fas fa-money-bill text-green"></i> <code>  Untuk Pembayaran</code> <br>
-                            <code>* Tekan </code> <i title="Detail Pendaftaran" class="fa fa-info-circle text-blue"></i> <code>  Untuk Melihat Detail Pendaftaran dan dan Pembayaran</code><br>
-                            <code>* Jika Status sudah </code> <span class="badge bg-success">paid</span> <code> Maka Pembayaran Sudah Lunas</code><br>
-                            <code>* Pembayaran UKT Sudah Termasuk Jas Almamater</code><br>
-
-                            <table id="example2" class="table table-bordered table-hover" style="width: 100%;">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Nama</th>
-                                        <th>Nomer Registrasi</th>
-                                        <th>Jenis Pembayaran</th>
-                                        <th>Jurusan Diterima</th>
-                                        <th>Nominal</th>
-                                        <th>Status</th>
-                                        <th>keterangan (Admin)</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                            </table>
+                            <div class="row" style="display: none;">
+                                <div class="col-lg-2">
+                                    <select class="form-control select2" id="kategori" name="kategori" required>
+                                        <option value="" selected disabled>-- Pilih Jenis Pembayaran --</option>
+                                        <option value="{{encrypt('pendaftaran')}}">Pendaftaran</option>
+                                        <option value="{{encrypt('ukt')}}">UKT</option>
+                                    </select>
+                                </div>
+                                <!-- /.col-lg-6 -->
+                                <div class="btn-group">
+                                    <button type="button" id="btn-showpembayaran" class="btn btn-primary btn-sm" style="margin-top: 6px;margin-right: 10px;">Show Data</button>
+                                    <button type="button" class="btn btn-success btn-sm" style="margin-top: 6px;display:none;">Export Excel</button>
+                                    <!-- /input-group -->
+                                </div>
+                                <!-- /.col-lg-6 -->
+                            </div>
+                            <div class="table-responsive" style="margin-top: 10px;">
+                                <table id="example2" class="table table-bordered table-hover" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama</th>
+                                            <th>No Registrasi</th>
+                                            <th>Kode Transaksi</th>
+                                            <th>Jenis Pembayaran</th>
+                                            <th>Nominal</th>
+                                            <th>Status</th>
+                                            <th>Keterangan</th>
+                                            <th>Approval</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                    {{-- @endfor --}}
                 </div>
                 <!-- /.col-md-6 -->
             </div>
@@ -68,6 +77,7 @@
         </div><!-- /.container-fluid -->
     </div>
     <!-- /.content -->
+
     <div class="modal fade" id="modal-detail">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
@@ -164,7 +174,7 @@
                                 <th id="o-durasis1" class="o-detaildaftar"></th>
                             </tr>
                         </thead>
-                        <tbody id="detail-berkas" class="o-detaildaftar">
+                        <tbody id="detail-bayar" class="o-detaildaftar">
 
                         </tbody>
                     </table>
@@ -177,35 +187,29 @@
         </div>
         <!-- /.modal-dialog -->
     </div>
-    <div class="modal fade" id="modal-pembayaran">
-        <div class="modal-dialog modal-dialog-scrollable">
+
+    <div class="modal fade" id="modal-approval">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="judul-modal">Upload Bukti Pembayaran</h4>
+                    <h4 class="modal-title" id="judul-modal">Revisi Bukti Pembayaran UKT</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{route('PembayaranUKT.uploadbayar')}}" id="form-upload-bayar" method="POST" enctype="multipart/form-data">
+                    <code>* Jika Masih Ada Bukti Pembayaran yang tidak sah Silahkan Input Pada Keterangan.</code><br>
+                    <code>* Bukti Pembayaran yang Sudah Diverifikasi Tidak Dapat diubah lagi</code>
+                    <form id="form-approval" action="{{ route('admin.pembayaranukt.revisi') }}" method="POST">
                         @csrf
-                        <input type="hidden" name="idtransaksi" id="idtransaksi" value="">
-                        <div class="col-md-12">
-                            <label><code>*</code> Format File <br> <code>.png</code> <br> <code>.jpg</code> <br> <code>.jpeg</code></label>
-                            <br>
-                            <label><code>*</code> Ukuran File Maksimal 1MB</code></label>
-                            <div class="input-group">
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="bukti_ukt" name="bukti_ukt" accept="image/png, image/jpeg, image/jpg">
-                                    <label class="custom-file-label" for="bukti_daftar">Choose file</label>
-                                </div>
-                            </div>
-                        </div>
+                        <input type="hidden" name="iddaftar" id="iddaftar" value="">
+                        <label for="keterangan">Keterangan</label>
+                        <textarea name="keterangan" id="keterangan" class="form-control" rows="3" placeholder="Tambahkan Keterangan (Jika Ada Revisi)"></textarea>
                     </form>
                 </div>
                 <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button id="btn-uploadbayar" class="btn btn-success float-right">Upload</button>
+                    <button type="button" id="btn-closemodalberkas" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="btn-saverevisi" class="btn btn-success">Simpan</button>
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -214,7 +218,6 @@
     </div>
 @endsection
 @section('script')
-
     <script>
         $(function() {
             $.ajaxSetup({
@@ -222,18 +225,33 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+            $('.select2').select2()
 
             loadEvent()
 
             function loadEvent()
             {
-                tabelPayment()
+                tabelPembayaran()
                 closemodal()
-                submit_upload()
+                submit_notapprove()
             }
 
-            function tabelPayment()
+            function ShowDataPembayaran()
             {
+                $('#btn-showpembayaran').click(function (e) {
+                    e.preventDefault();
+                    let params = $('#kategori').val()
+                    if(params==null||params==''){
+                        notifalert('Information','Jenis Pembayaran Harus Diisi','warning')
+                    }else{
+                        tabelPembayaran()
+                    }
+                });
+            }
+
+            function tabelPembayaran()
+            {
+                let params = $('#kategori').val()
                 let otable = $('#example2').DataTable({
                     destroy: true,
                     processing: true,
@@ -246,7 +264,7 @@
                     responsive: true,
                     order: [],
                     ajax: {
-                        url: '{!! route('PembayaranUKT.TabelBayar') !!}',
+                        url: '{!! url('admin/PembayaranUKT/tabelPembayaranUKT') !!}', //+'/'+params,
                         type: 'GET',
                     },
                     columns: [{
@@ -261,10 +279,10 @@
                             data: 'noreg'
                         },
                         {
-                            data: 'jenis'
+                            data: 'kodetx'
                         },
                         {
-                            data: 'jurusanditerima'
+                            data: 'jenis'
                         },
                         {
                             data: 'nominal'
@@ -276,6 +294,9 @@
                             data: 'keterangan'
                         },
                         {
+                            data: 'approve'
+                        },
+                        {
                             data: 'action',
                             orderable: false,
                             searchable: false
@@ -285,8 +306,9 @@
                         processing: '<i class="fa fa-spinner fa-lg fa-spin"></i>'
                     },
                     drawCallback: function(settings) {
-                        payment()
                         ShowDetail()
+                        approve()
+                        notApprove()
                     }
                 });
 
@@ -297,122 +319,14 @@
                 });
             }
 
-            function payment()
-            {
-                $('.btn_bayar').click(function (e) {
-                    e.preventDefault();
-                    $('#modal-pembayaran').modal('show')
-                    let idtransaksi = $(this).data('id')
-                    $('#idtransaksi').val(idtransaksi)
-
-                    // let params = $(this).data('id')
-                    // Swal.fire({
-                    //     title: "Information",
-                    //     text: "Bayar Biaya Pendaftaran ??",
-                    //     icon: "question",
-                    //     showConfirmButton: true,
-                    //     showCancelButton: true,
-                    // }).then((result) => {
-                    //     if(result.value){
-                    //         $.ajax({
-                    //             type: "GET",
-                    //             url: '{!! url('PembayaranUKT/PaymentUKT') !!}' + '/' + params,
-                    //             dataType: "JSON",
-                    //             beforeSend: function(response) {
-                    //                 $('#loading').show()
-                    //             },
-                    //             success: function(data) {
-                    //                 $('#loading').hide()
-                    //                 if(data.status==false){
-                    //                     notifalert('Information',data.message,'warning');
-                    //                 }else{
-                    //                     notifalert('Information',data.message,'success');
-                    //                     $('#example2').DataTable().ajax.reload();
-                    //                     // snap.pay(data.snap_token, {
-                    //                     //     onSuccess: function(result) {
-                    //                     //         notifalert('Information','Pembayaran sukses!','success');
-                    //                     //         console.log(result);
-                    //                     //     },
-                    //                     //     onPending: function(result) {
-                    //                     //         notifalert('Information','Menunggu pembayaran...','warning');
-                    //                     //         console.log(result);
-                    //                     //     },
-                    //                     //     onError: function(result) {
-                    //                     //         notifalert('Information','Pembayaran gagal!','error');
-                    //                     //         console.log(result);
-                    //                     //     },
-                    //                     //     onClose: function() {
-                    //                     //         notifalert('Information','Popup ditutup tanpa membayar','warning');
-                    //                     //     }
-                    //                     // });
-                    //                 }
-                    //             },
-                    //             error: function(xhr, status, error) {
-                    //                 $('#loading').hide()
-                    //                 Swal.fire({
-                    //                     title: 'Gagal Bayar Pendaftaran',
-                    //                     text: 'Periksa Data Anda !',
-                    //                     icon: 'error'
-                    //                 }).then((result) => {
-                    //                     $('#example2').DataTable().ajax.reload();
-                    //                 });
-                    //                 return;
-                    //             }
-                    //         });
-                    //     }else{
-                    //         return false;
-                    //     }
-                    // });
-
-                });
-            }
-
-            function closemodal()
-            {
-                $('#modal-pembayaran').on('hidden.bs.modal', function() {
-                    $('#form-upload-bayar')[0].reset();
-                });
-            }
-
-            function submit_upload()
-            {
-                $('#btn-uploadbayar').click(function (e) {
-                    let fileupload = $('#bukti_ukt').prop('files')[0];
-                    let btn = $(this);
-                    if(fileupload){
-                        let fileSize = fileupload.size;
-                        if(fileSize > 1 * 1024 * 1024){
-                            notifalert('Information','Ukuran File Tidak Boleh Lebih dari 1MB','warning')
-                        }else{
-                            Swal.fire({
-                                title: "Information",
-                                text: "Apakah Bukti Pembayaran Anda Sudah Yakin Benar ?",
-                                icon: "question",
-                                showConfirmButton: true,
-                                showCancelButton: true,
-                            }).then((result) => {
-                                if(result.value){
-                                    btn.prop('disabled',true)
-                                    $('#form-upload-bayar').submit();
-                                }else{
-                                    return false;
-                                }
-                            });
-                        }
-                    }else{
-                        notifalert('Information','Bukti Pembayaran Pendaftaran Tidak Boleh Kosong','warning')
-                    }
-                });
-            }
-
             function ShowDetail()
             {
                 $('.btn_detail').click(function (e) {
                     e.preventDefault();
-                    let param = $(this).data('daftarid')
+                    let param = $(this).data('id')
                     $.ajax({
                         type: "GET",
-                        url: '{!! url('PembayaranUKT/ShowPaymentUKT') !!}'+'/'+param,
+                        url: '{!! url('admin/PembayaranUKT/ShowPembayaranUKT') !!}'+'/'+param,
                         dataType: "JSON",
                         beforeSend: function(response) {
                             $('#loading').show()
@@ -447,7 +361,7 @@
                                 for(i=0;i<statusdaftar.length;i++){
                                     if(statusdaftar[i].kategori=='pendaftaran'){
                                         nama1 = statusdaftar[i].status
-                                        if(statusdaftar[i].status=='pending'){
+                                        if(statusdaftar[i].status=='pending'||statusdaftar[i].status=='waiting'){
                                             warna1 = 'warning'
                                         }else if(statusdaftar[i].status=='paid'){
                                             warna1 = 'success'
@@ -456,7 +370,7 @@
                                         }
                                     }else{
                                         nama2 = statusdaftar[i].status
-                                        if(statusdaftar[i].status=='pending'){
+                                        if(statusdaftar[i].status=='pending'||statusdaftar[i].status=='waiting'){
                                             warna2 = 'warning'
                                         }else if(statusdaftar[i].status=='paid'){
                                             warna2 = 'success'
@@ -484,7 +398,26 @@
                                 let durasis1 = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.durasi_s1+' Semester'
                                 $('#o-durasis1').html(durasis1)
 
-
+                                // let history = '<tr>'+
+                                //         '<th colspan="4" class="text-center" style="background-color: rgb(0, 204, 255);">History Pembayaran</th>'+
+                                //     '</tr>'
+                                //     history += '<tr>'+
+                                //         '<th>Kode Transaksi</th>'+
+                                //         '<th>Jenis Pembayaran</th>'+
+                                //         '<th>Status</th>'+
+                                //         '<th>Keterangan</th>'+
+                                //     '</tr>'
+                                // for(i=0;i<data.daftar.bayar.length;i++){
+                                //     for(a=0;a<data.daftar.bayar[i].history_transaksi.length;a++){
+                                //         history += '<tr>'+
+                                //             '<td>'+data.daftar.bayar[i].kode_transaksi+'</td>'+
+                                //             '<td>'+data.daftar.bayar[i].kategori+'</td>'+
+                                //             '<td>'+data.daftar.bayar[i].history_transaksi[a].status+'</td>'+
+                                //             '<td>'+data.daftar.bayar[i].history_transaksi[a].keterangan+'</td>'+
+                                //         '</tr>'
+                                //     }
+                                // }
+                                $('#detail-bayar').append(history);
                                 $('#modal-detail').modal('show')
                             }
                         },
@@ -492,10 +425,10 @@
                             $('#loading').hide()
                             Swal.fire({
                                 title: 'Gagal Show Data Pembayaran !',
-                                text: 'Silahkan Hubungi Admin PMB TSU',
+                                text: 'Hubungi Tim IT',
                                 icon: 'error'
                             }).then((result) => {
-                                window.isEditing = false;
+                                // window.isEditing = false;
                             });
                             return;
                         }
@@ -504,60 +437,99 @@
                 });
             }
 
-            // let testingku = 0;
-            // let intervalId = setInterval(function() {
-            //     console.log(testingku++)
+            function approve()
+            {
+                $('.approve-bayar').click(function (e) {
+                    e.preventDefault();
+                    let params = $(this).data('id')
+                    Swal.fire({
+                        title: "Information",
+                        text: "Konfirmasi Bukti Pembayaran Pendaftaran ?",
+                        icon: "question",
+                        showConfirmButton: true,
+                        showCancelButton: true,
+                    }).then((result) => {
+                        if(result.value){
+                            $.ajax({
+                                type: "GET",
+                                url: '{!! url('admin/PembayaranUKT/Approve') !!}' + '/' + params,
+                                dataType: "JSON",
+                                beforeSend: function(response) {
+                                    $('#loading').show()
+                                },
+                                success: function(data) {
+                                    $('#loading').hide()
+                                    if(data.status==false){
+                                        notifalert('Information',data.message,'warning');
+                                    }else{
+                                        notifalert('Information',data.message,'success');
+                                    }
+                                    $('#example2').DataTable().ajax.reload();
+                                },
+                                error: function(xhr, status, error) {
+                                    $('#loading').hide()
+                                    Swal.fire({
+                                        title: 'Gagal',
+                                        text: 'Silahkan Hubungi Tim IT !',
+                                        icon: 'error'
+                                    }).then((result) => {
+                                        $('#example2').DataTable().ajax.reload();
+                                    });
+                                    return;
+                                }
+                            });
+                        }else{
+                            return false;
+                        }
+                    });
+                });
+            }
 
-            //     if(testingku==5){
-            //         clearInterval(intervalId); // Stop reload
-            //         console.log("Interval dihentikan");
-            //     }
-            // }, 5000); // 5000 ms = 5 detik
+            function notApprove()
+            {
+                $('.revisi-bayar').click(function (e) {
+                    e.preventDefault();
+                    $('#modal-approval').modal('show')
+                    let params = $(this).data('id')
+                    $('#iddaftar').val(params)
+                });
+            }
 
-            // $('#loading').show()
-            $('#pay-button').click(function(){
-                $.ajax({
-                    url: "{{ route('paymentUKT.create') }}",
-                    type: "POST",
-                    data: {_token: "{{ csrf_token() }}"},
-                    beforeSend: function(response) {
-                        $('#loading').show()
-                    },
-                    success: function(data){
-                        $('#loading').hide()
-                        snap.pay(data.snap_token, {
-                            onSuccess: function(result) {
-                                notifalert('Information','Pembayaran sukses!','success');
-                                console.log(result);
-                            },
-                            onPending: function(result) {
-                                notifalert('Information','Menunggu pembayaran...','warning');
-                                console.log(result);
-                            },
-                            onError: function(result) {
-                                notifalert('Information','Pembayaran gagal!','error');
-                                console.log(result);
-                            },
-                            onClose: function() {
-                                notifalert('Information','Popup ditutup tanpa membayar','warning');
+            function submit_notapprove()
+            {
+                $('#btn-saverevisi').click(function (e) {
+                    e.preventDefault();
+                    let ket = $('#keterangan').val();
+                    let btn = $(this);
+                    if(ket){
+                        Swal.fire({
+                            title: "Information",
+                            text: "Apakah Keterangan Revisi Bukti Pembayaran Sudah Benar ?",
+                            icon: "question",
+                            showConfirmButton: true,
+                            showCancelButton: true,
+                        }).then((result) => {
+                            if(result.value){
+                                btn.prop('disabled',true)
+                                $('#form-approval').submit();
+                            }else{
+                                return false;
                             }
                         });
-                    },
-                    error: function(data) {
-                        $('#loading').hide()
-                        Swal.fire({
-                            title: 'Gagal',
-                            text: 'Silahkan Hubungi Admin PMB TSU',
-                            icon: 'error'
-                        }).then((result) => {
-                            // window.isEditing = false;
-                        });
-                        return;
+                    }else{
+                        notifalert('Information','Keterangan Tidak Boleh Kosong','warning')
                     }
                 });
-            });
+            }
+
+            function closemodal()
+            {
+                $('#modal-approval').on('hidden.bs.modal', function() {
+                    $('#form-approval')[0].reset();
+                });
+            }
+
 
         });
-
     </script>
 @endsection

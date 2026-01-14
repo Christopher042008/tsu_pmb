@@ -149,7 +149,7 @@ class BerkasPMBController extends Controller
     {
         // dd($post);
         $id = decrypt($post->kodedaftar);
-        $cek = Pendaftaran::where('KodePendaftaran',$id)->where('current_step',4)->first(); //->where('validasi_berkas_khusus','0')
+        $cek = Pendaftaran::where('KodePendaftaran',$id)->where('current_step',5)->first(); //->where('validasi_berkas_khusus','0')
         $status = $post->status=='null' ? '0' : $post->status;
         $stepku = $cek->current_step;
         $keterangan = $post->keterangan;

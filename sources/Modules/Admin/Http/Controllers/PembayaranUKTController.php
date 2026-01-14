@@ -17,21 +17,20 @@ use Yajra\DataTables\DataTables;
 use Session, Crypt, DB;
 use Symfony\Component\HttpFoundation\Response;
 
-class PembayaranPMBController extends Controller
+class PembayaranUKTController extends Controller
 {
     public function index()
     {
-
         $data = array(
-            'title' => 'Pembayaran PMB',
-            'menu'  => 'Data Pembayaran PMB',
+            'title' => 'Pembayaran UKT',
+            'menu'  => 'Data Pembayaran UKT',
         );
-        return view('admin::pembayaranPMB.index', $data);
+        return view('admin::pembayaranUKT.index', $data);
     }
 
-    public function tabelPembayaranPMB()
+    public function tabelPembayaranUKT()
     {
-        $data = Transaksi::with('biodata','pendaftaran')->where('kategori','pendaftaran')->get();
+        $data = Transaksi::with('biodata','pendaftaran')->where('kategori','ukt')->get();
         return DataTables::of($data)
         ->addIndexColumn()
         ->addColumn('nama', function ($d) {
@@ -74,7 +73,7 @@ class PembayaranPMBController extends Controller
         ->addColumn('approve', function ($d) {
             $id = encrypt($d->id_referensi);
             $approval = '';
-            if($d->pendaftaran->bayar_pendaftaran==0){
+            if($d->pendaftaran->bayar_ukt==0){
                 $approval = '<a href="#" class="revisi-bayar" data-id="'.$id.'"><i title="Revisi Bukti Pembayaran" class="fa fa-window-close fa-lg text-red"></i></a>
                                     <a href="#" class="approve-bayar" data-id="'.$id.'"><i title="Approve" class="fa fa-check-square fa-lg text-green"></i></a>';
             }else{
@@ -89,7 +88,7 @@ class PembayaranPMBController extends Controller
             $show = '';
             if($d->bukti_pembayaran){
                 $params1 = Parameter::where('id',1)->first();
-                $linkkhusus = asset('sources/storage/app/'.$params1->bukti_bayar_pendaftaran.'/'.$d->bukti_pembayaran);
+                $linkkhusus = asset('sources/storage/app/'.$params1->bukti_bayar_ukt.'/'.$d->bukti_pembayaran);
                 $show = '<a href="'.$linkkhusus.'" target="_blank"><i title="Lihat Bukti Pendaftaran" class="fa fa-eye"></i></a>';
             }
 
@@ -158,14 +157,13 @@ class PembayaranPMBController extends Controller
     {
         $id = decrypt($params);
         $cek = Pendaftaran::where('KodePendaftaran',$id)->select('current_step','jalur_daftar')->first();
-        $jalur = Master_JenisPendaftaran::where('id',$cek->jalur_daftar)->first();
 
-        $step = $jalur->berkas_khusus==null ? $cek->current_step+3 : $cek->current_step+1;
+        $step = $cek->current_step+1;
 
         DB::beginTransaction();
 
         $update1 = Pendaftaran::where('KodePendaftaran',$id)->update([
-            'bayar_pendaftaran' => '1',
+            'bayar_ukt' => '1',
             'current_step' => $step,
             'keterangan' => null,
             'updated_at' => date('Y-m-d H:i:s')

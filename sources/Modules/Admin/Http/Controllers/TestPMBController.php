@@ -207,7 +207,7 @@ class TestPMBController extends Controller
         $updt = Pendaftaran::where('KodePendaftaran',$id)->update($data);
 
         $t1=0;
-        $t2=0;
+        // $t2=0;
         if($post->status_diterima=='1'){
             $kode = 'UKT-'.$id.'-'.date('YmdHis');
             $jurusan = Master_JurusanKuliah::where('KodeJurusan',$post->jurusan_diterima)->first();
@@ -220,7 +220,7 @@ class TestPMBController extends Controller
                 'kode_transaksi' => $kode,
                 'jumlah' => $biaya->biaya_ukt,
                 'status' => $biaya->biaya_ukt == 0 ? 'paid' : 'pending',
-                'keterangan' => $biaya->keterangan,
+                // 'keterangan' => $biaya->keterangan,
                 'created_at' => date('Y-m-d H:i:s')
             ]);
 
@@ -230,26 +230,26 @@ class TestPMBController extends Controller
 
             $cek2 = Transaksi::orderby('id','desc')->latest()->first();
             // Simpan history
-            $historyTransaksi = TransaksiHistory::insert([
-                'transaksi_id' => $cek2->id,
-                'status' => $cek2->status,
-                'keterangan' => $biaya->biaya_ukt == 0 ? 'Gratis / Beasiswa' : 'Menunggu pembayaran',
-                'created_at' => date('Y-m-d H:i:s')
-            ]);
-            if(!$historyTransaksi){
-                $t2++;
-            }
+            // $historyTransaksi = TransaksiHistory::insert([
+            //     'transaksi_id' => $cek2->id,
+            //     'status' => $cek2->status,
+            //     'keterangan' => $biaya->biaya_ukt == 0 ? 'Gratis / Beasiswa' : 'Menunggu pembayaran',
+            //     'created_at' => date('Y-m-d H:i:s')
+            // ]);
+            // if(!$historyTransaksi){
+            //     $t2++;
+            // }
             if($biaya->biaya_ukt==0){
                 $ceklagi = Pendaftaran::where('KodePendaftaran',$id)->first();
                 Pendaftaran::where('KodePendaftaran',$id)->update([
-                    'current_step' => $ceklagi->current_step+1,
+                    'current_step' => $ceklagi->current_step+2,
                     'updated_at' => now()
                 ]);
             }
         }
 
 
-        if($updt&&$t1==0&&$t2==0){
+        if($updt&&$t1==0){ //&&$t2==0
             DB::commit();
             $data['title'] = 'Berhasil';
             $data['message'] = 'Data Test Online Sudah divalidasi !';

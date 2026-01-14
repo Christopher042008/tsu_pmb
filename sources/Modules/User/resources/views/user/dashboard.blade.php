@@ -181,7 +181,10 @@
                                             if($daftar->current_step==2){
                                                 $step4 = 'active';
                                                 $link4 = route('pembayaran');
-                                            }elseif($daftar->current_step>2){
+                                            }elseif($daftar->current_step==3){
+                                                $step4 = 'validating';
+                                                $link4 = route('pembayaran');
+                                            }elseif($daftar->current_step>3){
                                                 $step4 = 'completed';
                                                 $link4 = 'javascript:void(0)';
                                             }
@@ -207,16 +210,16 @@
                                         $step5 = '';
                                         $link5 = 'javascript:void(0)';
                                         if($daftar!=null){
-                                            if($daftar->current_step==3){
+                                            if($daftar->current_step==4){
                                                 $step5 = 'active';
                                                 $link5 = route('BksBeasiswa');
-                                            }elseif($daftar->current_step==4&&$daftar->current_step!=$daftar->stop_step){
+                                            }elseif($daftar->current_step==5&&$daftar->current_step!=$daftar->stop_step){
                                                 $step5 = 'validating';
                                                 $link5 = route('BksBeasiswa');
-                                            }elseif($daftar->current_step>4){
+                                            }elseif($daftar->current_step>5){
                                                 $step5 = 'completed';
                                                 $link5 = 'javascript:void(0)';
-                                            }elseif($daftar->current_step==4&&$daftar->current_step==$daftar->stop_step){
+                                            }elseif($daftar->current_step==5&&$daftar->current_step==$daftar->stop_step){
                                                 $step5 = 'rejected';
                                                 // $link5 = 'javascript:void(0)';
                                                 $link5 = route('BksBeasiswa');
@@ -243,16 +246,16 @@
                                         $step6 = '';
                                         $link6 = 'javascript:void(0)';
                                         if($daftar!=null){
-                                            if($daftar->current_step==5){
+                                            if($daftar->current_step==6){
                                                 $step6 = 'active';
                                                 $link6 = route('test');
-                                            }elseif($daftar->current_step==6&&$daftar->current_step!=$daftar->stop_step){
+                                            }elseif($daftar->current_step==7&&$daftar->current_step!=$daftar->stop_step){
                                                 $step6 = 'validating';
                                                 $link6 = route('test');
-                                            }elseif($daftar->current_step>6){
+                                            }elseif($daftar->current_step>7){
                                                 $step6 = 'completed';
                                                 $link6 = 'javascript:void(0)';
-                                            }elseif($daftar->current_step==6&&$daftar->current_step==$daftar->stop_step){
+                                            }elseif($daftar->current_step==7&&$daftar->current_step==$daftar->stop_step){
                                                 $step6 = 'rejected';
                                                 $link6 = 'javascript:void(0)';
                                             }
@@ -278,10 +281,13 @@
                                         $step7 = '';
                                         $link7 = 'javascript:void(0)';
                                         if($daftar!=null){
-                                            if($daftar->current_step==7){
+                                            if($daftar->current_step==8){
                                                 $step7 = 'active';
                                                 $link7 = route('pembayaranUKT');
-                                            }elseif($daftar->current_step>7){
+                                            }elseif($daftar->current_step==9){
+                                                $step7 = 'validating';
+                                                $link7 = route('pembayaranUKT');
+                                            }elseif($daftar->current_step>9){
                                                 $step7 = 'completed';
                                                 $link7 = 'javascript:void(0)';
                                             }
@@ -307,10 +313,10 @@
                                         $step8 = '';
                                         $link8 = 'javascript:void(0)';
                                         if($daftar!=null){
-                                            if($daftar->current_step==8){
+                                            if($daftar->current_step==10){
                                                 $step8 = 'active';
                                                 $link8 = route('biodata');
-                                            }elseif($daftar->current_step>8){
+                                            }elseif($daftar->current_step>10){
                                                 $step8 = 'completed';
                                                 $link8 = 'javascript:void(0)';
                                             }
@@ -337,7 +343,7 @@
                                         $step9 = '';
                                         $link9 = 'javascript:void(0)';
                                         if($daftar!=null){
-                                            if($daftar->current_step==9){
+                                            if($daftar->current_step==11){
                                                 $step9 = 'completed';
                                                 $link9 = route('HasilPMB');
                                             }

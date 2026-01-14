@@ -297,7 +297,7 @@ class ValidasiBerkasController extends Controller
                 ]);
             }else{
                 Pendaftaran::where('KodePendaftaran',$id)->where('biodata_id',$cek->biodata_id)->where('isactive',1)->update([
-                    'current_step'               => 5,
+                    'current_step'               => 6,
                     'updated_at'                 => now()
                 ]);
             }

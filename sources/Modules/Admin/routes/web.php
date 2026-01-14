@@ -8,6 +8,8 @@ use Modules\Admin\Http\Controllers\DataNonBeasiswaController;
 use Modules\Admin\Http\Controllers\LoginController;
 use Modules\Admin\Http\Controllers\SettingController;
 use Modules\Admin\Http\Controllers\PembayaranPMBController;
+use Modules\Admin\Http\Controllers\PembayaranUKTController;
+
 use Modules\Admin\Http\Controllers\EmailPMBController;
 use Modules\Admin\Http\Controllers\FinalPMBController;
 use Modules\Admin\Http\Controllers\masterdata\BatchPendaftaranController;
@@ -70,11 +72,27 @@ Route::middleware(['web'])->group(function () {
                     Route::get('/DetailNonBeasiswa/{params}', [DataNonBeasiswaController::class, 'showNonBeasiswa'])->name('admin.datanonbeasiswa.detail');
                 });
             });
+
+            //Pembayaran Pendaftaran
             Route::prefix('PembayaranPMB')->group(function() {
                 Route::get('/', [PembayaranPMBController::class, 'index'])->name('admin.pembayaranpmb.show');
-                Route::get('/TabelPembayaranPMB/{params}', [PembayaranPMBController::class, 'tabelPembayaranPMB']);
+                Route::get('/TabelPembayaranPMB', [PembayaranPMBController::class, 'tabelPembayaranPMB']);
                 Route::get('/ShowPembayaranPMB/{params}', [PembayaranPMBController::class, 'showPayment']);
+                Route::get('/Approve/{params}', [PembayaranPMBController::class, 'approve']);
+                Route::post('/Revisi', [PembayaranPMBController::class, 'revisi'])->name('admin.pembayaranpmb.revisi');
+
             });
+
+            //Pembayaran UKT
+            Route::prefix('PembayaranUKT')->group(function() {
+                Route::get('/', [PembayaranUKTController::class, 'index'])->name('admin.pembayaranukt.show');
+                Route::get('/tabelPembayaranUKT', [PembayaranUKTController::class, 'tabelPembayaranUKT']);
+                Route::get('/ShowPembayaranUKT/{params}', [PembayaranUKTController::class, 'showPayment']);
+                Route::get('/Approve/{params}', [PembayaranUKTController::class, 'approve']);
+                Route::post('/Revisi', [PembayaranUKTController::class, 'revisi'])->name('admin.pembayaranukt.revisi');
+
+            });
+
             Route::prefix('BerkasPMB')->group(function() {
                 Route::get('/', [BerkasPMBController::class, 'index'])->name('admin.berkaspmb.show');
                 Route::get('/TabelBerkasPMB', [BerkasPMBController::class, 'tabelBerkasPMB'])->name('admin.berkaspmb.tabel');
