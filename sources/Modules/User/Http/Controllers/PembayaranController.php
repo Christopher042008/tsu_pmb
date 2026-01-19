@@ -178,7 +178,8 @@ class PembayaranController extends Controller
             $transaksi->status = 'waiting';
             $transaksi->save();
 
-            $step = $jalur->berkas_khusus==null ? $cek->current_step+3 : $cek->current_step+1;
+            // $step = $jalur->berkas_khusus==null ? $cek->current_step+3 : $cek->current_step+1;
+            $step = $cek->current_step+1;
             $file->storeAs($parameter->bukti_bayar_pendaftaran, $filename);
         }else{
             // if($transaksi->bukti_pembayaran!=null){
