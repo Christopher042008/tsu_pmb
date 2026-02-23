@@ -22,7 +22,6 @@ use Midtrans\Config;
 use Midtrans\Transaction;
 use Yajra\DataTables\DataTables;
 
-
 use Illuminate\Http\Request;
 
 class PembayaranController extends Controller
