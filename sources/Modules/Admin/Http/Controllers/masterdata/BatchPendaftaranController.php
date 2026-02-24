@@ -3,6 +3,7 @@
 namespace Modules\Admin\Http\Controllers\masterdata;
 
 use App\Models\MasterData\Master_Batch;
+use App\Models\MasterData\Master_TarifUKT;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -242,10 +243,16 @@ class BatchPendaftaranController extends Controller
 
         $update = Master_Batch::where('id',$id)->update($up);
 
+        $upukt = Master_TarifUKT::where('idbatch',$id)->update([
+            'isactive' => $aktif,
+            'updated_at' => date('Y-m-d H:i:s'),
+            'updated_by' => session('session')->nip
+        ]);
+
         $kata = $aktif=='1' ? 'Berhasil Mengaktifkan Data': 'Berhasil Menghapus Data';
         $del = $aktif=='1' ? 'Gagal Mengaktifkan Data': 'Gagal Menghapus Data';
 
-        if($update){
+        if($update&&$upukt){
             DB::commit();
             $master['message'] = $kata;
             $master['type'] = 'success';
