@@ -25,6 +25,10 @@ use Modules\User\Http\Controllers\ValidasiBerkasController;
 Route::prefix('')->group(function() {
     Route::get('/', [UserController::class, 'index'])->name('indexing');
     Route::middleware(['web'])->group(function () {
+        Route::get('/program-studi', [UserController::class, 'programStudi'])->name('program_studi');
+        Route::get('/pengumuman', [UserController::class, 'pengumuman'])->name('pengumuman');
+        Route::get('/informasi-pendaftaran', [UserController::class, 'informasiPendaftaran'])->name('informasi_pendaftaran');
+        Route::get('/detail-pengumuman', [UserController::class, 'detailPengumuman'])->name('detail_pengumuman');
         Route::get('/register', [UserController::class, 'Register'])->name('register');
         Route::post('/StoreRegist', [UserController::class, 'StoreRegister'])->name('register.save');
         Route::get('/GetKabupaten/{params}', [UserController::class, 'getKabupaten']);

@@ -274,6 +274,8 @@
 @endsection
 @section('script')
     <script>
+        var isEditing = false; // Flag penanda status edit
+
         $(function() {
             $.ajaxSetup({
                 headers: {
@@ -417,129 +419,181 @@
                 });
             }
 
-            function ShowJalur()
-            {
-                $('#batch').on('change', function() {
-                    let params = $(this).val()
-                    if (params==null) {
-                        // Jika null, kosongkan dropdown kedua
-                        $('#jalur').empty().append('<option value="" selected disabled>-- Pilih Jalur Pendaftaran --</option>');
-                        $('#jalur').prop('disabled',true)
-                        return;
-                    }else{
-                        // console.log(params)
-                        $.ajax({
-                            type: "GET",
-                            url: '{!! url('Pendaftaran/ShowJalur') !!}' + '/' + params,
-                            dataType: "JSON",
-                            beforeSend: function(response) {
-                                $('#loading').show()
-                                // $('#submit-daftar').html('<i class="fas fa-hourglass"></i> Please Wait')
-                                // $('#submit-daftar').prop('disabled', true)
-                                $('#jalur').prop('disabled',true)
-                                $('#jalur').empty()
-                            },
-                            success: function(data) {
-                                $('#loading').hide()
-                                if (data.hasil == 0) {
-                                    notifalert('Information','Batch Pendaftaran Sudah Berakhir','warning')
-                                } else if(data.hasil==-1){
-                                    notifalert('Information','Jalur Pendaftaran Belum Tersedia','warning')
-                                } else {
-                                    let dis1 = '<option value="" selected disabled>-- Pilih Jalur Pendaftaran --</option>';
-                                    for (i = 0; i < data.jalur.length; i++) {
-                                        dis1 += '<option value="' + data.jalur[i].id + '" data-beasiswa="' + data.jalur[i].is_beasiswa + '">'+ data.jalur[i].jenis_pendaftaran + '</option>'
-                                    } //+data.jalur[i].KodeJenis+' - '
-                                    $('#jalur').append(dis1);
-                                    $('#jalur').prop('disabled',false)
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                $('#loading').hide()
-                                Swal.fire({
-                                    title: 'Gagal',
-                                    text: 'Error, Silahkan Hubungi Admin !',
-                                    icon: 'error'
-                                }).then((result) => {
-                                    console.log(0)
-                                    // $('#submit-daftar').html('<i class="fas fa-paper-plane"></i> Submit')
-                                    // $('#submit-daftar').prop('disabled',false)
-                                });
-                                return;
-                            }
-                        });
-                    }
-                });
+            // Function baru untuk memuat Jalur dengan Callback
+function loadJalur(batchId, selectedJalur = null, callback = null) {
+    if (batchId == null) {
+        $('#jalur').empty().append('<option value="" selected disabled>-- Pilih Jalur Pendaftaran --</option>');
+        $('#jalur').prop('disabled', true);
+        return;
+    }
+
+    $.ajax({
+        type: "GET",
+        url: '{!! url("Pendaftaran/ShowJalur") !!}' + '/' + batchId,
+        dataType: "JSON",
+        beforeSend: function(response) {
+            // Kita tetap kosongkan dulu untuk efek visual loading
+            if (!window.isEditing) $('#loading').show();
+            $('#jalur').prop('disabled', true);
+            $('#jalur').empty(); 
+        },
+        success: function(data) {
+            if (!window.isEditing) { 
+                $('#loading').hide(); 
             }
 
-            function loadBeasiswa(idJalur = null, selectedBea = null)
-            {
-                let params = idJalur ? idJalur : $('#jalur').val();
-                let beasiswa = $('#jalur').find(':selected').data('beasiswa');
-                if (params==null) {
-                    // Jika null, kosongkan dropdown kedua
-                    $('#beasiswa').empty().append('<option value="" selected disabled>-- Pilih Jalur Beasiswa --</option>');
-                    $('#beasiswa').prop('disabled',true)
-                    return;
-                }else{
-                    $.ajax({
-                        type: "GET",
-                        url: '{!! url('Pendaftaran/ShowBeasiswa') !!}' + '/' + params,
-                        dataType: "JSON",
-                        beforeSend: function(response) {
-                            $('#loading').show()
-                            $('#beasiswa').prop('disabled',true)
-                            $('#beasiswa').empty()
-                            $('#tingkat').val('')
-                            $('#keterangan').val('')
-                        },
-                        success: function(data) {
-                            $('#loading').hide()
-                            let dis1 = '<option value="" selected disabled>-- Pilih Jalur Beasiswa --</option>';
-                            if(beasiswa==1&&data.bea.length>0){
-                                for (i = 0; i < data.bea.length; i++) {
-                                    let selected = (selectedBea == data.bea[i].id) ? 'selected' : '';
-                                    dis1 += '<option value="' + data.bea[i].id + '" '+selected+'>'+ data.bea[i].jenis_beasiswa + '</option>'
-                                }
-                                $('#beasiswa').prop('disabled',false)
-                            }else if(beasiswa==1&&data.bea.length==0){
-                                notifalert('Information','Kategori Beasiswa Belum Ada !','warning')
-                                $('#beasiswa').prop('disabled',true)
+            if (data.hasil == 0) {
+                notifalert('Information', 'Batch Pendaftaran Sudah Berakhir', 'warning');
+            } else if (data.hasil == -1) {
+                notifalert('Information', 'Jalur Pendaftaran Belum Tersedia', 'warning');
+            } else {
+                let dis1 = '<option value="" selected disabled>-- Pilih Jalur Pendaftaran --</option>';
+                
+                // Gunakan let agar variabel i tidak bocor keluar (safety)
+                for (let i = 0; i < data.jalur.length; i++) {
+                    let isSelected = (selectedJalur == data.jalur[i].id) ? 'selected' : '';
+                    
+                    // Kita simpan data-beasiswa agar bisa dibaca oleh loadBeasiswa nanti
+                    dis1 += '<option value="' + data.jalur[i].id + '" data-beasiswa="' + data.jalur[i].is_beasiswa + '" ' + isSelected + '>' + data.jalur[i].jenis_pendaftaran + '</option>';
+                }
+                
+                // --- PERBAIKAN UTAMA DISINI ---
+                // Ganti .append() menjadi .html() agar isi dropdown di-replace total (tidak double)
+                $('#jalur').html(dis1);
+                $('#jalur').prop('disabled', false);
 
-                            }else{
-                                $('#beasiswa').prop('disabled',true)
+                // Trigger change jika ada selectedJalur agar loadBeasiswa otomatis jalan
+                if (selectedJalur) {
+                    // Gunakan setTimeout kecil untuk memastikan DOM sudah ter-render sempurna sebelum trigger
+                    setTimeout(() => {
+                        $('#jalur').trigger('change');
+                    }, 50);
+                }
 
-                            }
-                            $('#beasiswa').append(dis1)
-                            $('#tingkat').val('')
-                            $('#keterangan').val('')
-                            if (selectedBea) {
-                                $('#beasiswa').val(selectedBea).trigger('change');
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            $('#loading').hide()
-                            Swal.fire({
-                                title: 'Gagal',
-                                text: 'Error, Silahkan Hubungi Admin !',
-                                icon: 'error'
-                            }).then((result) => {
-                                console.log(0)
-                            });
-                            return;
-                        }
-                    });
+                // Eksekusi Callback (Penting untuk Edit)
+                if (callback && typeof callback === "function") {
+                    callback(); 
                 }
             }
+        },
+        error: function(xhr, status, error) {
+            if (!window.isEditing) $('#loading').hide();
+            Swal.fire({ title: 'Gagal', text: 'Error, Silahkan Hubungi Admin !', icon: 'error' });
+        }
+    });
+}
 
-            function ShowBeasiswa()
-            {
-                $('#jalur').on('change', function() {
-                    // if (!window.isEditing) {
-                        loadBeasiswa();
-                    // }
-                });
+            function ShowJalur() {
+    $('#batch').on('change', function() {
+        let params = $(this).val();
+        // Panggil function loadJalur biasa tanpa callback khusus
+        loadJalur(params); 
+    });
+}
+
+            function loadBeasiswa(idJalur = null, selectedBea = null) {
+    
+
+    // Prioritaskan parameter kiriman, baru ambil dari DOM
+    let params = idJalur ? idJalur : $('#jalur').val();
+    
+    // --- PERBAIKAN LOGIC DISINI ---
+    // Kita ambil status REAL dari atribut data-beasiswa di dropdown yang sudah terpilih.
+    // Karena loadJalur sudah selesai, value ini PASTI benar (0 untuk Reguler, 1 untuk Beasiswa).
+    let isBeasiswa = $('#jalur').find(':selected').data('beasiswa');
+    
+    // Fallback: Jika undefined (misal DOM belum ready), anggap 0 (Reguler) biar aman dan tidak error
+    if (typeof isBeasiswa === 'undefined') isBeasiswa = 0; 
+
+    
+
+    if (!params) {
+        console.warn("Params kosong, dropdown dikosongkan.");
+        $('#beasiswa').empty().append('<option value="" selected disabled>-- Pilih Jalur Beasiswa --</option>');
+        $('#beasiswa').prop('disabled', true);
+        return;
+    }
+
+    $.ajax({
+        type: "GET",
+        url: '{!! url("Pendaftaran/ShowBeasiswa") !!}' + '/' + params,
+        dataType: "JSON",
+        beforeSend: function(response) {
+            // Hanya nyalakan loading jika BUKAN mode edit (konsisten dengan function lain)
+            if (!window.isEditing) {
+                $('#loading').show();
             }
+            $('#beasiswa').prop('disabled', true);
+            $('#beasiswa').empty();
+            $('#tingkat').val('');
+            $('#keterangan').val('');
+        },
+        success: function(data) {
+           
+
+            // Matikan loading hanya jika bukan mode edit
+            if (!window.isEditing) { 
+                $('#loading').hide(); 
+            }
+            
+            $('#beasiswa').empty();
+            let dis1 = '<option value="" selected disabled>-- Pilih Jalur Beasiswa --</option>';
+
+            // Cek apakah array 'bea' ada dan isinya lebih dari 0
+            if (data.bea && data.bea.length > 0) {
+                
+                
+                for (let i = 0; i < data.bea.length; i++) {
+                    // Pakai loose equality (==) biar aman antara string/int
+                    let selected = (selectedBea == data.bea[i].id) ? 'selected' : '';
+                    dis1 += '<option value="' + data.bea[i].id + '" ' + selected + '>' + data.bea[i].jenis_beasiswa + '</option>';
+                }
+                $('#beasiswa').prop('disabled', false);
+            } else {
+                console.warn("4. Data beasiswa kosong dari server.");
+                
+                // --- PERBAIKAN LOGIC ALERT ---
+                // Hanya munculkan alert jika 'isBeasiswa' bernilai 1 (True/Beasiswa)
+                // Jadi kalau Reguler (0), dia akan diam saja meski datanya kosong.
+                if (isBeasiswa == 1) {
+                    notifalert('Information', 'Kategori Beasiswa Belum Ada !', 'warning');
+                }
+                
+                $('#beasiswa').prop('disabled', true);
+            }
+
+            $('#beasiswa').append(dis1);
+            $('#tingkat').val('');
+            $('#keterangan').val('');
+
+            // Trigger change untuk memuat detail (Tingkat/Keterangan)
+            if (selectedBea) {
+            
+                setTimeout(() => {
+                    $('#beasiswa').val(selectedBea).trigger('change');
+                }, 100);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("ERROR Ajax:", error);
+            if (!window.isEditing) {
+                $('#loading').hide();
+            }
+        }
+    });
+}
+
+            function ShowBeasiswa() {
+    $('#jalur').on('change', function() {
+        // HANYA jalan jika BUKAN sedang mode editing
+        if (window.isEditing == false) {
+            
+            loadBeasiswa();
+        } else {
+            
+        }
+    });
+}
 
             function ShowDetailBeasiswa()
             {
@@ -550,13 +604,17 @@
                         url: '{!! url('Pendaftaran/ShowDetailBeasiswa') !!}' + '/' + params,
                         dataType: "JSON",
                         beforeSend: function(response) {
-                            $('#loading').show()
+                            if (!window.isEditing) {
+                    $('#loading').show();
+                }
                             $('#tingkat').val('')
                             $('#keterangan').val('')
                         },
                         success: function(data) {
-                            // console.log(data)
-                            $('#loading').hide()
+                            
+                            if (!window.isEditing) {
+                    $('#loading').hide();
+                }
                             let tingkat = data.bea.idtingkat==null ? '-' : data.bea.tingkat.tingkat_kejuaraan
                             let keter = data.bea==null ? '-' : data.bea.juara_ke
                             $('#tingkat').val(tingkat)
@@ -589,78 +647,109 @@
                 });
             }
 
-            function loadProdi(prodi1=null,prodi2=null)
-            {
-                let batch = $('#batch').val()
-                let jalur = $('#jalur').val()
-                let jurusansekolah = $('#jurusansekolah').val()
+            function loadProdi(selectedProdi1 = null, selectedProdi2 = null, forceBatch = null, forceJalur = null, forceJurusan = null, callback = null) {
+    let batch = forceBatch ? forceBatch : $('#batch').val();
+    let jalur = forceJalur ? forceJalur : $('#jalur').val();
+    let jurusansekolah = forceJurusan ? forceJurusan : $('#jurusansekolah').val();
 
-                if (jurusansekolah==null) {
-                    // Jika null, kosongkan dropdown kedua
-                    $('#prodi1').empty().append('<option value="" selected disabled>-- Pilihan Jurusan 1 --</option>');
-                    $('#prodi2').empty().append('<option value="" selected disabled>-- Pilihan Jurusan 2 --</option>');
-                    $('#prodi1').prop('disabled',true)
-                    $('#prodi2').prop('disabled',true)
-                    return;
-                }else{
-                    $.ajax({
-                        type: "GET",
-                        url: '{!! url('Pendaftaran/ShowProdi') !!}' + '/' + batch + '/' + jalur + '/' + jurusansekolah,
-                        dataType: "JSON",
-                        beforeSend: function(response) {
-                            $('#loading').show()
-                            $('#prodi1').prop('disabled',true)
-                            $('#prodi2').prop('disabled',true)
-                            $('#prodi1').empty().html('<option value="" selected disabled>-- Pilihan Jurusan 1 --</option>')
-                            $('#prodi2').empty().html('<option value="" selected disabled>-- Pilihan Jurusan 2 --</option>')
-                        },
-                        success: function(data) {
-                            $('#loading').hide()
-                            if (data.hasil == 0) {
-                                notifalert('Information', 'Data Jurusan Tidak Ditemukan','error')
-                            } else {
-                                let dis1 = '';
-                                let dis2 = '';
-                                if (window.isEditing==true){
-                                     $('#prodi1').empty().html('<option value="" selected disabled>-- Pilihan Jurusan 1 --</option>')
-                                     $('#prodi2').empty().html('<option value="" selected disabled>-- Pilihan Jurusan 2 --</option>')
-                                }
+    // Jika data tidak lengkap, hentikan tapi tetap jalankan callback agar loading mati
+    if (!batch || !jalur || !jurusansekolah) {
+        if (callback && typeof callback === "function") callback();
+        return;
+    }
 
-                                for (i = 0; i < data.jurusan.length; i++) {
-                                    // let selected1 = (prodi1 == data.jurusan[i].KodeJurusan) ? 'selected' : '';
-                                    // let selected2 = (prodi2 == data.jurusan[i].KodeJurusan) ? 'selected' : '';
-                                    dis1 += '<option value="' + data.jurusan[i].KodeJurusan + '">'+data.jurusan[i].jenjang.jenjang+' - ' + data.jurusan[i].jurusan + '</option>'
-                                    dis2 += '<option value="' + data.jurusan[i].KodeJurusan + '">'+data.jurusan[i].jenjang.jenjang+' - ' + data.jurusan[i].jurusan + '</option>'
-                                }
-                                $('#prodi1').append(dis1);
-                                $('#prodi2').append(dis2);
-                                $('#prodi1').prop('disabled',false)
-                                $('#prodi2').prop('disabled',false)
-
-                                if(prodi1!=null){
-                                    $('#prodi1').val(prodi1).trigger('change');
-                                }
-                                if(prodi2!=null){
-                                    $('#prodi2').val(prodi2).trigger('change');
-                                }
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            $('#loading').hide()
-                            Swal.fire({
-                                title: 'Gagal',
-                                text: 'Error, Silahkan Hubungi Admin !',
-                                icon: 'error'
-                            }).then((result) => {
-                                console.log(0)
-                                // $('#submit-daftar').html('<i class="fas fa-paper-plane"></i> Submit')
-                                // $('#submit-daftar').prop('disabled',false)
-                            });
-                            return;
-                        }
-                    });
-                }
+    $.ajax({
+        type: "GET",
+        url: '{!! url("Pendaftaran/ShowProdi") !!}' + '/' + batch + '/' + jalur + '/' + jurusansekolah,
+        dataType: "JSON",
+        beforeSend: function() {
+            if (!window.isEditing) $('#loading').show();
+        },
+        success: function(data) {
+            // Hanya matikan loading jika BUKAN mode edit
+            if (!window.isEditing) { 
+                $('#loading').hide(); 
             }
+
+            if (data.hasil == 0) {
+                if (typeof window.isEditing !== 'undefined' && !window.isEditing) {
+                    notifalert('Information', 'Data Jurusan Tidak Ditemukan', 'error');
+                }
+            } else {
+                
+
+                // 1. Matikan Select2 Lama
+                if ($('#prodi1').hasClass("select2-hidden-accessible")) {
+                    $('#prodi1').select2('destroy');
+                    $('#prodi2').select2('destroy');
+                }
+
+                // 2. Bersihkan & Enable Select Asli
+                $('#prodi1, #prodi2').empty().prop('disabled', false);
+
+                // 3. Tambahkan Placeholder
+                $('#prodi1').append(new Option('-- Pilih Program Studi 1 --', '', true, true));
+                $('#prodi2').append(new Option('-- Pilih Program Studi 2 --', '', true, true));
+                $('#prodi1 option:first').prop('disabled', true);
+                $('#prodi2 option:first').prop('disabled', true);
+
+                // --- LOGIC EXTRACTION TARGET ---
+                let target1 = null;
+                let target2 = null;
+
+                if (selectedProdi1) {
+                    if (typeof selectedProdi1 === 'object' && selectedProdi1.KodeJurusan) {
+                        target1 = $.trim(selectedProdi1.KodeJurusan);
+                    } else {
+                        target1 = $.trim(selectedProdi1);
+                    }
+                }
+
+                if (selectedProdi2) {
+                    if (typeof selectedProdi2 === 'object' && selectedProdi2.KodeJurusan) {
+                        target2 = $.trim(selectedProdi2.KodeJurusan);
+                    } else {
+                        target2 = $.trim(selectedProdi2);
+                    }
+                }
+
+                // --- RENDER OPTIONS ---
+                $.each(data.jurusan, function(index, item) {
+                    let kode = $.trim(item.KodeJurusan);
+                    let teks = item.jenjang.jenjang + ' - ' + item.jurusan;
+
+                    let isSelected1 = (target1 && kode == target1); 
+                    let isSelected2 = (target2 && kode == target2);
+
+                    let optionFor1 = new Option(teks, kode, isSelected1, isSelected1);
+                    let optionFor2 = new Option(teks, kode, isSelected2, isSelected2);
+
+                    $('#prodi1').append(optionFor1);
+                    $('#prodi2').append(optionFor2);
+                });
+
+                // 4. Hidupkan Kembali Select2
+                $('#prodi1').select2({ theme: 'bootstrap4', width: '100%' });
+                $('#prodi2').select2({ theme: 'bootstrap4', width: '100%' });
+                
+                if(target1) $('#prodi1').val(target1).trigger('change.select2');
+                if(target2) $('#prodi2').val(target2).trigger('change.select2');
+            }
+
+            // --- PENTING: Jalankan Callback (Matikan Loading) Disini ---
+            if (callback && typeof callback === "function") {
+                callback();
+            }
+        },
+        error: function(xhr, status, error) {
+            if (!window.isEditing) $('#loading').hide();
+            console.error("Error AJAX Prodi: " + error);
+            
+            // Tetap jalankan callback agar loading tidak nyangkut selamanya jika error
+            if (callback && typeof callback === "function") callback();
+        }
+    });
+}
 
             function openProdi()
             {
@@ -693,7 +782,7 @@
                     let selectjalur = $('#jalur').find(':selected');
                     let beasiswa = selectjalur.data('beasiswa')
                     let kategoribeasiswa = $('#beasiswa').val()
-                    // console.log(selectjalur,jalur,beasiswa)
+                    
                     if(batch==null){
                         notifalert('Information', 'Isi Batch Pendaftaran Terlebih Dahulu','warning')
                     }else if(jalur==null){
@@ -832,60 +921,92 @@
                 });
             }
 
-            function editDaftar()
-            {
-                $('.btn_edit').off('click').click(function (e) {
-                    e.preventDefault();
-                    window.isEditing = true;
-                    let param = $(this).data('id')
-                    $.ajax({
-                        type: "GET",
-                        url: '{!! url('Pendaftaran/ShowDaftar') !!}'+'/'+param,
-                        dataType: "JSON",
-                        beforeSend: function(response) {
-                            $('#loading').show()
-                            $('#btn-reset').trigger('click');
-                        },
-                        success: function(data) {
-                            // $('#loading').hide()
-                            // console.log(data)
-                            if(data.hasil==0){
-                                notifalert('Information', 'Data Pendaftaran Tidak Ditemukan','error')
-                                // window.isEditing = false;
-                            }else{
-                                $('#IdPendaftaran').val(data.IdDaftar)
-                                $('#batch').val(data.daftar.batch_daftar).trigger('change')
-                                let beaId = data.daftar.beasiswa ? data.daftar.beasiswa.id : null;
-                                setTimeout(() => {
-                                    $('#jalur').val(data.daftar.jalur_daftar).trigger('change');
-                                    loadBeasiswa(data.daftar.jalur_daftar, beaId);
-                                }, 800);
+            function editDaftar() {
+    $('.btn_edit').off('click').click(function(e) {
+        e.preventDefault();
+        
+        // 1. AKTIFKAN MODE EDIT & LOADING
+        window.isEditing = true; 
+        $('#loading').show();
+        
+        let param = $(this).data('id');
 
-                                $('#tahunlulus').val(data.daftar.tahun_lulus).trigger('change')
+        $.ajax({
+            type: "GET",
+            url: '{!! url('Pendaftaran/ShowDaftar') !!}' + '/' + param,
+            dataType: "JSON",
+            beforeSend: function(response) {
+                // Loading sudah nyala di atas
+                $('#btn-reset').trigger('click');
+            },
+            success: function(data) {
+                if (data.hasil == 0) {
+                    $('#loading').hide();
+                    notifalert('Information', 'Data Pendaftaran Tidak Ditemukan', 'error');
+                    window.isEditing = false;
+                } else {
+                    $('#IdPendaftaran').val(data.IdDaftar);
+                    
+                    // Trigger change agar UI Batch muncul
+                    $('#batch').val(data.daftar.batch_daftar).trigger('change'); 
 
-                                setTimeout(() => {
-                                    $('#jurusansekolah').val(data.daftar.jurusan_sekolah).trigger('change')
-                                    loadProdi(data.daftar.pilihan1,data.daftar.pilihan2)
-                                }, 800);
-                                $('#waktukuliah').val(data.daftar.waktu_kuliah).trigger('change');
-                                // window.isEditing = false;
-                            }
-                        },
-                        error: function(data) {
-                            $('#loading').hide()
-                            Swal.fire({
-                                title: 'Gagal Show Data Pendaftaran !',
-                                text: 'Silahkan Hubungi Admin PMB TSU',
-                                icon: 'error'
-                            }).then((result) => {
-                                window.isEditing = false;
-                            });
-                            return;
+                    // Load Jalur dengan Callback
+                    loadJalur(data.daftar.batch_daftar, data.daftar.jalur_daftar, function() {
+                        
+                        // --- LOGIC ID BEASISWA ---
+                        let beaId = null;
+                        if (data.daftar.beasiswa && typeof data.daftar.beasiswa !== 'object') {
+                            beaId = data.daftar.beasiswa;
+                        } else if (data.daftar.beasiswa && data.daftar.beasiswa.id) {
+                            beaId = data.daftar.beasiswa.id;
+                        } else if (data.daftar.jenisbeasiswa && data.daftar.jenisbeasiswa.id) {
+                            beaId = data.daftar.jenisbeasiswa.id;
                         }
+                        
+                        // Load Beasiswa
+                        loadBeasiswa(data.daftar.jalur_daftar, beaId);
+
+                        // Isi data lainnya
+                        $('#tahunlulus').val(data.daftar.tahun_lulus).trigger('change');
+                        
+                        // Beri jeda sedikit agar DOM siap
+                        setTimeout(() => {
+                            $('#jurusansekolah').val(data.daftar.jurusan_sekolah).trigger('change');
+                            $('#waktukuliah').val(data.daftar.waktu_kuliah).trigger('change');
+                            $('#waktukuliah').prop('disabled', false); 
+
+                            // --- FUNGSI FINAL: MATIKAN LOADING ---
+                            // Fungsi ini akan dipanggil OLEH loadProdi setelah dia selesai
+                            var onProdiFinished = function() {
+                                setTimeout(() => {
+                                    window.isEditing = false;
+                                    $('#waktukuliah').prop('disabled', false); // Double check enable
+                                    $('#loading').fadeOut(); // Matikan loading dengan halus
+                                   
+                                }, 500); // Jeda pemanis
+                            };
+
+                            // Panggil loadProdi dan kirim fungsi 'onProdiFinished'
+                            if(typeof loadProdi === 'function') {
+                                loadProdi(data.daftar.prodi1, data.daftar.prodi2, null, null, null, onProdiFinished);
+                            } else {
+                                // Fallback jika loadProdi tidak ada
+                                onProdiFinished();
+                            }
+
+                        }, 300); // Delay sebelum mulai render prodi
                     });
-                    return false;
-                });
+                }
+            },
+            error: function(data) {
+                $('#loading').hide();
+                window.isEditing = false;
+                Swal.fire({ title: 'Error', text: 'Gagal', icon: 'error' });
             }
+        });
+        return false;
+    });
+}
 
             function deleteDaftar()
             {

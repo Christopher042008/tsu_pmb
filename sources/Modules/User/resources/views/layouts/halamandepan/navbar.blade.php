@@ -3,7 +3,8 @@
 
         <a href="{{ route('indexing') }}" class="logo d-flex align-items-center">
             <img src="{{ asset('public/assets/user/img/tsu.png') }}" alt="">
-            <h3 class="sitename">Universitas Tiga Serangkai</h3>
+            <span><h6>Seleksi Penerimaan Mahasiswa Baru</h6>
+            <h4 class="sitename">Universitas Tiga Serangkai</h4></span>
         </a>
 
         <nav id="navmenu" class="navmenu">
@@ -13,9 +14,9 @@
                 <li class="dropdown"><a href="#"><span>Informasi</span> <i
                             class="bi bi-chevron-down toggle-dropdown"></i></a>
                     <ul>
-                        <li><a href="#">program Studi</a></li>
-                        <li><a href="#">Pengumuman</a></li>
-                        <li><a href="#">Informasi Pendaftaran</a></li>
+                        <li><a href="{{ route('program_studi') }}">Program Studi</a></li>
+                        <li><a href="{{ route('pengumuman') }}">Pengumuman</a></li>
+                        <li><a href="{{ route('informasi_pendaftaran') }}">Informasi Pendaftaran</a></li>
                     </ul>
                 </li>
                 <li>

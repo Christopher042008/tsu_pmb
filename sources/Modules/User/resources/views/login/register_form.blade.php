@@ -190,47 +190,74 @@
                 });
             }
 
-            function validation()
-            {
-                let nama   = $('#nama').val()
-                let nik    = $('#nik').val()
-                let nohp   = $('#nohp').val()
-                let prov   = $('#provinsi').val()
-                let kabk   = $('#kabupaten').val()
-                let email  = $('#email').val()
-                let pass   = $('#password').val()
-                let repass = $('#password1').val()
+            function validation() {
+            let nama    = $('#nama').val()
+            let nik     = $('#nik').val()
+            let nohp    = $('#nohp').val()
+            let prov    = $('#provinsi').val()
+            let kabk    = $('#kabupaten').val()
+            let email   = $('#email').val()
+            let pass    = $('#password').val()
+            let repass  = $('#password1').val()
 
-                let notif = ''
-                if(nama==''||nama==null){
-                    notif = 'Nama Calon Mahasiswa Tidak Boleh Kosong';
-                    $('#prev-1').trigger('click');
-                }else if(nik==''||nik==null){
-                    notif = 'NIK Calon Mahasiswa Tidak Boleh Kosong';
-                    $('#prev-1').trigger('click');
-                }else if(nohp==''||nohp==null){
-                    notif = 'No HP Calon Mahasiswa Tidak Boleh Kosong';
-                    $('#prev-1').trigger('click');
-                }else if(prov==''||prov==null){
-                    notif = 'Provinsi Tempat Tinggal Tidak Boleh Kosong';
-                    $('#prev-1').trigger('click');
-                }else if(kabk==''||kabk==null){
-                    notif = 'Kabupaten/Kota Tinggal Tidak Boleh Kosong';
-                    $('#prev-1').trigger('click');
-                }else if(email==''||email==null){
-                    notif = 'Email Tidak Boleh Kosong';
-                    $('#next-1').trigger('click');
-                }else if(pass==''||pass==null){
-                    notif = 'Password Tidak Boleh Kosong';
-                    $('#next-1').trigger('click');
-                }else if(repass==''||repass==null){
-                    notif = 'Konfirmasi Password Tidak Boleh Kosong';
-                    $('#next-1').trigger('click');
-                }else{
-                    notif = 'success'
-                }
-                return notif;
+            let notif = ''
+            
+            // Regex Pattern untuk validasi final (8 char, upper, number, no symbol)
+            let passwordRegex = /^(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+
+            if (nama == '' || nama == null) {
+                notif = 'Nama Calon Mahasiswa Tidak Boleh Kosong';
+                $('#prev-1').trigger('click');
+            } else if (nik == '' || nik == null) {
+                notif = 'NIK Calon Mahasiswa Tidak Boleh Kosong';
+                $('#prev-1').trigger('click');
+            } else if (nohp == '' || nohp == null) {
+                notif = 'No HP Calon Mahasiswa Tidak Boleh Kosong';
+                $('#prev-1').trigger('click');
+            } else if (prov == '' || prov == null) {
+                notif = 'Provinsi Tempat Tinggal Tidak Boleh Kosong';
+                $('#prev-1').trigger('click');
+            } else if (kabk == '' || kabk == null) {
+                notif = 'Kabupaten/Kota Tinggal Tidak Boleh Kosong';
+                $('#prev-1').trigger('click');
+            } else if (email == '' || email == null) {
+                notif = 'Email Tidak Boleh Kosong';
+                $('#next-1').trigger('click');
+            } 
+            // --- MODIFIKASI VALIDASI PASSWORD DISINI ---
+            else if (pass == '' || pass == null) {
+                notif = 'Password Tidak Boleh Kosong';
+                $('#next-1').trigger('click');
+            } 
+            // Validasi Logika Ketat
+            else if (pass.length < 8) {
+                notif = 'Password Minimal 8 Karakter!';
+                $('#next-1').trigger('click');
             }
+            else if (!/[A-Z]/.test(pass)) {
+                notif = 'Password Harus Mengandung Huruf Besar!';
+                $('#next-1').trigger('click');
+            }
+            else if (!/[0-9]/.test(pass)) {
+                notif = 'Password Harus Mengandung Angka!';
+                $('#next-1').trigger('click');
+            }
+            else if (/[^a-zA-Z0-9]/.test(pass)) {
+                notif = 'Password Tidak Boleh Mengandung Simbol!';
+                $('#next-1').trigger('click');
+            }
+            // -------------------------------------------
+            else if (repass == '' || repass == null) {
+                notif = 'Konfirmasi Password Tidak Boleh Kosong';
+                $('#next-1').trigger('click');
+            } else if (pass != repass) {
+                notif = 'Konfirmasi Password Tidak Cocok'; // Tambahan keamanan
+                $('#next-1').trigger('click');
+            } else {
+                notif = 'success'
+            }
+            return notif;
+        }
 
             function submitRegist()
             {
@@ -313,47 +340,57 @@
         function checkPassword() {
             var password = $('#password').val();
             var password_re = $('#password1').val();
+            var error_msg = [];
 
+            // Reset Class
+            $('#password').removeClass('is-invalid is-valid');
+            $('#warning').html('');
+
+            // Cek Kesamaan Password (Konfirmasi)
             if (password != '' && password_re != '') {
                 if (password != password_re) {
                     $('#password1').addClass('is-invalid');
                     $('#password1').removeClass('is-valid');
-
-                    // $('#submit').attr('disabled', 'disabled');
                 } else {
                     $('#password1').removeClass('is-invalid');
                     $('#password1').addClass('is-valid');
-                    // $('#submit').removeAttr('disabled');
                 }
             }
 
+            // Jika password kosong, stop
+            if (password == '') return;
+
+            // 1. Cek Minimal 8 Karakter
             if (password.length < 8) {
+                error_msg.push('Min 8 Karakter');
+            }
+
+            // 2. Cek Huruf Besar (A-Z)
+            if (!/[A-Z]/.test(password)) {
+                error_msg.push('Harus ada Huruf Besar');
+            }
+
+            // 3. Cek Angka (0-9)
+            if (!/[0-9]/.test(password)) {
+                error_msg.push('Harus ada Angka');
+            }
+
+            // 4. Cek Simbol (Tidak boleh ada simbol)
+            // Regex ini mendeteksi jika ada karakter SELAIN huruf dan angka
+            if (/[^a-zA-Z0-9]/.test(password)) {
+                error_msg.push('Tidak boleh ada Simbol');
+            }
+
+            if (error_msg.length > 0) {
+                // Jika ada error
                 $('#password').addClass('is-invalid');
                 $('#password').removeClass('is-valid');
-
-                $('#warning').html('*Mininum length : 8');
-                // $('#submit').attr('disabled', 'disabled');
+                $('#warning').html('*' + error_msg.join(', ')); // Tampilkan semua error
             } else {
-                pass_numb = password.replace(/[^0-9]/g, '').length;
-                pass_char = password.replace(/[0-9]/g, '').length;
-
-                if (pass_numb == 0) {
-                    $('#password').addClass('is-invalid');
-                    $('#password').removeClass('is-valid');
-
-                    $('#warning').html('*Must contain Number');
-                    // $('#submit').attr('disabled', 'disabled');
-                } else if (pass_char == 0) {
-                    $('#password').addClass('is-invalid');
-                    $('#password').removeClass('is-valid');
-
-                    $('#warning').html('*Must contain Letter');
-                    // $('#submit').attr('disabled', 'disabled');
-                } else {
-                    $('#password').removeClass('is-invalid');
-                    $('#password').addClass('is-valid');
-                    $('#warning').html('');
-                }
+                // Jika lolos semua syarat
+                $('#password').removeClass('is-invalid');
+                $('#password').addClass('is-valid');
+                $('#warning').html('');
             }
         }
         function checkNIK() {
