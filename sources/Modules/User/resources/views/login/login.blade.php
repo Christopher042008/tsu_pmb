@@ -23,16 +23,21 @@
                             </div>
                         </div>
                     </div>
-                    {{-- <small><code id="warning"></code></small> --}}
+                    
+                    {{-- BAGIAN PASSWORD (DIUBAH) --}}
                     <div class="input-group mb-3">
                         <input type="password" class="form-control" placeholder="Password"
                             name="password" id="password" required>
                         <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-lock"></span>
+                            {{-- Tambahkan ID dan style cursor pointer --}}
+                            <div class="input-group-text" id="toggle-password" style="cursor: pointer;">
+                                {{-- Ubah default icon jadi mata (fa-eye) --}}
+                                <span class="fas fa-eye"></span>
                             </div>
                         </div>
                     </div>
+                    {{-- END BAGIAN PASSWORD --}}
+
                     <div class="row">
                         <div class="col-md-6">
                             <a href="{{route('ResetPassword')}}" class="btn btn-danger btn-block">
@@ -44,15 +49,13 @@
                                 Login
                             </button>
                         </div>
-                        <!-- /.col -->
-                    </div>
+                        </div>
                 </form>
                 <p style="margin-top:10px;">
                     <a href="{{ route('register') }}" class="text-center">Registrasi Akun Baru</a>
                 </p>
             </div>
-            <!-- /.card-body -->
-        </div>
+            </div>
     </div>
 @endsection
 
@@ -65,6 +68,26 @@
                 }
             });
 
+            // --- FITUR SHOW PASSWORD ---
+            $('#toggle-password').click(function(){
+                var passwordField = $('#password');
+                var passwordIcon = $(this).find('span');
+
+                // Cek tipe input saat ini
+                if(passwordField.attr('type') === 'password'){
+                    // Ubah jadi text (terlihat)
+                    passwordField.attr('type', 'text');
+                    // Ubah icon jadi mata dicoret
+                    passwordIcon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    // Balikin jadi password (tersembunyi)
+                    passwordField.attr('type', 'password');
+                    // Balikin icon jadi mata biasa
+                    passwordIcon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+            // ---------------------------
+
             $('#password').keypress(function(event) {
                 var ew = event.which;
                 if (48 <= ew && ew <= 57)
@@ -76,6 +99,7 @@
                 return false;
             });
         });
+
         function checkPassword() {
             var password = $('#password').val();
 

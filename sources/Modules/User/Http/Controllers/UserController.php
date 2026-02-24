@@ -37,7 +37,53 @@ class UserController extends Controller
         $data = array(
             'title' => 'Beranda'
         );
-        return view('user::halamandepan.index',$data);
+        return view('user::halamandepannew.index',$data);
+    }
+
+    public function programStudi()
+    {
+        // Variabel $title agar sesuai dengan @section('title', $title) di master Anda
+        $title = 'Program Studi - Universitas Tiga Serangkai'; 
+        
+        // 1. Ambil data jurusan dari database beserta relasi jenjangnya (S1, D3, dll)
+        $jurusans = Master_JurusanKuliah::with('jenjang')->where('isactive', 1)->get();
+
+        // 2. Kelompokkan data (Grouping)
+        // Catatan: Jika Anda memiliki relasi 'fakultas' di model Master_JurusanKuliah, gunakan itu.
+        // Jika tidak ada tabel fakultas, kode fallback 'Semua Program Studi' akan digunakan agar web tidak error.
+        $groupedJurusans = $jurusans->groupBy(function($item) {
+            return $item->fakultas->nama_fakultas ?? 'Semua Program Studi'; 
+        });
+        
+        // 3. Lempar data $groupedJurusans ke view
+        return view('user::halamandepannew.programstudi.index', compact('title', 'groupedJurusans'));
+    }
+
+    public function pengumuman()
+    {
+        // Variabel $title agar sesuai dengan @section('title', $title) di master Anda
+        $title = 'Pengumuman - Universitas Tiga Serangkai'; 
+        
+        // Memanggil view sesuai path yang Anda berikan
+        return view('user::halamandepannew.pengumuman.index', compact('title'));
+    }
+
+    public function detailPengumuman()
+    {
+        // Variabel $title agar sesuai dengan @section('title', $title) di master Anda
+        $title = 'Detail Pengumuman - Universitas Tiga Serangkai'; 
+        
+        // Memanggil view sesuai path yang Anda berikan
+        return view('user::halamandepannew.informasipendaftaran.detail', compact('title'));
+    }
+
+    public function informasiPendaftaran()
+    {
+        // Variabel $title agar sesuai dengan @section('title', $title) di master Anda
+        $title = 'Informasi Pendaftaran - Universitas Tiga Serangkai'; 
+        
+        // Memanggil view sesuai path yang Anda berikan
+        return view('user::halamandepannew.informasipendaftaran.index', compact('title'));
     }
 
     public function Register()

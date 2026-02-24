@@ -132,19 +132,19 @@ class PendaftaranController extends Controller
         header("Access-Control-Allow-Headers: *");
 
         $id = $params;
-        // dd($id);
         $now = date('Y-m-d');
         $cek1 = Master_Batch::where('id',$id)->where('isactive',1)->whereRaw('? BETWEEN tglmulai and tglselesai',[$now])->first();
+        // dd($cek1);
         if($cek1){
             $jalur = [];
             $cek3 = Master_JenisPendaftaran::where('isactive',1)->get();
+
             foreach($cek3 as $q){
                 $cek2 = Master_TarifUKT::where('idbatch',$id)->where('idjalur',$q->id)->where('isactive',1)->exists();
                 if($cek2){
                     $jalur[] = $q;
                 }
             }
-            // dd($jalur);
             if(count($jalur)>0){
                 $data['hasil'] = 1;
                 $data['jalur'] = $jalur;
@@ -278,54 +278,61 @@ class PendaftaranController extends Controller
         $batch = $post->batch;
         $jalur = $post->jalur;
         $beasiswa = $post->beasiswa;
-        $tahun = $post->tahunlulus;
+        $tahunLulusUser = $post->tahunlulus;
         $jurusansekolah = $post->jurusansekolah;
         $prodi1 = $post->prodi1;
         $prodi2 = $post->prodi2;
         $waktukuliah = $post->waktukuliah;
         $bioId = decrypt(session('user')->_biodata);
 
-        $cek = Pendaftaran::where('biodata_id',$bioId)->where('batch_daftar',$batch)->exists();
-        if($cek){
+        $cek = Pendaftaran::where('biodata_id', $bioId)->where('batch_daftar', $batch)->exists();
+        if ($cek) {
             $data['title'] = 'Information';
             $data['message'] = 'Anda Sudah Daftar Pada Batch ini ! Silahkan Daftar pada Batch Berikutnya';
             $data['status'] = 'warning';
-        }else{
+        } else {
             DB::beginTransaction();
-            $cekbiayadaftar = Master_JenisPendaftaran::where('id',$jalur)->where('isactive',1)->first();
-            $tahun = date('Y');
-            $kd1 = '0'.$batch;
-            $kd2 = '0'.$jalur;
+            $cekbiayadaftar = Master_JenisPendaftaran::where('id', $jalur)->where('isactive', 1)->first();
 
-            $count = Pendaftaran::whereYear('tgl_daftar', $tahun)->where('isactive',1)->count();
+            // 2. Gunakan nama variabel BARU untuk tahun sekarang
+            $tahunSekarang = date('Y');
+
+            $kd1 = '0' . $batch;
+            $kd2 = '0' . $jalur;
+
+            // Gunakan $tahunSekarang untuk generate kode pendaftaran agar formatnya tetap sesuai tahun berjalan
+            $count = Pendaftaran::whereYear('tgl_daftar', $tahunSekarang)->where('isactive', 1)->count();
             $urut = str_pad($count + 1, 4, '0', STR_PAD_LEFT);
 
-            $kode = $tahun.$kd1.$kd2.$urut;
-            // dd($kode);
+            $kode = $tahunSekarang . $kd1 . $kd2 . $urut;
+
             $data_daftar = array(
                 'KodePendaftaran'   => $kode,
                 'biodata_id'        => $bioId,
-                'bayar_pendaftaran' => $cekbiayadaftar->biaya_pendaftaran==1 ? '0' : '-1',
+                'bayar_pendaftaran' => $cekbiayadaftar->biaya_pendaftaran == 1 ? '0' : '-1',
                 'tgl_daftar'        => date('Y-m-d H:i:s'),
                 'batch_daftar'      => $batch,
                 'jalur_daftar'      => $jalur,
                 'beasiswa'          => $beasiswa,
-                'tahun_lulus'       => $tahun,
+
+                // 3. PENTING: Gunakan input dari user ($tahunLulusUser), JANGAN $tahunSekarang
+                'tahun_lulus'       => $tahunLulusUser,
+
                 'jurusan_sekolah'   => $jurusansekolah,
                 'pilihan1'          => $prodi1,
                 'pilihan2'          => $prodi2,
                 'waktu_kuliah'      => $waktukuliah,
-                'bayar_ukt'         => $cekbiayadaftar->status_ukt==1 ? '0' : '-1',
+                'bayar_ukt'         => $cekbiayadaftar->status_ukt == 1 ? '0' : '-1',
                 'created_at'        => date('Y-m-d H:i:s'),
             );
             $pendaftaran = Pendaftaran::insert($data_daftar);
 
-            if($pendaftaran){
+            if ($pendaftaran) {
                 DB::commit();
                 $data['title'] = 'Berhasil';
                 $data['message'] = 'Data Pendaftaran Berhasil disimpan ! Silahkan konfirmasi pendaftaran anda';
                 $data['status'] = 'success';
-            }else{
+            } else {
                 DB::rollback();
                 $data['title'] = 'Gagal';
                 $data['message'] = 'Data Pendaftaran Gagal disimpan !';
@@ -334,7 +341,6 @@ class PendaftaranController extends Controller
         }
 
         return $data;
-
     }
 
     public function update($post)
