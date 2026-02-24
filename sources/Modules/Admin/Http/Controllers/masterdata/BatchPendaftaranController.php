@@ -26,7 +26,7 @@ class BatchPendaftaranController extends Controller
 
     public function TabelBatch()
     {
-        $data = Master_Batch::where('isactive',1)->get();
+        $data = Master_Batch::orderBy('id','desc')->get();
         return DataTables::of($data)
         ->addIndexColumn()
         ->addColumn('kode', function ($d) {

@@ -40,7 +40,7 @@ class TarifUKTController extends Controller
         $data = Master_TarifUKT::where('isactive',1)->with(['batch','jalur','jurusan'=>function($q){
             $q->with('jenjang','Fakultas');
         }
-        ])->get();
+        ])->orderBy('id','desc')->get();
         return DataTables::of($data)
         ->addIndexColumn()
         ->addColumn('batch', function ($d) {
