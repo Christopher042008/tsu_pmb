@@ -37,10 +37,10 @@ class TarifUKTController extends Controller
 
     public function TabelUKT()
     {
-        $data = Master_TarifUKT::where('isactive',1)->with(['batch','jalur','jurusan'=>function($q){
+        $data = Master_TarifUKT::with(['batch','jalur','jurusan'=>function($q){
             $q->with('jenjang','Fakultas');
         }
-        ])->get();
+        ])->orderBy('id','desc')->get();
         return DataTables::of($data)
         ->addIndexColumn()
         ->addColumn('batch', function ($d) {
@@ -231,20 +231,28 @@ class TarifUKTController extends Controller
             'updated_by' => session('session')->nip
         );
 
-        $update = Master_TarifUKT::where('id',$id)->update($up);
-
-        $kata = $aktif=='1' ? 'Berhasil Mengaktifkan Data': 'Berhasil Menghapus Data';
-        $del = $aktif=='1' ? 'Gagal Mengaktifkan Data': 'Gagal Menghapus Data';
-
-        if($update){
-            DB::commit();
-            $master['message'] = $kata;
-            $master['status'] = 'success';
+        $cek = Master_TarifUKT::where('id',$id)->select('id','idbatch')->first();
+        $cekbatch = Master_Batch::where('id',$cek->idbatch)->select('id','isactive')->first();
+        if($cekbatch->isactive=='0'){
+            $master['message'] = 'Harus Mengaktifkan Batch Pendaftaran Terlebih Dahulu';
+            $master['status'] = 'warning';
         }else{
-            DB::rollback();
-            $master['message'] = $del;
-            $master['status'] = 'error';
+            $update = Master_TarifUKT::where('id',$id)->update($up);
+
+            $kata = $aktif=='1' ? 'Berhasil Mengaktifkan Data': 'Berhasil Menghapus Data';
+            $del = $aktif=='1' ? 'Gagal Mengaktifkan Data': 'Gagal Menghapus Data';
+
+            if($update){
+                DB::commit();
+                $master['message'] = $kata;
+                $master['status'] = 'success';
+            }else{
+                DB::rollback();
+                $master['message'] = $del;
+                $master['status'] = 'error';
+            }
         }
+
         return response()->json($master, Response::HTTP_OK);
     }
 }
