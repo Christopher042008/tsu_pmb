@@ -10,7 +10,7 @@
         <nav id="navmenu" class="navmenu">
             <ul>
                 <li><a href="{{ route('indexing') }}">Beranda</a></li>
-                <li><a href="#">Jalur Pendaftaran</a></li>
+                <li><a href="{{ route('jalur_pendaftaran') }}">Jalur Pendaftaran</a></li>
                 <li class="dropdown"><a href="#"><span>Informasi</span> <i
                             class="bi bi-chevron-down toggle-dropdown"></i></a>
                     <ul>

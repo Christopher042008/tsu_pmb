@@ -40,6 +40,7 @@ class UserController extends Controller
         return view('user::halamandepannew.index',$data);
     }
 
+
     public function programStudi()
     {
         // Variabel $title agar sesuai dengan @section('title', $title) di master Anda
@@ -57,7 +58,10 @@ class UserController extends Controller
         
         // 3. Lempar data $groupedJurusans ke view
         return view('user::halamandepannew.programstudi.index', compact('title', 'groupedJurusans'));
+
     }
+
+   
 
     public function pengumuman()
     {
@@ -84,6 +88,24 @@ class UserController extends Controller
         
         // Memanggil view sesuai path yang Anda berikan
         return view('user::halamandepannew.informasipendaftaran.index', compact('title'));
+
+    }
+
+    public function jalurPendaftaran()
+    {
+        $title = 'Jalur Pendaftaran - Universitas Tiga Serangkai'; 
+        
+        $batches = Master_Batch::where('isactive', '1') 
+            ->orderBy('tglmulai', 'asc')
+            ->get();
+
+        // Ganti 'status' menjadi 'isactive'
+        $jenis_pendaftaran = Master_JenisPendaftaran::where('isactive', '1')->get();
+
+        // (Hapus baris dd($jenis_pendaftaran); yang tadi kita tambahkan)
+
+        return view('user::halamandepannew.jalurpendaftaran.index', compact('title', 'batches', 'jenis_pendaftaran'));
+
     }
 
     public function Register()

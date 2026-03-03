@@ -1,4 +1,4 @@
-<footer id="footer" class="footer position-relative dark-background">
+<footer id="footer" class="footer position-relative light-background">
 
     <div class="container footer-top">
         <div class="row gy-4">

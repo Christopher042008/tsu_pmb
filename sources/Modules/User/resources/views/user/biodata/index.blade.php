@@ -113,10 +113,10 @@
                                             <input type="date" class="form-control pageku-1" name="tgl_lahir" id="tgl_lahir">
                                         </div>
                                         <div class="col-md-4">
-                                            <label for="tinggi_badan"><code>*</code> Tinggi Badan</label>
+                                            <!-- <label for="tinggi_badan"><code>*</code> Tinggi Badan</label>
                                             <input type="number" min="0" class="form-control pageku-1" name="tinggi_badan" id="tinggi_badan" placeholder="Masukan Tinggi Badan">
                                             <label for="berat_badan"><code>*</code> Berat Badan</label>
-                                            <input type="number" min="0" class="form-control pageku-1" name="berat_badan" id="berat_badan" placeholder="Masukan Berat Badan">
+                                            <input type="number" min="0" class="form-control pageku-1" name="berat_badan" id="berat_badan" placeholder="Masukan Berat Badan"> -->
                                             <label for="agama"><code>*</code> Agama</label>
                                             <select class="form-control select2 pageku-1" id="agama" name="agama">
                                                 <option value="" selected disabled>-- Pilih Agama --</option>
@@ -133,6 +133,7 @@
                                             <input type="email" class="form-control pageku-1" name="email" id="email" value="{{session('user')->email}}" placeholder="Masukan Email" readonly>
                                             <label for="ukuran_jas"><code>*</code> Ukuran Jas Almamater</label>
                                             <input type="text" class="form-control pageku-1" name="ukuran_jas" id="ukuran_jas" placeholder="Masukan Ukuran Jas Almamater">
+                                            <span class="text-bold d-block text-center mt-1"><code>!! Ambil 1 size dari size biasa !!</code></span>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="provinsi"><code>*</code> Provinsi</label>

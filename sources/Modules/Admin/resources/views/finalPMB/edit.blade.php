@@ -91,10 +91,10 @@
                                             <input type="date" class="form-control pageku-1" name="tgl_lahir" id="tgl_lahir" value="{{$datadaftar->biodata->tgl_lahir}}">
                                         </div>
                                         <div class="col-md-4">
-                                            <label for="tinggi_badan"><code>*</code> Tinggi Badan</label>
+                                            <!-- <label for="tinggi_badan"><code>*</code> Tinggi Badan</label>
                                             <input type="number" min="0" class="form-control pageku-1" name="tinggi_badan" id="tinggi_badan" placeholder="Masukan Tinggi Badan" value="{{$datadaftar->biodata->tinggi_badan}}">
                                             <label for="berat_badan"><code>*</code> Berat Badan</label>
-                                            <input type="number" min="0" class="form-control pageku-1" name="berat_badan" id="berat_badan" placeholder="Masukan Berat Badan" value="{{$datadaftar->biodata->berat_badan}}">
+                                            <input type="number" min="0" class="form-control pageku-1" name="berat_badan" id="berat_badan" placeholder="Masukan Berat Badan" value="{{$datadaftar->biodata->berat_badan}}"> -->
                                             <label for="agama"><code>*</code> Agama</label>
                                             <select class="form-control select2 pageku-1" id="agama" name="agama">
                                                 <option value="" selected disabled>-- Pilih Agama --</option>
