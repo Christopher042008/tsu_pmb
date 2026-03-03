@@ -282,50 +282,52 @@
                                             <tr>
                                                 <th>NIK</th>
                                                 <th>: {{$datadaftar->biodata->nik}}</th>
-                                                <th>Tinggi Badan</th>
-                                                <th>: {{$datadaftar->biodata->tinggi_badan}}</th>
+                                                <th>Kecamatan</th>
+                                                <th>: {{$kecamatan==null ? '' : $kecamatan->nama_kecamatan}}</th>
+                                                <!-- <th>Tinggi Badan</th>
+                                                <th>: {{$datadaftar->biodata->tinggi_badan}}</th> -->
                                                 <th>Provinsi</th>
-                                                <th>: {{$provinsi->nama_provinsi}}</th>
+                                                <th>: {{ $provinsi == null ? '-' : $provinsi->nama_provinsi }}</th>
                                             </tr>
                                             <tr>
                                                 <th>No KK</th>
                                                 <th>: {{$datadaftar->biodata->nokk}}</th>
-                                                <th>Berat Badan</th>
-                                                <th>: {{$datadaftar->biodata->berat_badan}}</th>
+                                                <th>Desa/Kelurahan</th>
+                                                <th>: {{$kelurahan==null ? '' : $kelurahan->nama_kelurahan}}</th>
+                                                <!-- <th>Berat Badan</th>
+                                                <th>: {{$datadaftar->biodata->berat_badan}}</th> -->
                                                 <th>Kabupaten/Kota</th>
-                                                <th>: {{$kabupaten->nama_kabupaten}}</th>
+                                                <th>: {{ $kabupaten == null ? '-' : $kabupaten->nama_kabupaten }}</th>
                                             </tr>
                                             <tr>
                                                 <th>Nama</th>
                                                 <th>: {{$datadaftar->biodata->nama}}</th>
                                                 <th>Agama</th>
                                                 <th>: {{$datadaftar->biodata->agama}}</th>
-                                                <th>Kecamatan</th>
-                                                <th>: {{$kecamatan==null ? '' : $kecamatan->nama_kecamatan}}</th>
+                                                <th>RT /RW / Kode Pos</th>
+                                                <th>: {{$datadaftar->biodata->rt}}/{{$datadaftar->biodata->rw}}/{{$datadaftar->biodata->kodepos}}</th>
                                             </tr>
                                             <tr>
                                                 <th>Jenis Kelamin</th>
                                                 <th>: {{$datadaftar->biodata->jenkel}}</th>
                                                 <th>No HP</th>
                                                 <th>: {{$datadaftar->biodata->nohp}}</th>
-                                                <th>Desa/Kelurahan</th>
-                                                <th>: {{$kelurahan==null ? '' : $kelurahan->nama_kelurahan}}</th>
+                                                <th>Alamat Lengkap</th>
+                                                <th>: {{$datadaftar->biodata->alamat_lengkap}}</th>
                                             </tr>
                                             <tr>
                                                 <th>Tempat Lahir</th>
                                                 <th>: {{$datadaftar->biodata->tempat_lahir}}</th>
                                                 <th>Email</th>
                                                 <th>: {{$datadaftar->biodata->akunbio->email}}</th>
-                                                <th>RT /RW / Kode Pos</th>
-                                                <th>: {{$datadaftar->biodata->rt}}/{{$datadaftar->biodata->rw}}/{{$datadaftar->biodata->kodepos}}</th>
+                                                
                                             </tr>
                                             <tr>
                                                 <th>Tanggal Lahir</th>
                                                 <th>: {{tglIndo($datadaftar->biodata->tgl_lahir)}}</th>
                                                 <th>Ukuran Jas Almamater</th>
                                                 <th>: {{$datadaftar->biodata->ukuran_jas}}</th>
-                                                <th>Alamat Lengkap</th>
-                                                <th>: {{$datadaftar->biodata->alamat_lengkap}}</th>
+                                                
                                             </tr>
                                         </thead>
                                     </table>
@@ -457,13 +459,13 @@
                                             </tr>
                                             <tr>
                                                 <th>Provinsi Sekolah</th>
-                                                <th>: {{$provinsi_sekolah->nama_provinsi}}</th>
+                                                <th>: {{ $provinsi_sekolah == null ? '-' : $provinsi_sekolah->nama_provinsi }}</th>
                                                 <th>Tahun Lulus</th>
                                                 <th>: {{$datadaftar->tahun_lulus}}</th>
                                             </tr>
                                             <tr>
                                                 <th>Kabupaten/Kota Sekolah</th>
-                                                <th>: {{$kabupaten_sekolah->nama_kabupaten}}</th>
+                                                <th>: {{ $kabupaten_sekolah == null ? '-' : $kabupaten_sekolah->nama_kabupaten }}</th>
                                                 <th>Nilai Akhir</th>
                                                 <th>: {{$datadaftar->biodata->nilai_akhir}}</th>
                                             </tr>

@@ -36,7 +36,7 @@
   --nav-mobile-background-color: #ffffff; /* Used as the background color for mobile navigation menu */
   --nav-dropdown-background-color: #ffffff; /* Used as the background color for dropdown items that appear when hovering over primary navigation items */
   --nav-dropdown-color: #212529; /* Used for navigation links of the dropdown items in the navigation menu. */
-  --nav-dropdown-hover-color: #08915e; /* Similar to --nav-hover-color, this color is applied to dropdown navigation links when they are hovered over. */
+  --nav-dropdown-hover-color: #126c84; /* Similar to --nav-hover-color, this color is applied to dropdown navigation links when they are hovered over. */
 }
 
 /* Color Presets - These classes override global colors when applied to any section or element, providing reuse of the sam color scheme. */
@@ -8223,11 +8223,6 @@ section,
 .starter-section {
   /* Add your styles here */
 }
-
-
-
-        /*beranda*/
-        main.css
 /* --- 1. Container Utama --- */
     .social-widget-container {
         position: fixed;
@@ -8866,3 +8861,7 @@ a.info-card:hover h3 {
     color: #0d6efd;
 }
 
+/* berkas khusus */
+div.dataTables_processing {
+        display: none !important;
+    }

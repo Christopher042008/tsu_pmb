@@ -389,46 +389,45 @@ class PendaftaranController extends Controller
 
     public function ConfirmDaftar($params)
     {
-        $kode = decrypt($params);
+       $kode = decrypt($params);
 
         DB::beginTransaction();
 
+        // 1. Ambil data pendaftaran peserta saat ini
         $cek1 = Pendaftaran::where('KodePendaftaran',$kode)->where('isactive',1)->first();
+        
+        // 2. Ambil data Master Jenis Pendaftaran (Jalur) berdasarkan pilihan peserta
         $jalur = Master_JenisPendaftaran::where('id',$cek1->jalur_daftar)->where('isactive',1)->first();
         $biaya = $jalur->jml_biaya_pendaftaran;
 
+        // 3.       Ambil ID berkas khusus dari tabel master jenis pendaftaran.
+        // Jika  jalur tersebut tidak butuh berkas khusus (null di database), maka variabel ini akan berisi null.
+        $idBerkasKhusus = $jalur->berkas_khusus;
+
+        // 4. Update data pendaftaran (Tambahkan kolom berkas_khusus)
         $updt = Pendaftaran::where('KodePendaftaran',$kode)->where('isactive',1)->update([
-            'konfirm_pendaftaran'=>'1',
-            'tgl_konfirm' => date('Y-m-d H:i:s'),
-            'current_step' => $biaya == 0 ? $cek1->current_step+3 : $cek1->current_step+1,
-            'updated_at' => date('Y-m-d H:i:s')
+            'konfirm_pendaftaran' => '1',
+            'tgl_konfirm'         => date('Y-m-d H:i:s'),
+            'current_step'        => $biaya == 0 ? $cek1->current_step+3 : $cek1->current_step+1,
+            'berkas_khusus'       => $idBerkasKhusus, // <-- INI fungsi yang mengirim kode jenis berkas
+            'updated_at'          => date('Y-m-d H:i:s')
         ]);
 
-        $kode = 'PMB-'.$cek1->KodePendaftaran.'-'.date('YmdHis');
+        $kode_transaksi = 'PMB-'.$cek1->KodePendaftaran.'-'.date('YmdHis');
         $bioId = decrypt(session('user')->_biodata);
 
-        // dd($bioId);
         // Simpan transaksi
         $transaksi = Transaksi::insert([
-            'user_id' => $bioId,
-            'kategori' => 'pendaftaran',
-            'id_referensi' => $cek1->KodePendaftaran,
-            'kode_transaksi' => $kode,
-            'jumlah' => $biaya,
-            'status' => $biaya == 0 ? 'paid' : 'pending',
-            'created_at' => date('Y-m-d H:i:s')
+            'user_id'        => $bioId,
+            'kategori'       => 'pendaftaran',
+            'id_referensi'   => $cek1->KodePendaftaran,
+            'kode_transaksi' => $kode_transaksi,
+            'jumlah'         => $biaya,
+            'status'         => $biaya == 0 ? 'paid' : 'pending',
+            'created_at'     => date('Y-m-d H:i:s')
         ]);
 
-        // $cek2 = Transaksi::orderby('id','desc')->latest()->first();
-        // Simpan history
-        // $historyTransaksi = TransaksiHistory::insert([
-            // 'transaksi_id' => $cek2->id,
-            // 'status' => $cek2->status,
-            // 'keterangan' => $biaya == 0 ? 'Gratis / Beasiswa' : 'Menunggu pembayaran',
-            // 'created_at' => date('Y-m-d H:i:s')
-        // ]);
-
-        if($updt&&$transaksi){ //&&$historyTransaksi
+        if($updt && $transaksi){ 
            DB::commit();
             $data['title'] = 'Berhasil';
             $data['message'] = 'Konfirmasi Pendaftaran Berhasil';
@@ -439,6 +438,7 @@ class PendaftaranController extends Controller
             $data['message'] = 'Konfirmasi Pendaftaran Gagal';
             $data['status'] = 'error';
         }
+        
         return response()->json($data, Response::HTTP_OK);
     }
 
