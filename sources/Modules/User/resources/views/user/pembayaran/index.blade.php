@@ -468,6 +468,7 @@
                                 showCancelButton: true,
                             }).then((result) => {
                                 if(result.value){
+                                    $('#loading').show()
                                     btn.prop('disabled',true)
                                     $('#form-upload-bayar').submit();
                                 }else{

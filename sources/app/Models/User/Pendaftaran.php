@@ -58,6 +58,10 @@ class Pendaftaran extends Model
         return $this->hasOne('App\Models\MasterData\Master_JurusanKuliah', 'KodeJurusan','pilihan2');
     }
 
+    public function prodi3(){
+        return $this->hasOne('App\Models\MasterData\Master_JurusanKuliah', 'KodeJurusan','pilihan3');
+    }
+
     public function waktukuliah(){
         return $this->hasOne('App\Models\MasterData\Master_WaktuKuliah', 'id','waktu_kuliah');
     }
