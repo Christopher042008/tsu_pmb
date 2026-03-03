@@ -130,6 +130,64 @@
                     </a>
                 </li>
                 @endif
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-list-ul"></i>
+                        <p>
+                            Assessment<i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                            <i class="fas fa-clipboard-list nav-icon"></i>
+                            <p>
+                                Master Data Assessment
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                            </a>
+                            <ul class="nav nav-treeview" style="display: none;">
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.mastertest.show') }}" class="nav-link">
+                                    <i class="far fa-dot-circle nav-icon"></i>
+                                    <p>Master Test</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                    <i class="far fa-dot-circle nav-icon"></i>
+                                    <p>Master Soal</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="nav nav-treeview" style="display: none;">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                            <i class="fa fa-list-alt nav-icon"></i>
+                            <p>
+                                Hasil & Monitoring
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                            </a>
+                            <ul class="nav nav-treeview" style="display: none;">
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                    <i class="far fa-dot-circle nav-icon"></i>
+                                    <p>Hasil Test</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                    <i class="far fa-dot-circle nav-icon"></i>
+                                    <p>Monitoring Test</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
                 @php
                     $fakultas = checkmenu('Master Data', 'Master Fakultas');
                     $jurusan = checkmenu('Master Data', 'Master Jurusan');
@@ -153,7 +211,7 @@
                 <li class="nav-item"> {{-- menu-open --}}
                     <a href="#" class="nav-link"> {{-- active --}}
                         <i class="nav-icon fas fa-clipboard-list"></i>
-                        <p>Master Data
+                        <p>Master Data PMB
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
