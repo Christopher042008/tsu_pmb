@@ -37,285 +37,458 @@ class ValidasiBerkasController extends Controller
             'title' => 'Berkas Beasiswa',
             'menu' => 'Berkas Beasiswa',
         );
-        return view('user::user.berkas.index',$data);
+        return view('user::user.berkas.index', $data);
     }
 
     public function tabelBerkasBeasiswa()
     {
         $bioId = decrypt(session('user')->_biodata);
-        $data = Pendaftaran::where('biodata_id',$bioId)
-        ->join('pmb_master_jenispendaftaran as a','pmb_pendaftaran.jalur_daftar','=','a.id')
-        ->selectRaw('pmb_pendaftaran.*')
-        ->whereRaw('a.berkas_khusus is not null')
-        ->with(['biodata','batch','jalur','jenisbeasiswa'])
-        ->get();
+
+        $data = Pendaftaran::where('pmb_pendaftaran.biodata_id', $bioId)
+            ->join('pmb_master_jenispendaftaran as a', 'pmb_pendaftaran.jalur_daftar', '=', 'a.id')
+            ->selectRaw('pmb_pendaftaran.*, a.berkas_khusus as list_berkas_diminta')
+            ->whereNotNull('a.berkas_khusus')
+            ->addSelect([
+                'jml_diminta' => DB::table('pmb_master_berkas')
+                    ->selectRaw('count(*)')
+                    ->whereColumn('pmb_master_berkas.IdJenis', 'a.berkas_khusus')
+            ])
+            ->addSelect([
+                'jml_diupload' => DB::table('pmb_berkas_pendaftaran')
+                    ->selectRaw('count(*)')
+                    ->whereColumn('pmb_berkas_pendaftaran.kode_daftar', 'pmb_pendaftaran.KodePendaftaran')
+            ])
+            ->with(['biodata', 'batch', 'jalur', 'jenisbeasiswa']);
+
         return DataTables::of($data)
-        ->addIndexColumn()
-        ->addColumn('nama', function ($d) {
-            return $d->biodata->nama;
-        })
-        ->addColumn('noreg', function ($d) {
-            return $d->KodePendaftaran;
-        })
-        ->addColumn('batch', function ($d) {
-            return $d->batch->nama_batch;
-        })
-        ->addColumn('jalur', function ($d) {
-            $nama = $d->jalur->jenis_pendaftaran;
-            return $nama;
-        })
-        ->addColumn('beasiswa', function ($d) {
-            $nama = $d->jenisbeasiswa ? $d->jenisbeasiswa->jenis_beasiswa : '-';
-            return $nama;
-        })
-        ->addColumn('status', function ($d) {
-            $role = '';
-            $warna = '';
-            if($d->validasi_berkas_khusus=='0'){
-                $role = 'Validasi Berkas';
-                $warna = 'warning';
-            }elseif($d->validasi_berkas_khusus=='1'){
-                $role = 'Berkas OK';
-                $warna = 'success';
-            }elseif($d->validasi_berkas_khusus=='-1'){
-                $role = 'Berkas Ditolak';
-                $warna = 'danger';
-            }else{
-                $role = 'Belum Diupload';
-                $warna = 'warning';
-            }
-            $show = '<span class="badge bg-'.$warna.'">'.$role.'</span>';
-            return $show;
-        })
-        ->addColumn('keterangan', function ($d) {
-            $id = encrypt($d->KodePendaftaran);
-            $nama = $d->keterangan ? $d->keterangan:'-';
-            $btn = '';
-            if($d->status_pindah_jalur=='0'){
-                $btn  = '<br><a href="#" class="tidaksetuju-pindah" data-id="'.$id.'"><i title="Tidak Setuju Pindah Jalur" class="fa fa-window-close fa-lg text-red"></i></a>
-                                <a href="#" class="setuju-pindah" data-id="'.$id.'"><i title="Setuju Pindah jalur" class="fa fa-check-square fa-lg text-green"></i></a>';
-            }
-            return $nama.$btn;
-        })
-        ->addColumn('action', function ($d) {
-            $id = encrypt($d->KodePendaftaran);
-            $upload = '';
-            $show = '';
-            $params1 = Parameter::where('id',1)->first();
-            if($d->berkas_khusus!=null){
-                $link = asset('sources/storage/app/'.$params1->file_khusus.'/'.$d->berkas_khusus);
-                $show = '<a href="'.$link.'" target="_blank" class="btn_show"><i title="Lihat Berkas" class="fas fa-eye text-green"></i></a>';
+            ->addIndexColumn()
+            ->addColumn('nama', function ($d) {
+                return $d->biodata->nama;
+            })
+            ->addColumn('noreg', function ($d) {
+                return $d->KodePendaftaran;
+            })
+            ->addColumn('batch', function ($d) {
+                return $d->batch->nama_batch;
+            })
+            ->addColumn('jalur', function ($d) {
+                return $d->jalur->jenis_pendaftaran;
+            })
+            ->addColumn('beasiswa', function ($d) {
+                return $d->jenisbeasiswa ? $d->jenisbeasiswa->jenis_beasiswa : '-';
+            })
+            ->addColumn('status', function ($d) {
+                if ($d->validasi_berkas_khusus == '1') {
+                    return '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Lolos</span>';
+                } elseif ($d->validasi_berkas_khusus == '-1') {
+                    return '<span class="badge bg-danger"><i class="fas fa-times-circle"></i> Tidak Lolos</span>';
+                } else {
+                    if ($d->jml_diupload >= $d->jml_diminta && $d->jml_diminta > 0) {
+                        return '<span class="badge bg-primary"><i class="fas fa-list-check"></i> Berkas Lengkap</span>';
+                    } else {
+                        return '<span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle"></i> Belum Lengkap</span>';
+                    }
+                }
+            })
+            ->addColumn('keterangan', function ($d) {
+                return $d->keterangan ? $d->keterangan : '-';
+            })
+            ->addColumn('action', function ($d) {
+                $id_raw = $d->KodePendaftaran;
+                $id_encrypt = encrypt($d->KodePendaftaran);
+
+                // 1. TOMBOL BARU: Mata (View Berkas) untuk buka Modal
+                $btn = '<button type="button" class="btn btn-sm btn-info btn-view-berkas me-1" data-id="' . $id_raw . '" title="Lihat Berkas Khusus"><i class="fas fa-eye"></i></button>';
+
+                // 2. TOMBOL DETAIL (Lama): Tetap dipertahankan
+                $btn .= '<a href="javascript:void(0)" class="btn btn-sm btn-primary btn-detail me-1" data-id="' . $id_raw . '" title="Lihat Detail"><i class="fas fa-list"></i></a>';
+
+                if ($d->validasi_berkas_khusus == '-1' && $d->status_pindah_jalur == '0') {
+                    $btn .= '<br><div class="mt-2">';
+                    $btn .= '<a href="#" class="btn btn-sm btn-success setuju-pindah me-1" data-id="' . $id_encrypt . '" title="Setuju Pindah"><i class="fa fa-check-square"></i></a>';
+                    $btn .= '<a href="#" class="btn btn-sm btn-danger tidaksetuju-pindah" data-id="' . $id_encrypt . '" title="Tolak"><i class="fa fa-window-close"></i></a>';
+                    $btn .= '</div>';
+                }
+                return $btn;
+            })
+            ->rawColumns(['status', 'action'])
+            ->make(true);
+    }
+
+    public function GetBerkasUser(Request $request)
+    {
+        try {
+            $kode_daftar = $request->kode_daftar;
+
+            // 1. Identifikasi Kode Pendaftaran
+            if (empty($kode_daftar)) {
+                // Jika tidak ada di request, ambil dari session biodata user yang login
+                $bioId = decrypt(session('user')->_biodata);
+                $cek_daftar = DB::table('pmb_pendaftaran')->where('biodata_id', $bioId)->first();
+
+                if ($cek_daftar) {
+                    $kode_daftar = $cek_daftar->KodePendaftaran;
+                } else {
+                    return response()->json([
+                        'hasil' => 0,
+                        'pesan' => 'Data pendaftaran tidak ditemukan dalam sesi Anda.'
+                    ]);
+                }
             }
 
-            if($d->validasi_berkas_khusus=='0'||$d->validasi_berkas_khusus==null){
-                $upload = '<a href="#" data-id="'.$id.'" class="btn_upload"><i title="Upload Berkas" class="fas fa-upload text-green"></i></a>';
+            // 2. Ambil data pendaftaran (termasuk kolom berkas_khusus)
+            $pendaftaran = DB::table('pmb_pendaftaran')
+                ->where('KodePendaftaran', $kode_daftar)
+                ->first();
+
+            if (!$pendaftaran) {
+                return response()->json([
+                    'hasil' => 0,
+                    'pesan' => 'Data Pendaftaran tidak ditemukan untuk Kode: ' . $kode_daftar
+                ]);
             }
 
-            $detail = '<a href="#" data-id="'.$id.'" class="btn_detail"><i title="Detail Pendaftaran" class="fa fa-info-circle"></i></a>';
+            // 3. OPTIMASI: Langsung cek kolom berkas_khusus
+            // Jika kolom berkas_khusus kosong (null), berarti jalur ini tidak butuh berkas tambahan
+            if (empty($pendaftaran->berkas_khusus)) {
+                return response()->json([
+                    'hasil' => 1,
+                    'kode_daftar' => $kode_daftar,
+                    'data' => []
+                ]);
+            }
 
-            return $detail.' '.$show.' '.$upload;
-        })
-        ->rawColumns(['action','status','keterangan'])
-        ->make(true);
+            // 4. Ambil daftar master berkas berdasarkan ID di kolom berkas_khusus
+            // Contoh: Jika berkas_khusus bernilai '7', maka mengambil semua berkas untuk 'BSA Akademik'
+            $master_berkas = DB::table('pmb_master_berkas')
+                ->where('IdJenis', $pendaftaran->berkas_khusus)
+                ->get();
+
+            $list_berkas = [];
+
+            // 5. Loop untuk mengecek status upload tiap berkas
+            foreach ($master_berkas as $mb) {
+                $cek_upload = DB::table('pmb_berkas_pendaftaran')
+                    ->where('kode_daftar', $kode_daftar)
+                    ->where('id_berkas', $mb->id)
+                    ->first();
+
+                $status_html = '';
+                $keterangan_file = '-';
+                // 0 = Menunggu, 1 = Disetujui, -1 = Ditolak, 99 = Belum Upload
+                $status_angka = 99;
+
+                if (!$cek_upload) {
+                    $status_html = '<span class="badge bg-secondary">Belum Diupload</span>';
+                } else {
+                    $status_angka = $cek_upload->status_berkas;
+
+                    if ($cek_upload->status_berkas == '1') {
+                        $status_html = '<span class="badge bg-success"><i class="fas fa-check"></i> Berkas Disetujui</span>';
+                    } elseif ($cek_upload->status_berkas == '-1') {
+                        $status_html = '<span class="badge bg-danger"><i class="fas fa-times"></i> Berkas Ditolak</span>';
+                        $keterangan_file = $cek_upload->keterangan_berkas ?? 'Silakan upload ulang file yang sesuai.';
+                    } else {
+                        $status_html = '<span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> Menunggu Verifikasi</span>';
+                    }
+                }
+
+                $list_berkas[] = [
+                    'id_berkas'    => $mb->id,
+                    'kode_berkas'  => $mb->KodeBerkas,
+                    'nama_berkas'  => $mb->nama_berkas,
+                    'is_uploaded'  => $cek_upload ? true : false,
+                    'file_name'    => $cek_upload ? $cek_upload->nama_berkas : null,
+                    'status_html'  => $status_html,
+                    'status_angka' => $status_angka,
+                    'keterangan'   => $keterangan_file,
+                ];
+            }
+
+            // 6. Kembalikan hasil akhir ke Frontend
+            return response()->json([
+                'hasil'       => 1,
+                'kode_daftar' => $kode_daftar,
+                'data'        => $list_berkas
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'hasil' => 0,
+                'pesan' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ]);
+        }
     }
 
     public function showBerkasBeasiswa($params)
     {
-        $id = decrypt($params);
+        // HAPUS decrypt() agar bisa menerima KodePendaftaran asli dari DataTables
+        $id = $params;
         $bioId = decrypt(session('user')->_biodata);
-        //->where('isactive',1)
-        $cek1 = Pendaftaran::where('KodePendaftaran',$id)->where('biodata_id',$bioId)->with(['biodata','batch',
-        'jalur'=>function($q){
-            $q->with(['berkasumum'=>function($q){
-                    $q->with('berkas');
-                },
 
-            'berkaskhusus'=>function($q){
-                    $q->with('berkas');
-                }
-            ]);
-        },
-        'jenisbeasiswa'=>function($q){
-            $q->with('tingkat');
-        },
-        'jurusansekolah',
-        'prodi1'=>function($q){
-            $q->with('jenjang');
-        },
-        'prodi2'=>function($q){
-            $q->with('jenjang');
-        },
-        'waktukuliah'])->first();
+        $cek1 = Pendaftaran::where('KodePendaftaran', $id)->where('biodata_id', $bioId)->with([
+            'biodata',
+            'batch',
+            'jalur' => function ($q) {
+                $q->with([
+                    'berkasumum' => function ($q) {
+                        $q->with('berkas');
+                    },
+                    'berkaskhusus' => function ($q) {
+                        $q->with('berkas');
+                    }
+                ]);
+            },
+            'jenisbeasiswa' => function ($q) {
+                $q->with('tingkat');
+            },
+            'jurusansekolah',
+            'prodi1' => function ($q) {
+                $q->with('jenjang');
+            },
+            'prodi2' => function ($q) {
+                $q->with('jenjang');
+            },
+            'waktukuliah'
+        ])->first();
+
         $prodi1 = null;
         $prodi2 = null;
-        if($cek1){
-            $prodi1 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi1->id)->where('isactive',1)->first();
-            $prodi2 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi2->id)->where('isactive',1)->first();
+
+        if ($cek1) {
+            $prodi1 = Master_TarifUKT::where('idbatch', $cek1->batch_daftar)->where('idjalur', $cek1->jalur_daftar)->where('idjurusan', $cek1->prodi1->id)->where('isactive', 1)->first();
+            $prodi2 = Master_TarifUKT::where('idbatch', $cek1->batch_daftar)->where('idjalur', $cek1->jalur_daftar)->where('idjurusan', $cek1->prodi2->id)->where('isactive', 1)->first();
             $data['hasil'] = 1;
             $data['daftar'] = $cek1;
             $data['IdDaftar'] = $params;
             $data['ukt1'] = $prodi1;
             $data['ukt2'] = $prodi2;
-        }else{
+        } else {
             $data['hasil'] = 0;
             $data['daftar'] = $cek1;
             $data['IdDaftar'] = null;
             $data['ukt1'] = $prodi1;
             $data['ukt2'] = $prodi2;
         }
-        // dd($data);
-        return response()->json($data, Response::HTTP_OK);
+
+        return response()->json($data, 200); // 200 adalah Response::HTTP_OK
     }
 
-    public function saveBerkas(Request $post)
+    public function saveBerkas(Request $request)
     {
-        $kddftar = decrypt($post->kodedaftar);
-        $cek = Pendaftaran::where('KodePendaftaran',$kddftar)->with(['jalur'])->first();
-        $file = $post->file('fileberkas');
-        $ext = $file->getClientOriginalExtension();
-        $filename = $cek->jalur->KodeJenis.'_'.$kddftar.'_'.date('YmdHis').'.'.$ext;
+        $kddftar = $request->iddaftar;
+        $id_berkas = $request->id_berkas;
+        $kode_berkas = $request->kode_berkas;
 
+        if (!$request->hasFile('berkaskhusus')) {
+            return response()->json(['status' => 'error', 'title' => 'Gagal', 'message' => 'File belum dipilih!'], 200);
+        }
+
+        // 1. KITA UBAH NAMA VARIABELNYA JADI $fileUpload AGAR AMAN & TIDAK BENTROK
+        $fileUpload = $request->file('berkaskhusus');
+
+        $originalName = $fileUpload->getClientOriginalName();
+        $safeOriginalName = str_replace(' ', '_', $originalName);
+        $filename = $kddftar . '_' . $kode_berkas . '_' . $safeOriginalName;
 
         DB::beginTransaction();
 
-        $parameter = Parameter::where('id',1)->first();
-        $updateberkas = null;
-        if($cek->berkas_khusus!=null){
-            $path = $parameter->file_khusus.'/'.$cek->berkas_khusus;
-            if (Storage::exists($path)) {
-                Storage::delete($path);
-            }
-            $stepku = $cek->current_step;
-            $updateberkas = date('Y-m-d H:i:s');
-        }else{
-            $stepku = $cek->current_step+1;
-            $updateberkas = null;
-        }
+        try {
+            $parameter = Parameter::where('id', 1)->first();
+            $folder_path = $parameter->file_khusus ?? 'berkas_khusus';
 
-        $update = Pendaftaran::where('KodePendaftaran',$kddftar)->update([
-            'current_step' => $stepku,
-            'berkas_khusus' => $filename,
-            'validasi_berkas_khusus' => '0',
-            'update_berkaskhusus' => $updateberkas,
-            'updated_at' => date('Y-m-d H:i:s')
-        ]);
+            $existing = DB::table('pmb_berkas_pendaftaran')
+                ->where('kode_daftar', $kddftar)
+                ->where('id_berkas', $id_berkas)
+                ->first();
 
-        if($update){
-            DB::commit();
-            $file->storeAs($parameter->file_khusus, $filename);
-            $data['title'] = 'Berhasil';
-            $data['message'] = 'Upload Berkas Sukses!';
-            $data['status'] = 'success';
-        }else{
-            DB::rollback();
-            $data['title'] = 'Gagal';
-            $data['message'] = 'Upload Berkas Gagal!';
-            $data['status'] = 'error';
-        }
-        return response()->json($data, Response::HTTP_OK);
-    }
+            // Ambil data user yang sedang login untuk mengisi created_by
+            // Jika tidak ada user login (misal public), gunakan kddftar
+            $user_login = auth()->user() ? auth()->user()->username : $kddftar;
 
-    public function PindahJalur($params1,$params2)
-    {
-        $id = decrypt($params1);
-        $pindahjalur = $params2;
-        // dd($params1,$params2);
-        $cekdaftar = Pendaftaran::where('KodePendaftaran',$id)->where('isactive',1)->first();
+            if ($existing) {
+                $old_path = $folder_path . '/' . $existing->nama_berkas;
+                if (Storage::exists($old_path)) {
+                    Storage::delete($old_path);
+                }
 
-        DB::beginTransaction();
+                DB::table('pmb_berkas_pendaftaran')
+                    ->where('id', $existing->id)
+                    ->update([
+                        'nama_berkas' => $filename,
+                        'updated_by'  => $user_login,
+                        'updated_at'  => date('Y-m-d H:i:s')
+                    ]);
+            } else {
+                // 1. Cari ID terakhir, lalu tambah 1
+                $maxId = DB::table('pmb_berkas_pendaftaran')->max('id');
+                $newId = $maxId ? $maxId + 1 : 1;
 
-        if($pindahjalur=='-1'){
-            $updt = Pendaftaran::where('KodePendaftaran',$id)->where('isactive',1)->update([
-                'keterangan' => 'Anda dinyatakan mengundurkan diri ! Silahkan Daftar pada batch selanjutnya.',
-                'status_pindah_jalur' => $pindahjalur,
-                'stop_step' => $cekdaftar->current_step,
-                'isactive' => '0',
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
-            if($updt){
-                DB::commit();
-                $data['title'] = 'Berhasil';
-                $data['message'] = 'Anda dinyatakan mengundurkan diri ! Silahkan Daftar pada batch selanjutnya.';
-                $data['status'] = 'success';
-            }else{
-                DB::rollback();
-                $data['title'] = 'Gagal';
-                $data['message'] = 'Gagal Mengundurkan diri. Silahkan Coba Kembali !';
-                $data['status'] = 'error';
-            }
-        }else{
-            $cek = Pendaftaran::where('KodePendaftaran',$id)->where('isactive',1)->first();
-            $transaksi = Transaksi::where('user_id',$cek->biodata_id)->where('id_referensi',$id)->first();
-            $cekjalur = Master_JenisPendaftaran::wherelike('jenis_pendaftaran','%reguler%')->where('isactive',1)->first();
-
-            // Tracking pindah jalur
-            $up1 = PindahJalur::insert([
-                'biodata_id' => $cek->biodata_id,
-                'KodePendaftaran' => $id,
-                'batch' => $cek->batch_daftar,
-                'jalur' => $cek->jalur_daftar,
-                'beasiswa' => $cek->beasiswa,
-                'berkas_khusus' => $cek->berkas_khusus,
-                'created_at' => date('Y-m-d H:i:s')
-            ]);
-
-            //Pindah Jalur Pendaftaran
-            $up2 = Pendaftaran::where('KodePendaftaran',$id)->where('biodata_id',$cek->biodata_id)->where('isactive',1)->update([
-                'bayar_pendaftaran'          => $cek->bayar_pendaftaran=='-1' ? '0' : $cek->bayar_pendaftaran,
-                'batch_daftar'               => $cek->batch_daftar,
-                'jalur_daftar'               => $cekjalur->id,
-                'beasiswa'                   => null,
-                'bayar_ukt'                  => $cekjalur->status_ukt,
-                'berkas_khusus'              => null,
-                'validasi_berkas_khusus'     => null,
-                'nik_validasi_berkas_khusus' => null,
-                'tgl_validasi_berkas_khusus' => null,
-                'keterangan'                 => null,
-                'status_pindah_jalur'        => '1',
-                'updated_at'                 => date('Y-m-d H:i:s')
-            ]);
-
-            //Cek Biaya Pendaftaran
-            if($cek->bayar_pendaftaran=='-1'){
-                Transaksi::where('user_id',$cek->biodata_id)->where('id_referensi',$id)
-                ->update([
-                    'jumlah' => $cekjalur->jml_biaya_pendaftaran,
-                    'status' => 'pending',
-                    'metode_bayar' => null,
-                    'midtrans_order_id' => null,
-                    'midtrans_snap_token' => null,
-                    'expired_at' => null
+                // 2. Masukkan ID baru tersebut ke dalam proses Insert
+                DB::table('pmb_berkas_pendaftaran')->insert([
+                    'id'          => $newId,
+                    'kode_daftar' => $kddftar,
+                    'id_berkas'   => $id_berkas,
+                    'nama_berkas' => $filename,
+                    'created_by'  => $user_login,
+                    'created_at'  => date('Y-m-d H:i:s'),
+                    'updated_at'  => date('Y-m-d H:i:s')
                 ]);
-                TransaksiHistory::where('transaksi_id',$transaksi->id)->delete();
-                TransaksiHistory::insert([
-                    'transaksi_id' => $transaksi->id,
-                    'status' => 'pending',
-                    'keterangan' => 'Menunggu pembayaran',
+            }
+            $fileUpload->storeAs($folder_path, $filename);
+            DB::table('pmb_pendaftaran')
+                ->where('KodePendaftaran', $kddftar)
+                ->update([
+                    'validasi_berkas_khusus' => '0',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'title'   => 'Berhasil',
+                'message' => 'Upload Berkas Sukses!'
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'status'  => 'error',
+                'title'   => 'Gagal',
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function PindahJalur($params1, $params2)
+    {
+        // 1. TERJEMAHKAN (DECRYPT) ID YANG DIKIRIM
+        try {
+            $id = decrypt($params1); // Mengubah teks panjang kembali menjadi misal: 2026050100007
+        } catch (\Exception $e) {
+            return response()->json([
+                'title' => 'Gagal',
+                'message' => 'Kode Pendaftaran tidak valid atau rusak!',
+                'status' => 'error'
+            ], 200);
+        }
+
+        $pindahjalur = $params2;
+
+        // 2. Sekarang lakukan pencarian seperti biasa
+        // (Anda bisa memasang kembali isactive-nya)
+        $cekdaftar = Pendaftaran::where('KodePendaftaran', $id)->where('isactive', 1)->first();
+
+        if (!$cekdaftar) {
+            return response()->json([
+                'title' => 'Gagal',
+                'message' => 'Data Pendaftaran tidak ditemukan!',
+                'status' => 'error'
+            ], 200); // Response::HTTP_OK itu nilainya 200
+        }
+
+        DB::beginTransaction();
+
+        try {
+            if ($pindahjalur == '-1') {
+                // PROSES 1: MENGUNDURKAN DIRI (TIDAK SETUJU)
+                Pendaftaran::where('KodePendaftaran', $id)->where('isactive', 1)->update([
+                    'keterangan' => 'Anda dinyatakan mengundurkan diri ! Silahkan Daftar pada batch selanjutnya.',
+                    'status_pindah_jalur' => $pindahjalur,
+                    'stop_step' => $cekdaftar->current_step,
+                    'isactive' => '0',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+
+                DB::commit();
+                $data = [
+                    'title' => 'Berhasil',
+                    'message' => 'Anda dinyatakan mengundurkan diri ! Silahkan Daftar pada batch selanjutnya.',
+                    'status' => 'success'
+                ];
+            } else {
+                // PROSES 2: PINDAH KE REGULER (SETUJU)
+                $transaksi = Transaksi::where('user_id', $cekdaftar->biodata_id)->where('id_referensi', $id)->first();
+
+                // PERBAIKAN: Gunakan where('kolom', 'like', 'nilai')
+                $cekjalur = Master_JenisPendaftaran::where('jenis_pendaftaran', 'like', '%reguler%')->where('isactive', 1)->first();
+
+                // Tracking pindah jalur
+                PindahJalur::insert([
+                    'biodata_id' => $cekdaftar->biodata_id,
+                    'KodePendaftaran' => $id,
+                    'batch' => $cekdaftar->batch_daftar,
+                    'jalur' => $cekdaftar->jalur_daftar,
+                    'beasiswa' => $cekdaftar->beasiswa,
+                    'berkas_khusus' => $cekdaftar->berkas_khusus,
                     'created_at' => date('Y-m-d H:i:s')
                 ]);
-                Pendaftaran::where('KodePendaftaran',$id)->where('biodata_id',$cek->biodata_id)->where('isactive',1)->update([
-                    'current_step'               => 2,
-                    'updated_at'                 => now()
-                ]);
-            }else{
-                Pendaftaran::where('KodePendaftaran',$id)->where('biodata_id',$cek->biodata_id)->where('isactive',1)->update([
-                    'current_step'               => 6,
-                    'updated_at'                 => now()
-                ]);
-            }
 
-            if($up1&&$up2){
+                // Pindah Jalur Pendaftaran
+                Pendaftaran::where('KodePendaftaran', $id)->where('biodata_id', $cekdaftar->biodata_id)->where('isactive', 1)->update([
+                    'bayar_pendaftaran'          => $cekdaftar->bayar_pendaftaran == '-1' ? '0' : $cekdaftar->bayar_pendaftaran,
+                    'batch_daftar'               => $cekdaftar->batch_daftar,
+                    'jalur_daftar'               => $cekjalur->id,
+                    'beasiswa'                   => null,
+                    'bayar_ukt'                  => $cekjalur->status_ukt,
+                    'berkas_khusus'              => null,
+                    'validasi_berkas_khusus'     => null,
+                    'nik_validasi_berkas_khusus' => null,
+                    'tgl_validasi_berkas_khusus' => null,
+                    'keterangan'                 => null, // Hapus keterangan penolakan sebelumnya
+                    'status_pindah_jalur'        => '1',
+                    'updated_at'                 => date('Y-m-d H:i:s')
+                ]);
+
+                // Cek Biaya Pendaftaran
+                if ($cekdaftar->bayar_pendaftaran == '-1') {
+                    // Reset transaksi menjadi pending dan tagih uang jalur reguler
+                    Transaksi::where('user_id', $cekdaftar->biodata_id)->where('id_referensi', $id)->update([
+                        'jumlah' => $cekjalur->jml_biaya_pendaftaran,
+                        'status' => 'pending',
+                        'metode_bayar' => null,
+                        'midtrans_order_id' => null,
+                        'midtrans_snap_token' => null,
+                        'expired_at' => null
+                    ]);
+
+                    if ($transaksi) {
+                        TransaksiHistory::where('transaksi_id', $transaksi->id)->delete();
+                        TransaksiHistory::insert([
+                            'transaksi_id' => $transaksi->id,
+                            'status' => 'pending',
+                            'keterangan' => 'Menunggu pembayaran (Pindah Jalur)',
+                            'created_at' => date('Y-m-d H:i:s')
+                        ]);
+                    }
+
+                    Pendaftaran::where('KodePendaftaran', $id)->where('biodata_id', $cekdaftar->biodata_id)->where('isactive', 1)->update([
+                        'current_step' => 2,
+                        'updated_at'   => now()
+                    ]);
+                } else {
+                    // Jika tidak perlu bayar, langsung lompat step
+                    Pendaftaran::where('KodePendaftaran', $id)->where('biodata_id', $cekdaftar->biodata_id)->where('isactive', 1)->update([
+                        'current_step' => 6,
+                        'updated_at'   => now()
+                    ]);
+                }
+
                 DB::commit();
-                $data['title'] = 'Berhasil';
-                $data['message'] = 'Anda Sudah Berpindah ke jalur pendaftaran Reguler. Silahkan Lanjut Ke Proses Selanjutnya!';
-                $data['status'] = 'success';
-            }else{
-                DB::rollback();
-                $data['title'] = 'Gagal';
-                $data['message'] = 'Gagal Berpindah Jalur. Silahkan Coba Lagi atau hubungi Admin PMB !';
-                $data['status'] = 'error';
+                $data = [
+                    'title' => 'Berhasil',
+                    'message' => 'Anda Sudah Berpindah ke jalur pendaftaran Reguler. Silahkan Lanjut Ke Proses Selanjutnya!',
+                    'status' => 'success'
+                ];
             }
+        } catch (\Exception $e) {
+            DB::rollback();
+            $data = [
+                'title' => 'Gagal',
+                // Opsional: tampilkan $e->getMessage() saat development agar gampang debug
+                'message' => 'Gagal Berpindah Jalur. Terjadi kesalahan pada server.',
+                'status' => 'error'
+            ];
         }
+
         return response()->json($data, Response::HTTP_OK);
     }
 }

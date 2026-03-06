@@ -97,6 +97,8 @@ Route::middleware(['web'])->group(function () {
                 Route::get('/', [BerkasPMBController::class, 'index'])->name('admin.berkaspmb.show');
                 Route::get('/TabelBerkasPMB', [BerkasPMBController::class, 'tabelBerkasPMB'])->name('admin.berkaspmb.tabel');
                 Route::post('/saveApprovalBerkas', [BerkasPMBController::class, 'saveApprovalBerkas'])->name('admin.berkaspmb.save');
+                Route::get('/GetBerkasUser', [BerkasPMBController::class, 'GetBerkasUser'])->name('admin.getberkasuser');
+                Route::post('/saveApprovalBerkasItem', [BerkasPMBController::class, 'saveApprovalBerkasItem'])->name('admin.berkaspmb.saveitem');
             });
 
             Route::prefix('TestOnlinePMB')->group(function() {
