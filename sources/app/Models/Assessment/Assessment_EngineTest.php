@@ -20,4 +20,13 @@ class Assessment_EngineTest extends Model
      */
     protected $table = 'pmb_assessment_engine_test';
     protected $primaryKey = 'id';
+    protected $fillable = [
+        'tipe_engine',
+        'keterangan',
+        'created_at',
+        'created_by',
+        'updated_at',
+        'updated_by',
+        'isactive',
+    ];
 }

@@ -212,7 +212,6 @@ class TestPMBController extends Controller
             $kode = 'UKT-'.$id.'-'.date('YmdHis');
             $jurusan = Master_JurusanKuliah::where('KodeJurusan',$post->jurusan_diterima)->first();
             $biaya = Master_TarifUKT::where('idbatch',$cek->batch_daftar)->where('idjalur',$cek->jalur_daftar)->where('idjurusan',$jurusan->id)->first();
-
             $transaksi = Transaksi::insert([
                 'user_id' => $cek->biodata_id,
                 'kategori' => 'ukt',

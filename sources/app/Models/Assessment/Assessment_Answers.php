@@ -20,4 +20,15 @@ class Assessment_Answers extends Model
      */
     protected $table = 'pmb_assessment_answers';
     protected $primaryKey = 'id';
+    protected $fillable = [
+        'attempt_id',
+        'question_id',
+        'option_id',
+        'most_option_id',
+        'least_option_id',
+        'jawaban_1',
+        'jawaban_2',
+        'created_at',
+        'updated_at',
+    ];
 }

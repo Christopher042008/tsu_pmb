@@ -379,7 +379,7 @@
                                     <i class="bi bi-whatsapp"></i> 0895705354767
                                 </a> via Whatsapp </code></span><br>
                         <span class="text-bold"><code>10. Jika ingin melanjutkan ke tahap selanjutnya, click step yang berwarna <span class="badge bg-primary">biru</span></code></span><br><br>
-                        
+
                         <span class="text-bold">Good Luck 😊</span>
                     </div>
                 </div>
