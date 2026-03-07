@@ -11,6 +11,7 @@ use App\Models\MasterData\Master_Kecamatan;
 use App\Models\MasterData\Master_Kelurahan;
 use App\Models\MasterData\Master_Provinsi;
 use App\Models\MasterData\Master_TarifUKT;
+use App\Models\MasterData\Master_Rekomendator;
 
 use App\Models\Parameter;
 use App\Models\User\Biodata;
@@ -51,6 +52,9 @@ class HasilPMBController extends Controller
         'prodi2'=>function($q){
             $q->with('jenjang');
         },
+        'prodi3'=>function($q){
+            $q->with('jenjang');
+        },
         'waktukuliah','bayar','jawaban_peserta',
         'jurusan_acc'=>function($q){
             $q->with('jenjang','fakultas');
@@ -59,6 +63,7 @@ class HasilPMBController extends Controller
         ->first();
         $prodi1 = Master_TarifUKT::where('idbatch',$datadaftar->batch_daftar)->where('idjalur',$datadaftar->jalur_daftar)->where('idjurusan',$datadaftar->prodi1->id)->where('isactive',1)->first();
         $prodi2 = Master_TarifUKT::where('idbatch',$datadaftar->batch_daftar)->where('idjalur',$datadaftar->jalur_daftar)->where('idjurusan',$datadaftar->prodi2->id)->where('isactive',1)->first();
+        $prodi3 = Master_TarifUKT::where('idbatch',$datadaftar->batch_daftar)->where('idjalur',$datadaftar->jalur_daftar)->where('idjurusan',$datadaftar->prodi3->id)->where('isactive',1)->first();
         $params1 = Parameter::where('id',1)->first();
         $linkkhusus = null;
         $linkumum = null;
@@ -80,12 +85,24 @@ class HasilPMBController extends Controller
 
         $provinsi_sekolah = Master_Provinsi::where('idprov',$datadaftar->biodata->provinsi_sekolah)->first();
         $kabupaten_sekolah = Master_Kabupaten::where('idprov',$datadaftar->biodata->provinsi_sekolah)->where('idkab',$datadaftar->biodata->kabupaten_sekolah)->first();
+        
+        $rekomendator_text = '-';
+        if ($datadaftar->rekomendator) {
+            $rek = Master_Rekomendator::where('kode_rekomendator', $datadaftar->rekomendator)->first();
+            if ($rek) {
+                // Tampilan: Nama Lengkap (Kode)
+                $rekomendator_text = $rek->nama_rekomendator . ' (' . $rek->kode_rekomendator . ')';
+            } else {
+                $rekomendator_text = $datadaftar->rekomendator;
+            }
+        }
         $data = array(
             'title' => 'Hasil PMB',
             'menu' => 'Hasil Akhir Pendaftaran Calon Mahasiswa Baru',
             'datadaftar' => $datadaftar,
             'ukt1' => $prodi1,
             'ukt2' => $prodi2,
+            'ukt3' => $prodi3,
             'berkas_khusus' => $linkkhusus,
             'berkas_umum' => $linkumum,
             'detailberkas_umum' => $berkasumum,
@@ -94,7 +111,8 @@ class HasilPMBController extends Controller
             'kecamatan' => $kecamatan,
             'kelurahan' => $kelurahan,
             'provinsi_sekolah' => $provinsi_sekolah,
-            'kabupaten_sekolah' => $kabupaten_sekolah
+            'kabupaten_sekolah' => $kabupaten_sekolah,
+            'rekomendator' => $rekomendator_text
         );
         // dd($data);
         return view('user::user.hasil.index',$data);

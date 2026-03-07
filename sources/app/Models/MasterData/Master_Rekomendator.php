@@ -20,13 +20,22 @@ class Master_Rekomendator extends Model
      */
     protected $table = 'pmb_master_rekomendator';
     protected $primaryKey = 'id';
+    public $timestamps = false;
     protected $fillable = [
-        // 'KodeBerkas',
-        // 'IdJenis',
-    //     'password',
-    //     'created_at',
-    //     'created_by',
-    //     'updated_at',
-    //     'updated_by',
+        'kode_rekomendator',
+        'kategori',
+        'nama_rekomendator',
+        'alamat',
+        'pekerjaan',
+        'no_hp',
+        'email',
+        'no_rekening',
+        'atasnama_rekening',
+        'nama_bank',
+        'created_at',
+        'created_by',
+        'updated_at',
+        'updated_by',
+        'isactive'
     ];
 }

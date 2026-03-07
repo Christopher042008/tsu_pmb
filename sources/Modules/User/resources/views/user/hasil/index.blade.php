@@ -97,18 +97,27 @@
                                         <th>Jurusan Sekolah</th>
                                         <th>: {{$datadaftar->jurusansekolah->sekolah}}/{{$datadaftar->jurusansekolah->jurusan_sekolah}}</th>
                                     </tr>
-                                    <tr>
+                                   <tr>
                                         <th>Program Studi Pilihan 1</th>
                                         <th>: {{$datadaftar->prodi1->jenjang->jenjang}}-{{$datadaftar->prodi1->jurusan}}</th>
-                                        <th>Program Studi Pilihan 2</th>
-                                        <th>: {{$datadaftar->prodi2->jenjang->jenjang}}-{{$datadaftar->prodi2->jurusan}}</th>
-                                    </tr>
-                                    <tr>
                                         <th>UKT Program Studi 1</th>
                                         <th>: {{rupiah($ukt1->biaya_ukt)}}</th>
-                                        <th>UKT Program Studi 2</th>
-                                        <th>: {{rupiah($ukt2->biaya_ukt)}}</th>
                                     </tr>
+
+                                    <tr>
+                                        <th>Program Studi Pilihan 2</th>
+                                        <th>: {{$datadaftar->prodi2 ? $datadaftar->prodi2->jenjang->jenjang.'-'.$datadaftar->prodi2->jurusan : '-'}}</th>
+                                        <th>UKT Program Studi 2</th>
+                                        <th>: {{$ukt2 ? rupiah($ukt2->biaya_ukt) : '-'}}</th>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <th>Program Studi Pilihan 3</th>
+                                        <th>: {{$datadaftar->prodi3 ? $datadaftar->prodi3->jenjang->jenjang.'-'.$datadaftar->prodi3->jurusan : '-'}}</th>
+                                        <th>UKT Program Studi 3</th>
+                                        <th>: {{$ukt3 ? rupiah($ukt3->biaya_ukt) : '-'}}</th>
+                                    </tr>
+
                                     @php
                                         $tglkonfirm = explode(' ',$datadaftar->tgl_konfirm);
                                         $tgldaftar = explode(' ',$datadaftar->tgl_daftar);
@@ -203,7 +212,7 @@
                                             Berkas Khusus Beasiswa
                                         </th>
 
-                                        <th colspan="3">
+                                        <th>
                                             :
                                             @if($berkas_khusus==null)
                                                 <span class="badge bg-warning">Non Beasiswa</span>
@@ -211,6 +220,8 @@
                                                 <a href="{{$berkas_khusus}}" target="_blank"><span class="badge bg-success">{{$datadaftar->berkas_khusus}}</span></a>
                                             @endif
                                         </th>
+                                        <th>Rekomendator</th>
+                                        <th colspan="3">: {{ $rekomendator }}</th>
                                     </tr>
                                 </thead>
                             </table>

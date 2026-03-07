@@ -25,6 +25,7 @@ use Modules\User\Http\Controllers\ValidasiBerkasController;
 Route::prefix('')->group(function() {
     Route::get('/', [UserController::class, 'index'])->name('indexing');
     Route::middleware(['web'])->group(function () {
+        Route::get('/jalur-pendaftaran', [UserController::class, 'jalurPendaftaran'])->name('jalur_pendaftaran');
         Route::get('/program-studi', [UserController::class, 'programStudi'])->name('program_studi');
         Route::get('/pengumuman', [UserController::class, 'pengumuman'])->name('pengumuman');
         Route::get('/informasi-pendaftaran', [UserController::class, 'informasiPendaftaran'])->name('informasi_pendaftaran');
@@ -52,6 +53,7 @@ Route::prefix('')->group(function() {
                 Route::get('/ShowJalur/{params}', [PendaftaranController::class, 'showJalur'])->name('Daftar.ShowJalur');
                 Route::get('/ShowBeasiswa/{params}', [PendaftaranController::class, 'showBeasiswa'])->name('Daftar.ShowBeasiswa');
                 Route::get('/ShowDetailBeasiswa/{params}', [PendaftaranController::class, 'detailbeasiswa'])->name('Daftar.ShowDetailBeasiswa');
+                Route::get('/CariRekomendator', [PendaftaranController::class, 'cariRekomendator'])->name('Daftar.CariRekomendator');
                 Route::get('/ShowProdi/{batch}/{jalur}/{jurusansekolah}', [PendaftaranController::class, 'showProdi'])->name('Daftar.ShowProdi');
                 Route::post('/StoreDaftar', [PendaftaranController::class, 'StoreDaftar'])->name('Daftar.StoreDaftar');
                 Route::get('/TabelDaftar', [PendaftaranController::class, 'tabelPendaftaran'])->name('Daftar.TabelDaftar');
@@ -67,6 +69,7 @@ Route::prefix('')->group(function() {
                 Route::get('/ShowBerkasBeasiswa/{params}', [ValidasiBerkasController::class, 'showBerkasBeasiswa']);
                 Route::post('/SaveBerkasBeasiswa', [ValidasiBerkasController::class, 'saveBerkas'])->name('BksBeasiswa.save');
                 Route::get('/ApprovalPindahJalur/{params1}/{params2}', [ValidasiBerkasController::class, 'PindahJalur']);
+                Route::get('/GetBerkasUser', [ValidasiBerkasController::class, 'GetBerkasUser']);
             });
 
             Route::prefix('OnlineTest')->group(function(){

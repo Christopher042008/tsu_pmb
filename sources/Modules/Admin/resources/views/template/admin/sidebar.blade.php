@@ -288,10 +288,10 @@
                             </a>
                         </li>
                         @endif
-                        <li class="nav-item" style="display: none;">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item">
+                            <a href="{{route('admin.Rekomendator.show')}}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
-                                Master Rekomendasi PMB(blm)
+                                Master Rekomendasi
                             </a>
                         </li>
                         @if ($jenisberkas > 0)

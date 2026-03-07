@@ -4,6 +4,7 @@ namespace Modules\Admin\Http\Controllers;
 
 use App\Models\MasterData\Master_JenisPendaftaran;
 use App\Models\MasterData\Master_TarifUKT;
+use App\Models\MasterData\Master_Rekomendator;
 use App\Models\Parameter;
 use App\Models\Transaksi;
 use App\Models\TransaksiHistory;
@@ -103,23 +104,10 @@ class PembayaranUKTController extends Controller
     {
         $id = decrypt($params);
         $cek = Pendaftaran::where('KodePendaftaran',$id)
-        // ->where('isactive',1)
         ->select('biodata_id','KodePendaftaran')->first();
-        // dd($cek);
+        
         $cek1 = Pendaftaran::where('KodePendaftaran',$id)->where('biodata_id',$cek->biodata_id)
-        // ->where('isactive',1)
-        ->with(['biodata','batch','jalur'
-        // =>function($q){
-        //     $q->with(['berkasumum'=>function($q){
-        //             $q->with('berkas');
-        //         },
-
-        //     'berkaskhusus'=>function($q){
-        //             $q->with('berkas');
-        //         }
-        //     ]);
-        // }
-        ,
+        ->with(['biodata','batch','jalur',
         'jenisbeasiswa'=>function($q){
             $q->with('tingkat');
         },
@@ -130,25 +118,55 @@ class PembayaranUKTController extends Controller
         'prodi2'=>function($q){
             $q->with('jenjang');
         },
+        'prodi3'=>function($q){ 
+            $q->with('jenjang');
+        },
         'waktukuliah','bayar'
-        // =>function($q){
-        //     $q->with('history_transaksi');
-        // }
         ])->first();
-        $prodi1 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi1->id)->where('isactive',1)->first();
-        $prodi2 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi2->id)->where('isactive',1)->first();
+
+        // PENGAMAN PENCARIAN NOMINAL UKT (Mencegah Fatal Error jika prodi kosong)
+        $prodi1 = null;
+        if($cek1 && $cek1->prodi1){
+            $prodi1 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi1->id)->where('isactive',1)->first();
+        }
+        
+        $prodi2 = null;
+        if($cek1 && $cek1->prodi2){
+            $prodi2 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi2->id)->where('isactive',1)->first();
+        }
+
+        $prodi3 = null;
+        if($cek1 && $cek1->prodi3){
+            $prodi3 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi3->id)->where('isactive',1)->first();
+        }
+
+        $rekomendator_text = '-';
+        if ($cek1 && $cek1->rekomendator) {
+            $rek = Master_Rekomendator::where('kode_rekomendator', $cek1->rekomendator)->first();
+            if ($rek) {
+                // Tampilan: Nama Lengkap (Kode)
+                $rekomendator_text = $rek->nama_rekomendator . ' (' . $rek->kode_rekomendator . ')';
+            } else {
+                $rekomendator_text = $cek1->rekomendator;
+            }
+        }
+
         if($cek1){
             $data['hasil'] = 1;
             $data['daftar'] = $cek1;
             $data['IdDaftar'] = $params;
             $data['ukt1'] = $prodi1;
             $data['ukt2'] = $prodi2;
+            $data['ukt3'] = $prodi3; 
+            $data['rekomendator'] = $rekomendator_text;
         }else{
             $data['hasil'] = 0;
             $data['daftar'] = $cek1;
             $data['IdDaftar'] = null;
-            $data['ukt1'] = $prodi1;
-            $data['ukt2'] = $prodi2;
+            $data['ukt1'] = null;
+            $data['ukt2'] = null;
+            $data['ukt3'] = null; 
+            $data['rekomendator'] = '-';
         }
         return response()->json($data, Response::HTTP_OK);
     }

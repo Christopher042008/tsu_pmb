@@ -114,14 +114,20 @@
                             <tr>
                                 <th>Program Studi Pilihan 1</th>
                                 <th id="o-prodi1" class="o-detaildaftar"></th>
-                                <th>Program Studi Pilihan 2</th>
-                                <th id="o-prodi2" class="o-detaildaftar"></th>
-                            </tr>
-                            <tr>
                                 <th>UKT Program Studi 1</th>
                                 <th id="o-uktprodi1" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Program Studi Pilihan 2</th>
+                                <th id="o-prodi2" class="o-detaildaftar"></th>
                                 <th>UKT Program Studi 2</th>
                                 <th id="o-uktprodi2" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Program Studi Pilihan 3</th>
+                                <th id="o-prodi3" class="o-detaildaftar"></th>
+                                <th>UKT Program Studi 3</th>
+                                <th id="o-uktprodi3" class="o-detaildaftar"></th>
                             </tr>
                             <tr>
                                 <th>Konfirmasi Daftar</th>
@@ -172,6 +178,10 @@
                                     Durasi Beasiswa S1
                                 </th>
                                 <th id="o-durasis1" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Rekomendator</th>
+                                <th id="o-rekomendator" class="o-detaildaftar" colspan="3"></th>
                             </tr>
                         </thead>
                         <tbody id="detail-bayar" class="o-detaildaftar">
@@ -343,14 +353,18 @@
                                 $('#o-tahunlulus').html(data.daftar.tahun_lulus)
                                 $('#o-jalur').html(data.daftar.jalur.KodeJenis+'-'+data.daftar.jalur.jenis_pendaftaran)
                                 $('#o-jurusansekolah').html(data.daftar.jurusansekolah.sekolah+'/'+data.daftar.jurusansekolah.jurusan_sekolah)
-                                $('#o-prodi1').html(data.daftar.prodi1.jenjang.jenjang+'-'+data.daftar.prodi1.jurusan)
-                                $('#o-prodi2').html(data.daftar.prodi2.jenjang.jenjang+'-'+data.daftar.prodi2.jurusan)
-                                // let ukt1 = data.ukt1.biaya_ukt.replace(/\D/g, '')
-                                let ukt1 = new Intl.NumberFormat('id-ID').format(data.ukt1.biaya_ukt);
-                                $('#o-uktprodi1').html('Rp '+ukt1)
-                                let ukt2 = new Intl.NumberFormat('id-ID').format(data.ukt2.biaya_ukt);
-                                $('#o-uktprodi2').html('Rp '+ukt2)
+                                // PENGAMAN PRODI & UKT
+                                $('#o-prodi1').html(data.daftar.prodi1 && data.daftar.prodi1.jenjang ? data.daftar.prodi1.jenjang.jenjang + '-' + data.daftar.prodi1.jurusan : (data.daftar.prodi1 ? data.daftar.prodi1.jurusan : '-'));
+                                $('#o-prodi2').html(data.daftar.prodi2 && data.daftar.prodi2.jenjang ? data.daftar.prodi2.jenjang.jenjang + '-' + data.daftar.prodi2.jurusan : (data.daftar.prodi2 ? data.daftar.prodi2.jurusan : '-'));
+                                $('#o-prodi3').html(data.daftar.prodi3 && data.daftar.prodi3.jenjang ? data.daftar.prodi3.jenjang.jenjang + '-' + data.daftar.prodi3.jurusan : (data.daftar.prodi3 ? data.daftar.prodi3.jurusan : '-'));
+                                let ukt1 = data.ukt1 ? new Intl.NumberFormat('id-ID').format(data.ukt1.biaya_ukt) : '0';
+                                $('#o-uktprodi1').html('Rp ' + ukt1);                               
+                                let ukt2 = data.ukt2 ? new Intl.NumberFormat('id-ID').format(data.ukt2.biaya_ukt) : '0';
+                                $('#o-uktprodi2').html('Rp ' + ukt2);                              
+                                let ukt3 = data.ukt3 ? new Intl.NumberFormat('id-ID').format(data.ukt3.biaya_ukt) : '0';
+                                $('#o-uktprodi3').html('Rp ' + ukt3);
                                 let konfirmdaftar = data.daftar.konfirm_pendaftaran=='0' ? 'Belum Konfirmasi' : 'Sudah Konfirmasi';
+                                $('#o-rekomendator').html(data.rekomendator);
                                 $('#o-konfirmdaftar').html(konfirmdaftar)
                                 let biayadaftar = data.daftar.jalur.biaya_pendaftaran=='1' ? 'Rp '+new Intl.NumberFormat('id-ID').format(data.daftar.jalur.jml_biaya_pendaftaran) : 'Gratis';
                                 let statusdaftar = data.daftar.bayar
