@@ -46,32 +46,32 @@
                                     <!-- Nama Jenis -->
                                     <table class="table">
                                         <tr>
-                                            <th width="15%">Nama Test</th>
+                                            <th width="15%">Nama Test<code>*</code></th>
                                             <th width="35%">
                                                 <input type="text" id="nama_test" name="nama_test" placeholder="Nama Test" class="form-control" title="Isian Maksimal 100 karakter">
                                             </th>
-                                            <th width="15%">Tipe Engine</th>
+                                            <th width="15%">Tipe Engine<code>*</code></th>
                                             <th width="35%">
                                                 <select class="form-control select2" id="engine_test" name="engine_test">
                                                     <option value="" selected disabled>-- Pilih Tipe Engine --</option>
                                                     @foreach($engine as $key => $p)
-                                                        <option value="{{ $p->id }}">{{$p->tipe_engine}} ({{ $p->keterangan }})</option>
+                                                        <option value="{{ $p->tipe_engine }}">{{$p->tipe_engine}} ({{ $p->keterangan }})</option>
                                                     @endforeach
                                                 </select>
                                             </th>
                                         </tr>
                                         <tr>
-                                            <th>Kode Test</th>
+                                            <th>Kode Test<code>*</code></th>
                                             <th>
                                                 <input type="text" id="kodetest" name="kodetest" placeholder="Kode Test" class="form-control" title="Isian Maksimal 20 karakter">
                                             </th>
-                                            <th>Durasi Test (Menit)</th>
+                                            <th>Durasi Test (Menit)<code>*</code></th>
                                             <th>
                                                 <input type="number"  class="form-control" name="durasi_test" id="durasi_test" min="1">
                                             </th>
                                         </tr>
                                         <tr>
-                                            <th>Urutan</th>
+                                            <th>Urutan<code>*</code></th>
                                             <th>
                                                 <input type="number"  class="form-control" name="urutan_test" id="urutan_test" min="1">
                                             </th>
@@ -100,10 +100,9 @@
                                             <th>Nama Test</th>
                                             <th>Kode Test</th>
                                             <th>Urutan</th>
-                                            <th>Tipe Engine</th>
-                                            <th>Durasi (Menit)</th>
+                                            <th>Durasi Test</th>
                                             <th>Status Aktif</th>
-                                            <th>Action</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
 
@@ -174,9 +173,6 @@
                             data: 'urutan'
                         },
                         {
-                            data: 'tipe'
-                        },
-                        {
                             data: 'durasi'
                         },
                         {
@@ -192,7 +188,8 @@
                         processing: '<i class="fa fa-spinner fa-lg fa-spin"></i>'
                     },
                     drawCallback: function(settings) {
-
+                        edit()
+                        aktifNonaktif()
                     }
                 });
 
@@ -288,8 +285,10 @@
                                             text: data.message,
                                             icon: data.status
                                         }).then((result) => {
-                                            $('#btn-batal').trigger('click');
-                                            $('#example2').DataTable().ajax.reload();
+                                            if(data.status=='success'){
+                                                $('#btn-batal').trigger('click');
+                                                $('#example2').DataTable().ajax.reload();
+                                            }
                                         });
                                         return;
                                     },
@@ -300,7 +299,7 @@
                                             text: 'Check Your Data',
                                             icon: 'error'
                                         }).then((result) => {
-                                            $('#example2').DataTable().ajax.reload();
+                                            // $('#example2').DataTable().ajax.reload();
                                         });
                                         return;
                                     }
@@ -310,6 +309,99 @@
                             }
                         });
                     }
+                });
+            }
+
+            function edit()
+            {
+                $('.btn_edit').click(function (e) {
+                    e.preventDefault();
+                    let params = $(this).data('id')
+                    $.ajax({
+                        type: "GET",
+                        url: '{!! url('admin/Assessment/MasterAssessment/Test/edit-test') !!}' + '/' + params,
+                        dataType: "JSON",
+                        beforeSend: function(response) {
+                            $('#loading').show()
+                            $('#btn-batal').trigger('click')
+                        },
+                        success: function(data) {
+                            $('#loading').hide()
+                            if(data.hasil==0){
+                                notifalert('Information', 'Data Type Test Tidak Ditemukan','error')
+                            }else{
+                                $('#IdTest').val(data.type.id)
+                                $('#nama_test').val(data.type.nama_test)
+                                $('#engine_test').val(data.type.tipe_engine).trigger('change')
+                                $('#kodetest').val(data.type.kode_test)
+                                $('#durasi_test').val(data.type.durasi_menit)
+                                $('#urutan_test').val(data.type.urutan)
+                                $('#status').val(data.type.isactive).trigger('change')
+                                $('#btn-tambah').trigger('click')
+                            }
+                        },
+                        error: function(data) {
+                            $('#loading').hide()
+                            Swal.fire({
+                                title: 'Gagal',
+                                text: 'Silahkan Hubungi PIKDI',
+                                icon: 'error'
+                            }).then((result) => {
+
+                            });
+                            return;
+                        }
+                    });
+                    return false;
+                });
+            }
+
+            function aktifNonaktif()
+            {
+                $('.btn_aktif').click(function (e) {
+                    e.preventDefault();
+                    let params = $(this).data('id')
+                    let status = $(this).data('aktif')
+                    Swal.fire({
+                        title: 'Information',
+                        text: status=='0' ? 'Non Aktifkan Type Test ?' : 'Aktifkan Type Test ?',
+                        icon: 'question',
+                        showConfirmButton: true,
+                        showCancelButton: true,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                type: "GET",
+                                url: '{!! url('admin/Assessment/MasterAssessment/Test/status-test') !!}'+'/'+params+'/'+status,
+                                dataType: "JSON",
+                                beforeSend: function(response) {
+                                    $('#loading').show()
+                                },
+                                success: function(data) {
+                                    $('#loading').hide()
+                                    if(data.status=='success'){
+                                        $('#example2').DataTable().ajax.reload();
+                                    }
+                                    notifalert(data.title,data.message,data.status)
+                                },
+                                error: function(data) {
+                                    $('#loading').hide()
+                                    Swal.fire({
+                                        title: 'Gagal',
+                                        text: 'Silahkan Hubungi PIKDI',
+                                        icon: 'error'
+                                    }).then((result) => {
+
+                                    });
+                                    return;
+                                }
+                            });
+                            return false;
+                        }else{
+                            return false;
+                        }
+                    })
+
                 });
             }
 

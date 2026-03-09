@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\User\Http\Controllers\AssessmentController;
 use Modules\User\Http\Controllers\BiodataController;
 use Modules\User\Http\Controllers\HasilPMBController;
 use Modules\User\Http\Controllers\LoginController;
@@ -107,6 +108,9 @@ Route::prefix('')->group(function() {
 
             Route::prefix('HasilPMB')->group(function(){
                 Route::get('/', [HasilPMBController::class, 'index'])->name('HasilPMB');
+            });
+            Route::prefix('Assessment')->group(function(){
+                Route::get('/', [AssessmentController::class, 'index'])->name('assessment.show');
             });
         });
     });

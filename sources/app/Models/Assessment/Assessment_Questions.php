@@ -20,4 +20,23 @@ class Assessment_Questions extends Model
      */
     protected $table = 'pmb_assessment_questions';
     protected $primaryKey = 'id';
+    protected $fillable = [
+        'tipe_test_id',
+        'pertanyaan',
+        'dimensi',
+        'urutan',
+        'created_at',
+        'created_by',
+        'updated_at',
+        'updated_by',
+        'isactive',
+    ];
+
+    public function tipe(){
+        return $this->hasOne('App\Models\Assessment\Assessment_TipeTest', 'id','tipe_test_id');
+    }
+
+    public function option(){
+        return $this->hasMany('App\Models\Assessment\Assessment_QuestionOptions', 'question_id','id');
+    }
 }

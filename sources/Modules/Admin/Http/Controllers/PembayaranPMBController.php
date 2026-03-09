@@ -174,7 +174,7 @@ class PembayaranPMBController extends Controller
         $jalur = Master_JenisPendaftaran::where('id',$cek->jalur_daftar)->first();
 
         $step = $jalur->berkas_khusus==null ? $cek->current_step+3 : $cek->current_step+1;
-
+        // dd($step);
         DB::beginTransaction();
 
         $update1 = Pendaftaran::where('KodePendaftaran',$id)->update([

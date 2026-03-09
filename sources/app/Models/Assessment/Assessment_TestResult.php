@@ -20,4 +20,14 @@ class Assessment_TestResult extends Model
      */
     protected $table = 'pmb_assessment_test_result';
     protected $primaryKey = 'id';
+    protected $fillable = [
+        'attempt_id',
+        'hasil_json',
+        'catatan_admin',
+        'created_at',
+        'created_by',
+        'updated_at',
+        'updated_by',
+        'isactive',
+    ];
 }

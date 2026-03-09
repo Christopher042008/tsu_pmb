@@ -348,6 +348,91 @@ class BerkasPMBController extends Controller
                 'stop_step'                  => null,
                 'isactive'                   => '1'
             ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['title' => 'Error!', 'message' => $e->getMessage(), 'status' => 'error']);
+        }
+    }
+
+    public function saveApprovalBerkas(Request $post)
+    {
+        try {
+            // Pastikan kodedaftar memang dienkripsi dari View. Jika dari View tidak dienkripsi, 
+            // hapus fungsi decrypt() dan gunakan langsung $post->kodedaftar;
+            $id = decrypt($post->kodedaftar);
+
+            // KITA HILANGKAN ->where('current_step', 5) AGAR LEBIH FLEKSIBEL
+            $cek = Pendaftaran::where('KodePendaftaran', $id)->first();
+
+            if (!$cek) {
+                return response()->json([
+                    'title' => 'Gagal!',
+                    'message' => 'Data Pendaftaran tidak ditemukan!',
+                    'status' => 'error'
+                ], Response::HTTP_OK);
+            }
+
+            // --- 1. PENGECEKAN STATUS BERKAS PER ITEM ---
+            $berkas_items = DB::table('pmb_berkas_pendaftaran')->where('kode_daftar', $id)->get();
+
+            $ada_yang_menunggu = false;
+            $ada_yang_ditolak = false;
+
+            foreach ($berkas_items as $item) {
+                if (empty($item->status_berkas) || $item->status_berkas == '0') {
+                    $ada_yang_menunggu = true;
+                }
+                if ($item->status_berkas == '-1') {
+                    $ada_yang_ditolak = true;
+                }
+            }
+
+            // --- 2. LOGIKA PENENTUAN STATUS GLOBAL ---
+            $status_global = $post->status == 'null' ? '0' : $post->status;
+
+            // Jika Admin memilih "OK" tapi ada berkas yang menunggu atau ditolak
+            if ($status_global == '1') {
+                if ($ada_yang_menunggu) {
+                    return response()->json([
+                        'title' => 'Peringatan!',
+                        'message' => 'Masih ada berkas yang belum divalidasi secara individual.',
+                        'status' => 'warning'
+                    ], Response::HTTP_OK);
+                }
+                if ($ada_yang_ditolak) {
+                    return response()->json([
+                        'title' => 'Peringatan!',
+                        'message' => 'Tidak bisa meluluskan pendaftar ini karena ada berkas yang berstatus Ditolak/Revisi.',
+                        'status' => 'warning'
+                    ], Response::HTTP_OK);
+                }
+            }
+
+            // --- 3. PROSES SIMPAN KE DATABASE ---
+            DB::beginTransaction();
+
+            $stepku = $cek->current_step;
+            if ($status_global == '1') {
+                // Pastikan jika stepnya sudah 6 atau lebih, tidak perlu ditambah lagi
+                $stepku = ($cek->current_step < 6) ? 6 : $cek->current_step;
+            }
+
+            $pindahjalur = $post->pindahjalur == '0' ? null : '0';
+            $keterangan = $post->keterangan;
+
+            $updt = Pendaftaran::where('KodePendaftaran', $id)
+                ->update([
+                    'validasi_berkas_khusus'     => $status_global,
+                    'update_berkaskhusus'        => null,
+                    'nik_validasi_berkas_khusus' => session('session')->nip ?? 'Admin',
+                    'tgl_validasi_berkas_khusus' => date('Y-m-d H:i:s'),
+                    'status_pindah_jalur'        => $pindahjalur,
+                    'keterangan'                 => $keterangan,
+                    'current_step'               => $stepku,
+                    'stop_step'                  => null,
+                    'updated_at'                 => date('Y-m-d H:i:s'),
+                    'isactive'                   => '1'
+                ]);
 
             if ($updt) {
                 DB::commit();

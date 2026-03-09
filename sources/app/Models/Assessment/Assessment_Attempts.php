@@ -20,4 +20,13 @@ class Assessment_Attempts extends Model
      */
     protected $table = 'pmb_assessment_attempts';
     protected $primaryKey = 'id';
+    protected $fillable = [
+        'kodependaftaran',
+        'tipe_test_id',
+        'mulai_at',
+        'selesai_at',
+        'status',
+        'created_at',
+        'updated_at',
+    ];
 }
