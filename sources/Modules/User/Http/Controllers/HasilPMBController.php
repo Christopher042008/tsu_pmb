@@ -40,27 +40,27 @@ class HasilPMBController extends Controller
         // $datadaftar = Pendaftaran::where('biodata_id',$bioId)->orderby('created_at','desc')->first();
         $datadaftar = Pendaftaran::where('biodata_id',$bioId)->orderby('created_at','desc')->where('isactive',1)->with([
         'biodata'=>function($q){
-            $q->with('saudara');
-        },
-        'batch',
+                $q->with('saudara');
+            },
+            'batch',
             'jalur',
             'jenisbeasiswa' => function($q) {
-            $q->with('tingkat');
-        },
-        'jurusansekolah',
+                $q->with('tingkat');
+            },
+            'jurusansekolah',
             'prodi1' => function($q) {
-            $q->with('jenjang');
-        },
+                $q->with('jenjang');
+            },
             'prodi2' => function($q) {
-            $q->with('jenjang');
-        },
+                $q->with('jenjang');
+            },
             'prodi3' => function($q) {
-            $q->with('jenjang');
-        },
+                $q->with('jenjang');
+            },
             'waktukuliah', 'bayar', 'jawaban_peserta',
             'jurusan_acc' => function($q) {
                 $q->with('jenjang', 'fakultas');
-        }
+            }
         ])->first();
 
         // Jika user belum mendaftar sama sekali, antisipasi error dengan membatasi eksekusi lanjutan
@@ -89,10 +89,10 @@ class HasilPMBController extends Controller
         // <-- [TAMBAHKAN INI] Ambil data file pendaftar
         $berkasPendaftar = BerkasPendaftaran::where('kode_daftar', $datadaftar->KodePendaftaran)->get(); 
 
-        $provinsi = Master_Provinsi::where('idprov',$datadaftar->biodata->provinsi)->first();
-        $kabupaten = Master_Kabupaten::where('idprov',$datadaftar->biodata->provinsi)->where('idkab',$datadaftar->biodata->kabupaten)->first();
-        $kecamatan = Master_Kecamatan::where('idprov',$datadaftar->biodata->provinsi)->where('idkab',$datadaftar->biodata->kabupaten)->where('idkec',$datadaftar->biodata->kecamatan)->first();
-        $kelurahan = Master_Kelurahan::where('idprov',$datadaftar->biodata->provinsi)->where('idkab',$datadaftar->biodata->kabupaten)->where('idkec',$datadaftar->biodata->kecamatan)->where('idkel',$datadaftar->biodata->kelurahan)->first();
+        $provinsi = Master_Provinsi::where('idprov', $datadaftar->biodata->provinsi)->first();
+        $kabupaten = Master_Kabupaten::where('idprov', $datadaftar->biodata->provinsi)->where('idkab', $datadaftar->biodata->kabupaten)->first();
+        $kecamatan = Master_Kecamatan::where('idprov', $datadaftar->biodata->provinsi)->where('idkab', $datadaftar->biodata->kabupaten)->where('idkec', $datadaftar->biodata->kecamatan)->first();
+        $kelurahan = Master_Kelurahan::where('idprov', $datadaftar->biodata->provinsi)->where('idkab', $datadaftar->biodata->kabupaten)->where('idkec', $datadaftar->biodata->kecamatan)->where('idkel', $datadaftar->biodata->kelurahan)->first();
 
         $provinsi_sekolah = Master_Provinsi::where('idprov', $datadaftar->biodata->provinsi_sekolah)->first();
         $kabupaten_sekolah = Master_Kabupaten::where('idprov', $datadaftar->biodata->provinsi_sekolah)->where('idkab', $datadaftar->biodata->kabupaten_sekolah)->first();
@@ -118,15 +118,16 @@ class HasilPMBController extends Controller
             'berkas_khusus'     => $linkkhusus,
             'berkas_umum'       => $linkumum,
             'detailberkas_umum' => $berkasumum,
-            'provinsi' => $provinsi,
-            'kabupaten' => $kabupaten,
-            'kecamatan' => $kecamatan,
-            'kelurahan' => $kelurahan,
-            'provinsi_sekolah' => $provinsi_sekolah,
+            'berkasPendaftar'   => $berkasPendaftar, // <-- [TAMBAHKAN INI] Lempar ke blade
+            'provinsi'          => $provinsi,
+            'kabupaten'         => $kabupaten,
+            'kecamatan'         => $kecamatan,
+            'kelurahan'         => $kelurahan,
+            'provinsi_sekolah'  => $provinsi_sekolah,
             'kabupaten_sekolah' => $kabupaten_sekolah,
             'rekomendator'      => $rekomendator_text
         );
-        // dd($data);
-        return view('user::user.hasil.index',$data);
+        
+        return view('user::user.hasil.index', $data);
     }
 }

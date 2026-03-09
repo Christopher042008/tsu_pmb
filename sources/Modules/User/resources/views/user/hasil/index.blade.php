@@ -491,7 +491,7 @@
                                         style="width: 100%;">
                                         <thead>
                                             <tr>
-<th colspan="4" style="background-color: cadetblue; color: white;"
+                                                <th colspan="4" style="background-color: cadetblue; color: white;"
                                                     class="text-center">Daftar Berkas Pendaftaran</th>
                                             </tr>
                                             <tr>
@@ -532,7 +532,7 @@
                                                                         '/' .
                                                                         $fileUploaded->nama_berkas,
                                                                 );
-                                                    @endphp
+                                                            @endphp
                                                             <a href="{{ $pathFile }}" target="_blank"
                                                                 class="btn btn-sm btn-success">
                                                                 <i class="fa fa-eye"></i> Lihat Berkas
