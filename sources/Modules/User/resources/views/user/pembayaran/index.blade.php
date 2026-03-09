@@ -41,6 +41,15 @@
                             <code>* Tekan </code> <i title="Bayar Sekarang" class="fas fa-money-bill text-green"></i> <code>  Untuk Pembayaran</code> <br>
                             <code>* Tekan </code> <i title="Detail Pendaftaran" class="fa fa-info-circle text-blue"></i> <code>  Untuk Melihat Detail Pendaftaran dan dan Pembayaran</code><br>
                             <code>* Jika Status sudah </code> <span class="badge bg-success">paid</span> <code> Maka Pembayaran Sudah Lunas</code><br>
+                            <div class="callout callout-info mt-3" style="background-color: #f8f9fa;">
+                                <h5><i class="fas fa-university text-info"></i> Informasi Rekening Pembayaran</h5>
+                                <p class="mb-1">Silakan lakukan transfer pembayaran UKT ke rekening resmi berikut:</p>
+                                <ul class="mb-0" style="list-style-type: none; padding-left: 0;">
+                                    <li><strong>Bank:</strong> Bank Mandiri</li>
+                                    <li><strong>No. Rekening:</strong> <span class="text-danger" style="font-size: 1.2em; font-weight: bold;">1380026961560</span></li>
+                                    <li><strong>Atas Nama:</strong> PMB Universitas Tiga Serangkai</li>
+                                </ul>
+                            </div>
                             <table id="example2" class="table table-bordered table-hover" style="width: 100%;">
                                 <thead>
                                     <tr>
@@ -101,14 +110,22 @@
                             <tr>
                                 <th>Program Studi Pilihan 1</th>
                                 <th id="o-prodi1" class="o-detaildaftar"></th>
-                                <th>Program Studi Pilihan 2</th>
-                                <th id="o-prodi2" class="o-detaildaftar"></th>
-                            </tr>
-                            <tr>
                                 <th>UKT Program Studi 1</th>
                                 <th id="o-uktprodi1" class="o-detaildaftar"></th>
+                            </tr>
+                            
+                            <tr>
+                                <th>Program Studi Pilihan 2</th>
+                                <th id="o-prodi2" class="o-detaildaftar"></th>
                                 <th>UKT Program Studi 2</th>
                                 <th id="o-uktprodi2" class="o-detaildaftar"></th>
+                            </tr>
+                            
+                            <tr>
+                                <th>Program Studi Pilihan 3</th>
+                                <th id="o-prodi3" class="o-detaildaftar"></th>
+                                <th>UKT Program Studi 3</th>
+                                <th id="o-uktprodi3" class="o-detaildaftar"></th>
                             </tr>
                             <tr>
                                 <th>Konfirmasi Daftar</th>
@@ -122,6 +139,7 @@
                                 <th>Waktu Kuliah</th>
                                 <th id="o-waktukuliah" class="o-detaildaftar"></th>
                             </tr>
+
                             <tr>
                                 <th>Status UKT</th>
                                 <th id="o-statusukt" class="o-detaildaftar"></th>
@@ -159,6 +177,10 @@
                                     Durasi Beasiswa S1
                                 </th>
                                 <th id="o-durasis1" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Rekomendator</th>
+                                <th id="o-rekomendator" class="o-detaildaftar" colspan="3"></th>
                             </tr>
                         </thead>
                         <tbody id="detail-berkas" class="o-detaildaftar">
@@ -368,13 +390,15 @@
                                 $('#o-tahunlulus').html(data.daftar.tahun_lulus)
                                 $('#o-jalur').html(data.daftar.jalur.KodeJenis+'-'+data.daftar.jalur.jenis_pendaftaran)
                                 $('#o-jurusansekolah').html(data.daftar.jurusansekolah.sekolah+'/'+data.daftar.jurusansekolah.jurusan_sekolah)
-                                $('#o-prodi1').html(data.daftar.prodi1.jenjang.jenjang+'-'+data.daftar.prodi1.jurusan)
-                                $('#o-prodi2').html(data.daftar.prodi2.jenjang.jenjang+'-'+data.daftar.prodi2.jurusan)
-                                // let ukt1 = data.ukt1.biaya_ukt.replace(/\D/g, '')
-                                let ukt1 = new Intl.NumberFormat('id-ID').format(data.ukt1.biaya_ukt);
-                                $('#o-uktprodi1').html('Rp '+ukt1)
-                                let ukt2 = new Intl.NumberFormat('id-ID').format(data.ukt2.biaya_ukt);
-                                $('#o-uktprodi2').html('Rp '+ukt2)
+                                $('#o-prodi1').html(data.daftar.prodi1 && data.daftar.prodi1.jenjang ? data.daftar.prodi1.jenjang.jenjang + '-' + data.daftar.prodi1.jurusan : (data.daftar.prodi1 ? data.daftar.prodi1.jurusan : '-'));
+                                $('#o-prodi2').html(data.daftar.prodi2 && data.daftar.prodi2.jenjang ? data.daftar.prodi2.jenjang.jenjang + '-' + data.daftar.prodi2.jurusan : (data.daftar.prodi2 ? data.daftar.prodi2.jurusan : '-'));
+                                $('#o-prodi3').html(data.daftar.prodi3 && data.daftar.prodi3.jenjang ? data.daftar.prodi3.jenjang.jenjang + '-' + data.daftar.prodi3.jurusan : (data.daftar.prodi3 ? data.daftar.prodi3.jurusan : '-'));
+                                let ukt1 = data.ukt1 ? new Intl.NumberFormat('id-ID').format(data.ukt1.biaya_ukt) : '0';
+                                $('#o-uktprodi1').html('Rp ' + ukt1);        
+                                let ukt2 = data.ukt2 ? new Intl.NumberFormat('id-ID').format(data.ukt2.biaya_ukt) : '0';
+                                $('#o-uktprodi2').html('Rp ' + ukt2);  
+                                let ukt3 = data.ukt3 ? new Intl.NumberFormat('id-ID').format(data.ukt3.biaya_ukt) : '0';
+                                $('#o-uktprodi3').html('Rp ' + ukt3);
                                 let konfirmdaftar = data.daftar.konfirm_pendaftaran=='0' ? 'Belum Konfirmasi' : 'Sudah Konfirmasi';
                                 $('#o-konfirmdaftar').html(konfirmdaftar)
                                 let biayadaftar = data.daftar.jalur.biaya_pendaftaran=='1' ? 'Rp '+new Intl.NumberFormat('id-ID').format(data.daftar.jalur.jml_biaya_pendaftaran) : 'Gratis';
@@ -410,6 +434,7 @@
                                 $('#o-biayadaftar').html(biayadaftar+' '+showstatusdaftar)
                                 $('#o-tgldaftar').html(data.daftar.tgl_daftar)
                                 $('#o-waktukuliah').html(data.daftar.waktukuliah.waktu)
+                                $('#o-rekomendator').html(data.rekomendator)
                                 let statusUkt = data.daftar.jalur.status_ukt=='0' ? 'Gratis '+showstatusUKT : 'Bayar '+showstatusUKT;
                                 $('#o-statusukt').html(statusUkt)
                                 let beasiswa = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.jenis_beasiswa

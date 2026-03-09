@@ -97,18 +97,27 @@
                                         <th>Jurusan Sekolah</th>
                                         <th>: {{$datadaftar->jurusansekolah->sekolah}}/{{$datadaftar->jurusansekolah->jurusan_sekolah}}</th>
                                     </tr>
-                                    <tr>
+                                   <tr>
                                         <th>Program Studi Pilihan 1</th>
                                         <th>: {{$datadaftar->prodi1->jenjang->jenjang}}-{{$datadaftar->prodi1->jurusan}}</th>
-                                        <th>Program Studi Pilihan 2</th>
-                                        <th>: {{$datadaftar->prodi2->jenjang->jenjang}}-{{$datadaftar->prodi2->jurusan}}</th>
-                                    </tr>
-                                    <tr>
                                         <th>UKT Program Studi 1</th>
                                         <th>: {{rupiah($ukt1->biaya_ukt)}}</th>
-                                        <th>UKT Program Studi 2</th>
-                                        <th>: {{rupiah($ukt2->biaya_ukt)}}</th>
                                     </tr>
+
+                                    <tr>
+                                        <th>Program Studi Pilihan 2</th>
+                                        <th>: {{$datadaftar->prodi2 ? $datadaftar->prodi2->jenjang->jenjang.'-'.$datadaftar->prodi2->jurusan : '-'}}</th>
+                                        <th>UKT Program Studi 2</th>
+                                        <th>: {{$ukt2 ? rupiah($ukt2->biaya_ukt) : '-'}}</th>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <th>Program Studi Pilihan 3</th>
+                                        <th>: {{$datadaftar->prodi3 ? $datadaftar->prodi3->jenjang->jenjang.'-'.$datadaftar->prodi3->jurusan : '-'}}</th>
+                                        <th>UKT Program Studi 3</th>
+                                        <th>: {{$ukt3 ? rupiah($ukt3->biaya_ukt) : '-'}}</th>
+                                    </tr>
+
                                     @php
                                         $tglkonfirm = explode(' ',$datadaftar->tgl_konfirm);
                                         $tgldaftar = explode(' ',$datadaftar->tgl_daftar);
@@ -203,7 +212,7 @@
                                             Berkas Khusus Beasiswa
                                         </th>
 
-                                        <th colspan="3">
+                                        <th>
                                             :
                                             @if($berkas_khusus==null)
                                                 <span class="badge bg-warning">Non Beasiswa</span>
@@ -211,6 +220,8 @@
                                                 <a href="{{$berkas_khusus}}" target="_blank"><span class="badge bg-success">{{$datadaftar->berkas_khusus}}</span></a>
                                             @endif
                                         </th>
+                                        <th>Rekomendator</th>
+                                        <th colspan="3">: {{ $rekomendator }}</th>
                                     </tr>
                                 </thead>
                             </table>
@@ -250,7 +261,7 @@
                             </table>
                         </div>
                     </div>
-                    <div class="card card-primary collapsed-card">
+                    {{-- <div class="card card-primary collapsed-card">
                         <div class="card-header">
                             <h5 class="card-title">Data Test Online</h5>
                             <div class="card-tools">
@@ -261,7 +272,7 @@
                             <p class="text-bold">Nilai Test : {{$datadaftar->nilai_test}}</p>
                             <p class="text-bold">Jumlah Soal : {{ count($datadaftar->jawaban_peserta)}}</p>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="card card-primary collapsed-card">
                         <div class="card-header">
                             <h5 class="card-title">Biodata</h5>
@@ -476,32 +487,63 @@
                                     <label class="step-title">Berkas Pendaftaran</label>
                                 </div>
                                 <div class="row mt-3">
-                                    <table id="tabel-detail" class="table" style="width: 100%;">
+                                    <table id="tabel-detail" class="table table-bordered table-striped"
+                                        style="width: 100%;">
                                         <thead>
                                             <tr>
-
-                                                <th>File Berkas</th>
-                                                <th colspan="3">: <a href="{{$berkas_umum}}" target="_blank"><span class="badge bg-success">{{$datadaftar->biodata->berkas_umum}}</span></a></th>
+                                                <th colspan="4" style="background-color: cadetblue; color: white;"
+                                                    class="text-center">Daftar Berkas Pendaftaran</th>
                                             </tr>
                                             <tr>
-                                                <th colspan="4" style="background-color: cadetblue;" class="text-center">Detail Berkas</th>
+                                                <th class="text-center" width="5%">No</th>
+                                                <th>Nama Berkas yang Diminta</th>
+                                                <th class="text-center" width="15%">Status Wajib</th>
+                                                <th class="text-center" width="25%">File Pendaftar</th>
                                             </tr>
-                                            @foreach($detailberkas_umum as $row => $b)
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($detailberkas_umum as $row => $b)
+                                                @php
+                                                    // CARA PALING AMPUH: Cari id_berkas yang sama persis dengan $b->id
+                                                    $fileUploaded = $berkasPendaftar->firstWhere('id_berkas', $b->id);
+
+                                                    $warna = $b->keterangan == 'Wajib' ? 'danger' : 'secondary';
+                                                @endphp
                                                 <tr>
-                                                    <th>{{$row+1}}</th>
-                                                    <th>{{$b->nama_berkas}}</th>
-                                                    <th>{{$b->formatfile}}</th>
-                                                    @php
-                                                        if($b->keterangan=='Wajib'){
-                                                            $warna = 'warning';
-                                                        }else{
-                                                            $warna = 'secondary';
-                                                        }
-                                                    @endphp
-                                                    <th><span class="badge bg-{{$warna}}">{{$b->keterangan}}</span></th>
+                                                    <td class="text-center">{{ $row + 1 }}</td>
+                                                    <td>
+                                                        {{ $b->nama_berkas }} <br>
+                                                        <small class="text-muted">Format: {{ $b->formatfile }}</small>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span
+                                                            class="badge bg-{{ $warna }}">{{ $b->keterangan }}</span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @if ($fileUploaded)
+                                                            @php
+                                                                $parameter = \App\Models\Parameter::where(
+                                                                    'id',
+                                                                    1,
+                                                                )->first();
+                                                                $pathFile = asset(
+                                                                    'sources/storage/app/' .
+                                                                        $parameter->file_umum .
+                                                                        '/' .
+                                                                        $fileUploaded->nama_berkas,
+                                                                );
+                                                            @endphp
+                                                            <a href="{{ $pathFile }}" target="_blank"
+                                                                class="btn btn-sm btn-success">
+                                                                <i class="fa fa-eye"></i> Lihat Berkas
+                                                            </a>
+                                                        @else
+                                                            <span class="badge bg-warning text-dark">Belum Upload</span>
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                             @endforeach
-                                        </thead>
+                                        </tbody>
                                     </table>
                                     <br>
                                 </div>

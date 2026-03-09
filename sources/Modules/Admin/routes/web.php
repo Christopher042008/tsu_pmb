@@ -29,6 +29,7 @@ use Modules\Admin\Http\Controllers\masterdata\ProvinsiController;
 use Modules\Admin\Http\Controllers\masterdata\SoalTestController;
 use Modules\Admin\Http\Controllers\masterdata\TarifUKTController;
 use Modules\Admin\Http\Controllers\masterdata\TingkatKejuaraanController;
+use Modules\Admin\Http\Controllers\masterdata\RekomendatorController;
 use Modules\Admin\Http\Controllers\TestPMBController;
 
 /*
@@ -65,11 +66,13 @@ Route::middleware(['web'])->group(function () {
                     Route::get('/', [DataBeasiswaContoller::class, 'index'])->name('admin.databeasiswa.show');
                     Route::get('/TabelBeasiswa', [DataBeasiswaContoller::class, 'tabelBeasiswa'])->name('admin.databeasiswa.Tabel');
                     Route::get('/DetailBeasiswa/{params}', [DataBeasiswaContoller::class, 'showBeasiswa'])->name('admin.databeasiswa.detail');
+                    Route::post('/UpdateRekomendator', [DataBeasiswaContoller::class, 'updateRekomendator'])->name('admin.databeasiswa.updaterekomendator');
                 });
                 Route::prefix('NonBeasiswa')->group(function(){
                     Route::get('/', [DataNonBeasiswaController::class, 'index'])->name('admin.datanonbeasiswa.show');
                     Route::get('/TabelNonBeasiswa', [DataNonBeasiswaController::class, 'tabelNonBeasiswa'])->name('admin.datanonbeasiswa.Tabel');
                     Route::get('/DetailNonBeasiswa/{params}', [DataNonBeasiswaController::class, 'showNonBeasiswa'])->name('admin.datanonbeasiswa.detail');
+                    Route::post('/UpdateRekomendator', [DataNonBeasiswaController::class, 'updateRekomendator'])->name('admin.datanonbeasiswa.updaterekomendator');
                 });
             });
 
@@ -153,6 +156,13 @@ Route::middleware(['web'])->group(function () {
                 Route::prefix('Provinsi')->group(function(){
                     Route::get('/', [ProvinsiController::class, 'index'])->name('admin.Provinsi.show');
                     Route::get('/TabelProvinsi', [ProvinsiController::class, 'TabelProvinsi'])->name('admin.Provinsi.Tabel');
+                });
+                Route::prefix('Rekomendator')->group(function(){
+                    Route::get('/', [RekomendatorController::class, 'index'])->name('admin.Rekomendator.show');
+                    Route::get('/TabelRekomendator', [RekomendatorController::class, 'TabelRekomendator'])->name('admin.Rekomendator.Tabel');
+                    Route::post('/Store', [RekomendatorController::class, 'StoreRekomendator'])->name('admin.Rekomendator.Store');
+                    Route::get('/Edit/{params}', [RekomendatorController::class, 'ShowRekomendator'])->name('admin.Rekomendator.Edit');
+                    Route::get('/Status/{params1}/{params2}', [RekomendatorController::class, 'delete'])->name('admin.Rekomendator.delete');
                 });
                 Route::prefix('Kabupaten')->group(function(){
                     Route::get('/', [KabupatenController::class, 'index'])->name('admin.Kabupaten.show');

@@ -184,8 +184,10 @@
                             <option value="1">OK</option>
                             <option value="-1">Ditolak</option>
                         </select><br>
-                        <input type="checkbox" id="pindahjalur" name="pindahjalur" value="0">
-                        <label for="pindahjalur">Arahkan Ke jalur Reguler</label>
+                        <div id="wadah_pindah_jalur" style="display: none;">
+    <input type="checkbox" id="pindahjalur" name="pindahjalur" value="0">
+    <label for="pindahjalur">Arahkan Ke jalur Reguler</label>
+</div>
                     </form>
                 </div>
                 <div class="modal-footer justify-content-between">
@@ -216,6 +218,7 @@
                 tabelBerkasKhusus()
                 SubmitApprovalBerkas()
                 checkPindahJalur()
+                watchStatus();
             }
 
             function tabelBerkasKhusus() {
@@ -448,13 +451,21 @@
             });
 
             function approvalBerkas() {
-                $('.btn_approval').click(function(e) {
-                    e.preventDefault();
-                    let params = $(this).data('id');
-                    $('#iddaftar').val(params)
-                    $('#modal-approval').modal('show')
-                });
-            }
+    $('.btn_approval').click(function(e) {
+        e.preventDefault();
+        let params = $(this).data('id');
+        $('#iddaftar').val(params);
+        
+        // --- TAMBAHAN RESET FORM ---
+        $('#status').val('0').trigger('change'); // Kembalikan ke "-- Pilih Status --"
+        $('#keterangan').val('');                // Kosongkan keterangan
+        $('#pindahjalur').prop('checked', false).val(0); // Hilangkan centang
+        $('#wadah_pindah_jalur').hide();         // Sembunyikan kembali checkbox
+        // ---------------------------
+
+        $('#modal-approval').modal('show');
+    });
+}
 
             function SubmitApprovalBerkas() {
                 $('#btn-saveapproval').click(function(e) {
@@ -529,6 +540,23 @@
                     });
                 });
             }
+
+            function watchStatus() {
+    $('#status').on('change', function() {
+        let nilaiStatus = $(this).val();
+
+        // Jika pilih Ditolak (-1), munculkan pilihan pindah jalur
+        if (nilaiStatus == '-1') {
+            $('#wadah_pindah_jalur').slideDown();
+        } else {
+            // Jika pilih OK (1) atau reset (0), sembunyikan lagi
+            $('#wadah_pindah_jalur').slideUp();
+            
+            // Hapus centangan dan kembalikan value ke 0 agar tidak ikut tersubmit
+            $('#pindahjalur').prop('checked', false).val(0); 
+        }
+    });
+}
 
             $('#modal-approval-item').on('hidden.bs.modal', function() {
 

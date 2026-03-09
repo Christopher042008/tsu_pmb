@@ -4,6 +4,7 @@ namespace Modules\Admin\Http\Controllers;
 
 use App\Models\MasterData\Master_JenisPendaftaran;
 use App\Models\MasterData\Master_TarifUKT;
+use App\Models\MasterData\Master_Rekomendator;
 use App\Models\Parameter;
 use App\Models\Transaksi;
 use App\Models\TransaksiHistory;
@@ -61,6 +62,9 @@ class PembayaranUKTController extends Controller
                 $warna = 'danger';
             }
             $show = '<span class="badge bg-'.$warna.'">'.$d->status.'</span>';
+            if($d->status=='paid' && $d->pendaftaran->skema_ukt) {
+                $show .= '<br><small class="text-muted text-uppercase">'. $d->pendaftaran->skema_ukt .'</small>';
+            }
             return $show;
         })
         ->addColumn('keterangan', function ($d) {
@@ -103,23 +107,10 @@ class PembayaranUKTController extends Controller
     {
         $id = decrypt($params);
         $cek = Pendaftaran::where('KodePendaftaran',$id)
-        // ->where('isactive',1)
         ->select('biodata_id','KodePendaftaran')->first();
-        // dd($cek);
+        
         $cek1 = Pendaftaran::where('KodePendaftaran',$id)->where('biodata_id',$cek->biodata_id)
-        // ->where('isactive',1)
-        ->with(['biodata','batch','jalur'
-        // =>function($q){
-        //     $q->with(['berkasumum'=>function($q){
-        //             $q->with('berkas');
-        //         },
-
-        //     'berkaskhusus'=>function($q){
-        //             $q->with('berkas');
-        //         }
-        //     ]);
-        // }
-        ,
+        ->with(['biodata','batch','jalur',
         'jenisbeasiswa'=>function($q){
             $q->with('tingkat');
         },
@@ -130,61 +121,98 @@ class PembayaranUKTController extends Controller
         'prodi2'=>function($q){
             $q->with('jenjang');
         },
+        'prodi3'=>function($q){ 
+            $q->with('jenjang');
+        },
         'waktukuliah','bayar'
-        // =>function($q){
-        //     $q->with('history_transaksi');
-        // }
         ])->first();
-        $prodi1 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi1->id)->where('isactive',1)->first();
-        $prodi2 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi2->id)->where('isactive',1)->first();
+
+        // PENGAMAN PENCARIAN NOMINAL UKT (Mencegah Fatal Error jika prodi kosong)
+        $prodi1 = null;
+        if($cek1 && $cek1->prodi1){
+            $prodi1 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi1->id)->where('isactive',1)->first();
+        }
+        
+        $prodi2 = null;
+        if($cek1 && $cek1->prodi2){
+            $prodi2 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi2->id)->where('isactive',1)->first();
+        }
+
+        $prodi3 = null;
+        if($cek1 && $cek1->prodi3){
+            $prodi3 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi3->id)->where('isactive',1)->first();
+        }
+
+        $rekomendator_text = '-';
+        if ($cek1 && $cek1->rekomendator) {
+            $rek = Master_Rekomendator::where('kode_rekomendator', $cek1->rekomendator)->first();
+            if ($rek) {
+                // Tampilan: Nama Lengkap (Kode)
+                $rekomendator_text = $rek->nama_rekomendator . ' (' . $rek->kode_rekomendator . ')';
+            } else {
+                $rekomendator_text = $cek1->rekomendator;
+            }
+        }
+
         if($cek1){
             $data['hasil'] = 1;
             $data['daftar'] = $cek1;
             $data['IdDaftar'] = $params;
             $data['ukt1'] = $prodi1;
             $data['ukt2'] = $prodi2;
+            $data['ukt3'] = $prodi3; 
+            $data['rekomendator'] = $rekomendator_text;
         }else{
             $data['hasil'] = 0;
             $data['daftar'] = $cek1;
             $data['IdDaftar'] = null;
-            $data['ukt1'] = $prodi1;
-            $data['ukt2'] = $prodi2;
+            $data['ukt1'] = null;
+            $data['ukt2'] = null;
+            $data['ukt3'] = null; 
+            $data['rekomendator'] = '-';
         }
         return response()->json($data, Response::HTTP_OK);
     }
 
-    public function approve($params)
+    // Tambahkan "Request $request" di parameternya
+    public function approve(Request $request, $params)
     {
         $id = decrypt($params);
-        $cek = Pendaftaran::where('KodePendaftaran',$id)->select('current_step','jalur_daftar')->first();
+        
+        // Tangkap data skema dari AJAX
+        $skema = $request->skema_ukt; 
 
-        $step = $cek->current_step+1;
+        $cek = Pendaftaran::where('KodePendaftaran',$id)->select('current_step','jalur_daftar')->first();
+        $step = $cek->current_step + 1;
 
         DB::beginTransaction();
 
         $update1 = Pendaftaran::where('KodePendaftaran',$id)->update([
-            'bayar_ukt' => '1',
+            'bayar_ukt'    => '1',
+            'skema_ukt'    => $skema, // <-- Simpan ke tabel pmb_pendaftaran
             'current_step' => $step,
-            'keterangan' => null,
-            'updated_at' => date('Y-m-d H:i:s')
+            'keterangan'   => null,
+            'updated_at'   => date('Y-m-d H:i:s')
         ]);
 
         $update2 = Transaksi::where('id_referensi',$id)->update([
-            'status' => 'paid',
+            'status'               => 'paid',
             'validator_pembayaran' => session('session')->nip,
-            'keterangan' => null,
-            'updated_at' => date('Y-m-d H:i:s')
+            'keterangan'           => null,
+            'updated_at'           => date('Y-m-d H:i:s')
         ]);
 
-        if($update1&&$update2){
+        if($update1 && $update2){
             DB::commit();
             $data['status']  = true;
-            $data['message'] = 'Bukti Pembayaran Berhasil di Validasi';
+            // Tambahkan keterangan skema di pesan sukses agar admin yakin data masuk
+            $data['message'] = 'Bukti Pembayaran Berhasil di Validasi (Skema: '. strtoupper($skema) .')';
         }else{
             DB::rollback();
             $data['status']  = false;
             $data['message'] = 'Bukti Pembayaran Gagal di Validasi';
         }
+        
         return response()->json($data, Response::HTTP_OK);
     }
 

@@ -54,6 +54,7 @@ Route::prefix('')->group(function() {
                 Route::get('/ShowJalur/{params}', [PendaftaranController::class, 'showJalur'])->name('Daftar.ShowJalur');
                 Route::get('/ShowBeasiswa/{params}', [PendaftaranController::class, 'showBeasiswa'])->name('Daftar.ShowBeasiswa');
                 Route::get('/ShowDetailBeasiswa/{params}', [PendaftaranController::class, 'detailbeasiswa'])->name('Daftar.ShowDetailBeasiswa');
+                Route::get('/CariRekomendator', [PendaftaranController::class, 'cariRekomendator'])->name('Daftar.CariRekomendator');
                 Route::get('/ShowProdi/{batch}/{jalur}/{jurusansekolah}', [PendaftaranController::class, 'showProdi'])->name('Daftar.ShowProdi');
                 Route::post('/StoreDaftar', [PendaftaranController::class, 'StoreDaftar'])->name('Daftar.StoreDaftar');
                 Route::get('/TabelDaftar', [PendaftaranController::class, 'tabelPendaftaran'])->name('Daftar.TabelDaftar');
