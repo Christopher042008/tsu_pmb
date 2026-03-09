@@ -66,6 +66,7 @@ Route::middleware(['web'])->group(function () {
                     Route::get('/', [DataBeasiswaContoller::class, 'index'])->name('admin.databeasiswa.show');
                     Route::get('/TabelBeasiswa', [DataBeasiswaContoller::class, 'tabelBeasiswa'])->name('admin.databeasiswa.Tabel');
                     Route::get('/DetailBeasiswa/{params}', [DataBeasiswaContoller::class, 'showBeasiswa'])->name('admin.databeasiswa.detail');
+                    Route::get('/CariRekomendator', [DataBeasiswaContoller::class, 'cariRekomendator'])->name('admin.databeasiswa.carirekomendator');
                     Route::post('/UpdateRekomendator', [DataBeasiswaContoller::class, 'updateRekomendator'])->name('admin.databeasiswa.updaterekomendator');
                 });
                 Route::prefix('NonBeasiswa')->group(function(){

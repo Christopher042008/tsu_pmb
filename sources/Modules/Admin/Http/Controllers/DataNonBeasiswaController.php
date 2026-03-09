@@ -101,7 +101,7 @@ class DataNonBeasiswaController extends Controller
                 if ($rek) {
                     $rek_text = $rek->nama_rekomendator . ' (' . $rek->kode_rekomendator . ')';
                 } else {
-                    $rek_text = $d->rekomendator; 
+                    $rek_text = $d->rekomendator;
                 }
             }
             // $aktif = '';
@@ -168,7 +168,7 @@ class DataNonBeasiswaController extends Controller
         if($cek1 && $cek1->prodi2){
             $prodi2 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi2->id)->where('isactive',1)->first();
         }
-        
+
         $prodi3 = null;
         if($cek1 && $cek1->prodi3){
             $prodi3 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi3->id)->where('isactive',1)->first();

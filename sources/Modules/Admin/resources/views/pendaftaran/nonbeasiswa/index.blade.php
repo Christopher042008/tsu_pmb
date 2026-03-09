@@ -198,7 +198,7 @@
                     <div class="text-center mb-4">
                         <h6 class="text-muted mb-2">Rekomendator Saat Ini:</h6>
                         <h4 id="teks_rekomendator_saatini" class="text-bold text-primary">-</h4>
-                        
+
                         <button type="button" id="btn-tampil-form-edit" class="btn btn-sm btn-outline-warning mt-3">
                             <i class="fas fa-edit"></i> Ubah / Tambah Rekomendator
                         </button>
@@ -313,7 +313,7 @@
                 $('#example2').off('click', '.btn_detail').on('click', '.btn_detail', function (e) {
                     e.preventDefault();
                     let param = $(this).data('id');
-                    
+
                     $.ajax({
                         type: "GET",
                         url: '{!! url('admin/DataPendaftaran/NonBeasiswa/DetailNonBeasiswa') !!}' + '/' + param,
@@ -332,10 +332,10 @@
                                 $('#o-nama').html(data.daftar.biodata ? data.daftar.biodata.nama : '-');
                                 $('#o-batch').html(data.daftar.batch ? data.daftar.batch.nama_batch + ' ' + data.daftar.batch.tahun_akademik : '-');
                                 $('#o-tahunlulus').html(data.daftar.tahun_lulus ? data.daftar.tahun_lulus : '-');
-                                
+
                                 $('#o-jalur').html(data.daftar.jalur ? data.daftar.jalur.KodeJenis + '-' + data.daftar.jalur.jenis_pendaftaran : '-');
                                 $('#o-jurusansekolah').html(data.daftar.jurusansekolah ? data.daftar.jurusansekolah.sekolah + '/' + data.daftar.jurusansekolah.jurusan_sekolah : '-');
-                                
+
                                 // PRODI & UKT
                                 $('#o-prodi1').html(data.daftar.prodi1 && data.daftar.prodi1.jenjang ? data.daftar.prodi1.jenjang.jenjang + '-' + data.daftar.prodi1.jurusan : (data.daftar.prodi1 ? data.daftar.prodi1.jurusan : '-'));
                                 $('#o-prodi2').html(data.daftar.prodi2 && data.daftar.prodi2.jenjang ? data.daftar.prodi2.jenjang.jenjang + '-' + data.daftar.prodi2.jurusan : (data.daftar.prodi2 ? data.daftar.prodi2.jurusan : '-'));
@@ -343,24 +343,24 @@
 
                                 let ukt1 = data.ukt1 ? new Intl.NumberFormat('id-ID').format(data.ukt1.biaya_ukt) : '0';
                                 $('#o-uktprodi1').html('Rp ' + ukt1);
-                                
+
                                 let ukt2 = data.ukt2 ? new Intl.NumberFormat('id-ID').format(data.ukt2.biaya_ukt) : '0';
                                 $('#o-uktprodi2').html('Rp ' + ukt2);
-                                
+
                                 let ukt3 = data.ukt3 ? new Intl.NumberFormat('id-ID').format(data.ukt3.biaya_ukt) : '0';
                                 $('#o-uktprodi3').html('Rp ' + ukt3);
 
                                 let konfirmdaftar = data.daftar.konfirm_pendaftaran == '0' ? 'Belum Konfirmasi' : 'Sudah Konfirmasi';
                                 $('#o-konfirmdaftar').html(konfirmdaftar);
-                                
+
                                 let biayadaftar = (data.daftar.jalur && data.daftar.jalur.biaya_pendaftaran == '1') ? 'Rp ' + new Intl.NumberFormat('id-ID').format(data.daftar.jalur.jml_biaya_pendaftaran) : 'Gratis';
                                 $('#o-biayadaftar').html(biayadaftar);
-                                
+
                                 $('#o-tgldaftar').html(data.daftar.tgl_daftar);
                                 $('#o-waktukuliah').html(data.daftar.waktukuliah ? data.daftar.waktukuliah.waktu : '-');
 
                                 $('#o-rekomendator').html(data.rekomendator);
-                                
+
                                 let statusUkt = (data.daftar.jalur && data.daftar.jalur.status_ukt == '0') ? 'Gratis' : 'Bayar';
                                 $('#o-statusukt').html(statusUkt);
 
@@ -390,7 +390,7 @@
 
                                 let berkaskhusus = (data.daftar.jalur && data.daftar.jalur.berkaskhusus) ? data.daftar.jalur.berkaskhusus.jenis_berkas : 'Khusus';
                                 berkas += '<tr style="background-color: rgb(0, 238, 255);"><th colspan="4" class="text-center">' + berkaskhusus + '</th></tr>';
-                                
+
                                 if (data.daftar.jalur && data.daftar.jalur.berkaskhusus) {
                                     berkas += '<tr style="background-color: rgb(0, 238, 255);"><th>No</th><th>Nama berkas</th><th>Keterangan</th><th>Format File</th></tr>';
                                     for (let i = 0; i < data.daftar.jalur.berkaskhusus.berkas.length; i++) {
@@ -431,7 +431,7 @@
                 let rek_saatini = $(this).attr('data-rek');
 
                 $('#edit_id_daftar').val(id);
-                
+
                 // Tampilkan Teks Rekomendator Saat Ini
                 if(rek_saatini && rek_saatini !== '-' && rek_saatini !== '') {
                     $('#teks_rekomendator_saatini').text(rek_saatini);
@@ -447,16 +447,16 @@
 
                 // Kosongkan Select2
                 $('#select_rekomendator').empty().append('<option value="" selected disabled>-- Ketik Nama Rekomendator --</option>');
-                
+
                 $('#modal-edit-rekomendator').modal('show');
             });
 
             // 2. EVENT KETIKA TOMBOL "UBAH / TAMBAH" DI DALAM MODAL DIKLIK
             $('#btn-tampil-form-edit').click(function(e){
                 e.preventDefault();
-                $(this).hide(); 
-                $('#wadah-form-rekomendator').slideDown('fast'); 
-                $('#btn-save-rekomendator').fadeIn('fast'); 
+                $(this).hide();
+                $('#wadah-form-rekomendator').slideDown('fast');
+                $('#btn-save-rekomendator').fadeIn('fast');
             });
 
             // 3. SETUP SELECT2 UNTUK PENCARIAN NAMA REKOMENDATOR SAJA
@@ -467,7 +467,7 @@
                 allowClear: true,
                 minimumInputLength: 2,
                 ajax: {
-                    url: '{!! route('Daftar.CariRekomendator') !!}', 
+                    url: '{!! route('admin.databeasiswa.carirekomendator') !!}',
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {
@@ -477,71 +477,8 @@
                         return {
                             results: $.map(data, function(item) {
                                 return {
-                                    text: item.nama_rekomendator, 
-                                    id: item.kode_rekomendator 
-                                }
-                            })
-                        };
-                    },
-                    cache: true
-                }
-            });
-
-            // 1. EVENT KETIKA TOMBOL INFO REKOMENDATOR DIKLIK PADA TABEL
-            $('#example2').on('click', '.btn_edit_rekomendator', function(e) {
-                e.preventDefault();
-                let id = $(this).data('id');
-                let rek_saatini = $(this).attr('data-rek');
-
-                $('#edit_id_daftar').val(id);
-                
-                // Tampilkan Teks Rekomendator Saat Ini
-                if(rek_saatini && rek_saatini !== '-' && rek_saatini !== '') {
-                    $('#teks_rekomendator_saatini').text(rek_saatini);
-                } else {
-                    $('#teks_rekomendator_saatini').text('-');
-                }
-
-                // Sembunyikan form dropdown pencarian & tombol simpan
-                $('#wadah-form-rekomendator').hide();
-                $('#btn-save-rekomendator').hide();
-                // Munculkan tombol pemancing edit
-                $('#btn-tampil-form-edit').show();
-
-                // Kosongkan Select2
-                $('#select_rekomendator').empty().append('<option value="" selected disabled>-- Ketik Nama Rekomendator --</option>');
-                
-                $('#modal-edit-rekomendator').modal('show');
-            });
-
-            // 2. EVENT KETIKA TOMBOL "UBAH / TAMBAH" DI DALAM MODAL DIKLIK
-            $('#btn-tampil-form-edit').click(function(e){
-                e.preventDefault();
-                $(this).hide(); 
-                $('#wadah-form-rekomendator').slideDown('fast'); 
-                $('#btn-save-rekomendator').fadeIn('fast'); 
-            });
-
-            // 3. SETUP SELECT2 UNTUK PENCARIAN NAMA REKOMENDATOR SAJA
-            $('#select_rekomendator').select2({
-                dropdownParent: $('#modal-edit-rekomendator'),
-                theme: 'bootstrap4',
-                placeholder: '-- Ketik Nama Rekomendator --',
-                allowClear: true,
-                minimumInputLength: 2,
-                ajax: {
-                    url: '{!! route('Daftar.CariRekomendator') !!}', 
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return { q: params.term };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: $.map(data, function(item) {
-                                return {
-                                    text: item.nama_rekomendator, 
-                                    id: item.kode_rekomendator 
+                                    text: item.kode_rekomendator+' - '+item.nama_rekomendator,
+                                    id: item.kode_rekomendator
                                 }
                             })
                         };
@@ -562,7 +499,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: '{!! route('admin.datanonbeasiswa.updaterekomendator') !!}', 
+                    url: '{!! route('admin.datanonbeasiswa.updaterekomendator') !!}',
                     data: {
                         id_daftar: id_daftar,
                         kode_rekomendator: kode_rek
@@ -576,7 +513,7 @@
                         if (response.status == 'success') {
                             $('#modal-edit-rekomendator').modal('hide');
                             notifalert('Berhasil', response.message, 'success');
-                            $('#example2').DataTable().ajax.reload(null, false); 
+                            $('#example2').DataTable().ajax.reload(null, false);
                         } else {
                             notifalert('Gagal', response.message, 'error');
                         }

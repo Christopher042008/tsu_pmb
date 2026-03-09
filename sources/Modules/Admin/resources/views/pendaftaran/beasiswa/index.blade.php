@@ -106,14 +106,14 @@
                                 <th>UKT Program Studi 1</th>
                                 <th id="o-uktprodi1" class="o-detaildaftar"></th>
                             </tr>
-                            
+
                             <tr>
                                 <th>Program Studi Pilihan 2</th>
                                 <th id="o-prodi2" class="o-detaildaftar"></th>
                                 <th>UKT Program Studi 2</th>
                                 <th id="o-uktprodi2" class="o-detaildaftar"></th>
                             </tr>
-                            
+
                             <tr>
                                 <th>Program Studi Pilihan 3</th>
                                 <th id="o-prodi3" class="o-detaildaftar"></th>
@@ -204,7 +204,7 @@
                     <div class="text-center mb-4">
                         <h6 class="text-muted mb-2">Rekomendator Saat Ini:</h6>
                         <h4 id="teks_rekomendator_saatini" class="text-bold text-primary">-</h4>
-                        
+
                         <button type="button" id="btn-tampil-form-edit" class="btn btn-sm btn-outline-warning mt-3">
                             <i class="fas fa-edit"></i> Ubah / Tambah Rekomendator
                         </button>
@@ -446,12 +446,12 @@
         $('#example2').on('click', '.btn_edit_rekomendator', function(e) {
                 e.preventDefault();
                 let id = $(this).data('id');
-                
+
                 // MENGGUNAKAN .attr() AGAR DATA SELALU TERBACA AKURAT DARI DOM
                 let rek_saatini = $(this).attr('data-rek');
 
                 $('#edit_id_daftar').val(id);
-                
+
                 // Tampilkan Teks Rekomendator Saat Ini
                 if(rek_saatini && rek_saatini !== '-' && rek_saatini !== '') {
                     $('#teks_rekomendator_saatini').text(rek_saatini);
@@ -467,7 +467,7 @@
 
                 // Kosongkan Select2
                 $('#select_rekomendator').empty().append('<option value="" selected disabled>-- Ketik Nama Rekomendator --</option>');
-                
+
                 $('#modal-edit-rekomendator').modal('show');
             });
 
@@ -487,7 +487,7 @@
                 allowClear: true,
                 minimumInputLength: 2,
                 ajax: {
-                    url: '{!! route('Daftar.CariRekomendator') !!}', // Pastikan route ini dapat diakses admin juga
+                    url: '{!! route('admin.databeasiswa.carirekomendator') !!}', // Pastikan route ini dapat diakses admin juga
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {
@@ -497,8 +497,8 @@
                         return {
                             results: $.map(data, function(item) {
                                 return {
-                                    text: item.nama_rekomendator, 
-                                    id: item.kode_rekomendator 
+                                    text: item.kode_rekomendator+' - '+item.nama_rekomendator,
+                                    id: item.kode_rekomendator
                                 }
                             })
                         };
@@ -520,7 +520,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: '{!! url('admin/DataPendaftaran/UpdateRekomendator') !!}', 
+                    url: '{!! route('admin.databeasiswa.updaterekomendator') !!}',
                     data: {
                         id_daftar: id_daftar,
                         kode_rekomendator: kode_rek

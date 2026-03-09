@@ -114,7 +114,7 @@ class DataBeasiswaContoller extends Controller
 
             // --- 2. RENDER TOMBOL DENGAN ICON UNGU DAN DATA-REK ---
             $detail = '<a href="#" data-id="'.$id.'" class="btn_detail"><i title="Detail" class="fa fa-info-circle text-blue"></i></a>';
-            
+
             // Perhatikan: Ada tambahan data-rek="'.$rek_text.'" dan icon fa-user-edit text-purple
             $edit_rek = ' <a href="#" data-id="'.$id.'" data-rek="'.$rek_text.'" class="btn_edit_rekomendator"><i title="Info / Edit Rekomendator" class="fa fa-user-edit text-red"></i></a>';
             // $aktif = '';
@@ -176,7 +176,7 @@ class DataBeasiswaContoller extends Controller
         if($cek1 && $cek1->prodi2){
             $prodi2 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi2->id)->where('isactive',1)->first();
         }
-        
+
         $prodi3 = null;
         if($cek1 && $cek1->prodi3){
             $prodi3 = Master_TarifUKT::where('idbatch',$cek1->batch_daftar)->where('idjalur',$cek1->jalur_daftar)->where('idjurusan',$cek1->prodi3->id)->where('isactive',1)->first();
@@ -207,14 +207,31 @@ class DataBeasiswaContoller extends Controller
         }
         return response()->json($data, Response::HTTP_OK);
     }
+
+    public function cariRekomendator(Request $request)
+    {
+        $search = $request->q;
+        $query = null;
+        if ($search) {
+        $query = Master_Rekomendator::where('isactive', 1)
+            ->select('kode_rekomendator', 'nama_rekomendator')
+            ->where('nama_rekomendator', 'like', '%' . $search . '%')
+            ->orderBy('nama_rekomendator', 'asc')
+            ->limit(15)
+            ->get();
+        }
+
+        $data = $query;
+        return response()->json($data);
+    }
+
     public function updateRekomendator(Request $request)
     {
         $id = decrypt($request->id_daftar);
         $kode_rek = $request->kode_rekomendator;
-
         $update = Pendaftaran::where('KodePendaftaran', $id)->update([
             'rekomendator' => $kode_rek,
-            'updated_at'   => date('Y-m-d H:i:s')
+            'updated_at'   => date('Y-m-d H:i:s'),
         ]);
 
         if ($update) {
