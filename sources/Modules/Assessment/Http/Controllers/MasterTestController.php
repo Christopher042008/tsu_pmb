@@ -5,6 +5,7 @@ namespace Modules\Assessment\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Assessment\Assessment_EngineTest;
 use App\Models\Assessment\Assessment_TipeTest;
+use App\Models\MasterData\Master_Fakultas;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Response;

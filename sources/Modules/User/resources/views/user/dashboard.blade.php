@@ -253,10 +253,10 @@
                             if($daftar!=null){
                             if($daftar->current_step==6){
                             $step6 = 'active';
-                            $link6 = route('test');
+                            $link6 = route('assessment.show');
                             }elseif($daftar->current_step==7&&$daftar->current_step!=$daftar->stop_step){
                             $step6 = 'validating';
-                            $link6 = route('test');
+                            $link6 = route('assessment.show');
                             }elseif($daftar->current_step>7){
                             $step6 = 'completed';
                             $link6 = 'javascript:void(0)';

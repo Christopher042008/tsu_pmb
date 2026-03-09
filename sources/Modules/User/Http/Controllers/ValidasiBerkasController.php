@@ -9,10 +9,10 @@ use App\Models\MasterData\Master_TarifUKT;
 use App\Models\MasterData\Master_Rekomendator;
 use App\Models\Parameter;
 use App\Models\User\PindahJalur;
-use App\Models\User\BerkasPendaftaran;
 
 use App\Models\Transaksi;
 use App\Models\TransaksiHistory;
+use App\Models\User\BerkasPendaftaran;
 use App\Models\User\Biodata;
 use App\Models\User\Maba;
 use App\Models\User\Pendaftaran;
@@ -247,7 +247,7 @@ class ValidasiBerkasController extends Controller
             'prodi2' => function ($q) {
                 $q->with('jenjang');
             },
-            'prodi3' => function ($q) { 
+            'prodi3' => function ($q) {
                 $q->with('jenjang');
             },
             'waktukuliah'
@@ -255,7 +255,7 @@ class ValidasiBerkasController extends Controller
 
         $prodi1 = null;
         $prodi2 = null;
-        $prodi3 = null; 
+        $prodi3 = null;
 
         if ($cek1) {
             if ($cek1->prodi1) {
@@ -299,15 +299,15 @@ class ValidasiBerkasController extends Controller
             $data['IdDaftar'] = $params;
             $data['ukt1'] = $prodi1;
             $data['ukt2'] = $prodi2;
-            $data['ukt3'] = $prodi3; 
+            $data['ukt3'] = $prodi3;
             $data['rekomendator'] = $rekomendator_text;
         } else {
             $data['hasil'] = 0;
-            $data['daftar'] = null; 
+            $data['daftar'] = null;
             $data['IdDaftar'] = null;
             $data['ukt1'] = null;
             $data['ukt2'] = null;
-            $data['ukt3'] = null; 
+            $data['ukt3'] = null;
             $data['rekomendator'] = '-';
         }
 
@@ -375,7 +375,7 @@ class ValidasiBerkasController extends Controller
         // --- MULAI PERUBAHAN DI SINI ---
         // PERBAIKAN 5: Cek step dan update pendaftaran sekaligus
         $cekstep = Pendaftaran::where('KodePendaftaran', $kddftar)->select('current_step')->first();
-        
+
         Pendaftaran::where('KodePendaftaran', $kddftar)
             ->update([
                 'current_step'           => ($cekstep->current_step == 4) ? $cekstep->current_step + 1 : $cekstep->current_step,

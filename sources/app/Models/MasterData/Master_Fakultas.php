@@ -30,4 +30,9 @@ class Master_Fakultas extends Model
     //     'updated_at',
     //     'updated_by',
     ];
+
+    function jurusan()
+    {
+        return $this->hasMany('App\Models\MasterData\Master_JurusanKuliah', 'idfakultas','KodeFakultas');
+    }
 }
