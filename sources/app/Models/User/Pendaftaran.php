@@ -21,6 +21,8 @@ class Pendaftaran extends Model
     protected $table = 'pmb_pendaftaran';
     protected $primaryKey = 'KodePendaftaran';
     protected $keyType = 'string';
+
+    protected $guarded = [];
     // protected $fillable = [
     //     'nik',
     //     'role_access',

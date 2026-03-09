@@ -91,6 +91,9 @@ class PendaftaranController extends Controller
         ->addColumn('rekomendator', function ($d) {
             return $d->rekomendator != null ? $d->rekomendator : '-';
         })
+        ->addColumn('rekomendator', function ($d) {
+            return $d->rekomendator != null ? $d->rekomendator : '-';
+        })
         ->addColumn('status', function ($d) {
             $role = '-';
             $warna = '';
@@ -387,99 +390,103 @@ class PendaftaranController extends Controller
     }
 
     public function save($post)
-    {
-        try {
-            $batch = $post->batch;
-            $jalur = $post->jalur;
-            $beasiswa = $post->beasiswa;
-            $tahunLulusUser = $post->tahunlulus;
-            $jurusansekolah = $post->jurusansekolah;
-            $prodi1 = $post->prodi1;
-            $prodi2 = $post->prodi2;
-            $prodi3 = $post->prodi3;
-            $waktukuliah = $post->waktukuliah;
-            $rekomendator = $post->rekomendator;
-            $bioId = decrypt(session('user')->_biodata);
+{
+    try {
+        $batch = $post->batch;
+        $jalur = $post->jalur;
+        $beasiswa = $post->beasiswa;
+        $tahunLulusUser = $post->tahunlulus;
+        $jurusansekolah = $post->jurusansekolah;
+        $prodi1 = $post->prodi1;
+        $prodi2 = $post->prodi2;
+        $prodi3 = $post->prodi3;
+        $waktukuliah = $post->waktukuliah;
+        $rekomendator = $post->rekomendator;
+        $bioId = decrypt(session('user')->_biodata);
 
-            // Validasi Duplikat Prodi
-            if ($prodi1 == $prodi2 || $prodi1 == $prodi3 || $prodi2 == $prodi3) {
-                return ['title' => 'Peringatan', 'message' => 'Program Studi Pilihan tidak boleh ada yang sama!', 'status' => 'warning'];
-            }
-
-            // Validasi Fakultas
-            $fakultas1 = Master_JurusanKuliah::where('KodeJurusan', $prodi1)->value('idfakultas');
-            $fakultas2 = Master_JurusanKuliah::where('KodeJurusan', $prodi2)->value('idfakultas');
-            $fakultas3 = Master_JurusanKuliah::where('KodeJurusan', $prodi3)->value('idfakultas');
-
-            if (($fakultas1 == $fakultas2 && $fakultas1 != null) || ($fakultas1 == $fakultas3 && $fakultas1 != null) || ($fakultas2 == $fakultas3 && $fakultas2 != null)) {
-                return ['title' => 'Peringatan', 'message' => 'Setiap Pilihan Program Studi harus berasal dari Fakultas yang berbeda!', 'status' => 'warning'];
-            }
-
-            $cek = Pendaftaran::where('biodata_id', $bioId)->where('batch_daftar', $batch)->exists();
-            if ($cek) {
-                return ['title' => 'Information', 'message' => 'Anda Sudah Daftar Pada Batch ini ! Silahkan Daftar pada Batch Berikutnya', 'status' => 'warning'];
-            }
-
-            DB::beginTransaction();
-            $cekbiayadaftar = Master_JenisPendaftaran::where('id', $jalur)->where('isactive', 1)->first();
-            $tahunSekarang = date('Y');
-            $kd1 = '0' . $batch;
-            $kd2 = '0' . $jalur;
-            
-            // Perbaikan Generator Kode Pendaftaran (Mencegah Duplicate Entry)
-            $lastRecord = Pendaftaran::whereYear('tgl_daftar', $tahunSekarang)
-                                     ->where('KodePendaftaran', 'like', $tahunSekarang . '%')
-                                     ->orderBy('KodePendaftaran', 'desc')
-                                     ->first();
-
-            if ($lastRecord) {
-                // Ambil 4 digit terakhir dari kode sebelumnya, lalu tambah 1
-                $lastSequence = (int) substr($lastRecord->KodePendaftaran, -4);
-                $urut = str_pad($lastSequence + 1, 4, '0', STR_PAD_LEFT);
-            } else {
-                // Jika belum ada pendaftar sama sekali di tahun ini
-                $urut = '0001';
-            }
-
-            $kode = $tahunSekarang . $kd1 . $kd2 . $urut;
-
-            $data_daftar = array(
-                'KodePendaftaran'   => $kode,
-                'biodata_id'        => $bioId,
-                'bayar_pendaftaran' => $cekbiayadaftar ? ($cekbiayadaftar->biaya_pendaftaran == 1 ? '0' : '-1') : '0',
-                'tgl_daftar'        => date('Y-m-d H:i:s'),
-                'batch_daftar'      => $batch,
-                'jalur_daftar'      => $jalur,
-                'beasiswa'          => $beasiswa,
-                'tahun_lulus'       => $tahunLulusUser,
-                'jurusan_sekolah'   => $jurusansekolah,
-                'pilihan1'          => $prodi1,
-                'pilihan2'          => $prodi2,
-                'pilihan3'          => $prodi3,
-                'waktu_kuliah'      => $waktukuliah,
-                'rekomendator'      => $rekomendator,
-                'bayar_ukt'         => $cekbiayadaftar ? ($cekbiayadaftar->status_ukt == 1 ? '0' : '-1') : '0',
-                'created_at'        => date('Y-m-d H:i:s'),
-            );
-            
-            $pendaftaran = Pendaftaran::insert($data_daftar);
-
-            if ($pendaftaran) {
-                DB::commit();
-                return ['title' => 'Berhasil', 'message' => 'Data Pendaftaran Berhasil disimpan ! Silahkan konfirmasi pendaftaran anda', 'status' => 'success'];
-            } else {
-                DB::rollback();
-                return ['title' => 'Gagal', 'message' => 'Data Pendaftaran Gagal disimpan !', 'status' => 'error'];
-            }
-        } catch (\Exception $e) {
-            DB::rollback();
-            return [
-                'title' => 'Server Error',
-                'message' => 'PHP Error: ' . $e->getMessage() . ' pada baris ' . $e->getLine(),
-                'status' => 'error'
-            ];
+        // Validasi Duplikat Prodi
+        if ($prodi1 == $prodi2 || $prodi1 == $prodi3 || $prodi2 == $prodi3) {
+            return ['title' => 'Peringatan', 'message' => 'Program Studi Pilihan tidak boleh ada yang sama!', 'status' => 'warning'];
         }
+
+        // Validasi Fakultas
+        $fakultas1 = Master_JurusanKuliah::where('KodeJurusan', $prodi1)->value('idfakultas');
+        $fakultas2 = Master_JurusanKuliah::where('KodeJurusan', $prodi2)->value('idfakultas');
+        $fakultas3 = Master_JurusanKuliah::where('KodeJurusan', $prodi3)->value('idfakultas');
+
+        if (($fakultas1 == $fakultas2 && $fakultas1 != null) || ($fakultas1 == $fakultas3 && $fakultas1 != null) || ($fakultas2 == $fakultas3 && $fakultas2 != null)) {
+            return ['title' => 'Peringatan', 'message' => 'Setiap Pilihan Program Studi harus berasal dari Fakultas yang berbeda!', 'status' => 'warning'];
+        }
+
+        $cek = Pendaftaran::where('biodata_id', $bioId)->where('batch_daftar', $batch)->exists();
+        if ($cek) {
+            return ['title' => 'Information', 'message' => 'Anda Sudah Daftar Pada Batch ini ! Silahkan Daftar pada Batch Berikutnya', 'status' => 'warning'];
+        }
+
+        DB::beginTransaction();
+        $cekbiayadaftar = Master_JenisPendaftaran::where('id', $jalur)->where('isactive', 1)->first();
+        $tahunSekarang = date('Y');
+        
+        // --- PERBAIKAN GENERATOR KODE PENDAFTARAN ---
+        // Memastikan panjang batch dan jalur konsisten 2 digit (misal: 06, 11)
+        $kd1 = str_pad($batch, 2, '0', STR_PAD_LEFT);
+        $kd2 = str_pad($jalur, 2, '0', STR_PAD_LEFT); 
+        
+        // Mencari kode terakhir berdasarkan format yang baku
+        $lastRecord = Pendaftaran::whereYear('tgl_daftar', $tahunSekarang)
+                                 ->where('KodePendaftaran', 'like', $tahunSekarang . $kd1 . $kd2 . '%')
+                                 ->orderBy('KodePendaftaran', 'desc')
+                                 ->first();
+
+        if ($lastRecord) {
+            // Ambil 4 digit terakhir dengan aman karena panjang string awal sudah pasti
+            $lastSequence = (int) substr($lastRecord->KodePendaftaran, -4);
+            $urut = str_pad($lastSequence + 1, 4, '0', STR_PAD_LEFT);
+        } else {
+            // Jika belum ada pendaftar sama sekali di tahun/batch/jalur ini
+            $urut = '0001';
+        }
+
+        $kode = $tahunSekarang . $kd1 . $kd2 . $urut;
+        // ---------------------------------------------
+
+        $data_daftar = array(
+            'KodePendaftaran'   => $kode,
+            'biodata_id'        => $bioId,
+            'bayar_pendaftaran' => $cekbiayadaftar ? ($cekbiayadaftar->biaya_pendaftaran == 1 ? '0' : '-1') : '0',
+            'tgl_daftar'        => date('Y-m-d H:i:s'),
+            'batch_daftar'      => $batch,
+            'jalur_daftar'      => $jalur,
+            'beasiswa'          => $beasiswa,
+            'tahun_lulus'       => $tahunLulusUser,
+            'jurusan_sekolah'   => $jurusansekolah,
+            'pilihan1'          => $prodi1,
+            'pilihan2'          => $prodi2,
+            'pilihan3'          => $prodi3,
+            'waktu_kuliah'      => $waktukuliah,
+            'rekomendator'      => $rekomendator,
+            'bayar_ukt'         => $cekbiayadaftar ? ($cekbiayadaftar->status_ukt == 1 ? '0' : '-1') : '0',
+            'created_at'        => date('Y-m-d H:i:s'),
+        );
+        
+        $pendaftaran = Pendaftaran::insert($data_daftar);
+
+        if ($pendaftaran) {
+            DB::commit();
+            return ['title' => 'Berhasil', 'message' => 'Data Pendaftaran Berhasil disimpan ! Silahkan konfirmasi pendaftaran anda', 'status' => 'success'];
+        } else {
+            DB::rollback();
+            return ['title' => 'Gagal', 'message' => 'Data Pendaftaran Gagal disimpan !', 'status' => 'error'];
+        }
+    } catch (\Exception $e) {
+        DB::rollback();
+        return [
+            'title' => 'Server Error',
+            'message' => 'PHP Error: ' . $e->getMessage() . ' pada baris ' . $e->getLine(),
+            'status' => 'error'
+        ];
     }
+}
 
     public function update($post)
     {

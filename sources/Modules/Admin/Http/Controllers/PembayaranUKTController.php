@@ -62,6 +62,9 @@ class PembayaranUKTController extends Controller
                 $warna = 'danger';
             }
             $show = '<span class="badge bg-'.$warna.'">'.$d->status.'</span>';
+            if($d->status=='paid' && $d->pendaftaran->skema_ukt) {
+                $show .= '<br><small class="text-muted text-uppercase">'. $d->pendaftaran->skema_ukt .'</small>';
+            }
             return $show;
         })
         ->addColumn('keterangan', function ($d) {
@@ -171,38 +174,45 @@ class PembayaranUKTController extends Controller
         return response()->json($data, Response::HTTP_OK);
     }
 
-    public function approve($params)
+    // Tambahkan "Request $request" di parameternya
+    public function approve(Request $request, $params)
     {
         $id = decrypt($params);
-        $cek = Pendaftaran::where('KodePendaftaran',$id)->select('current_step','jalur_daftar')->first();
+        
+        // Tangkap data skema dari AJAX
+        $skema = $request->skema_ukt; 
 
-        $step = $cek->current_step+1;
+        $cek = Pendaftaran::where('KodePendaftaran',$id)->select('current_step','jalur_daftar')->first();
+        $step = $cek->current_step + 1;
 
         DB::beginTransaction();
 
         $update1 = Pendaftaran::where('KodePendaftaran',$id)->update([
-            'bayar_ukt' => '1',
+            'bayar_ukt'    => '1',
+            'skema_ukt'    => $skema, // <-- Simpan ke tabel pmb_pendaftaran
             'current_step' => $step,
-            'keterangan' => null,
-            'updated_at' => date('Y-m-d H:i:s')
+            'keterangan'   => null,
+            'updated_at'   => date('Y-m-d H:i:s')
         ]);
 
         $update2 = Transaksi::where('id_referensi',$id)->update([
-            'status' => 'paid',
+            'status'               => 'paid',
             'validator_pembayaran' => session('session')->nip,
-            'keterangan' => null,
-            'updated_at' => date('Y-m-d H:i:s')
+            'keterangan'           => null,
+            'updated_at'           => date('Y-m-d H:i:s')
         ]);
 
-        if($update1&&$update2){
+        if($update1 && $update2){
             DB::commit();
             $data['status']  = true;
-            $data['message'] = 'Bukti Pembayaran Berhasil di Validasi';
+            // Tambahkan keterangan skema di pesan sukses agar admin yakin data masuk
+            $data['message'] = 'Bukti Pembayaran Berhasil di Validasi (Skema: '. strtoupper($skema) .')';
         }else{
             DB::rollback();
             $data['status']  = false;
             $data['message'] = 'Bukti Pembayaran Gagal di Validasi';
         }
+        
         return response()->json($data, Response::HTTP_OK);
     }
 

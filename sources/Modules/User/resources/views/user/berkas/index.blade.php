@@ -45,31 +45,41 @@
                                         <strong>Fungsi Tombol pada Tabel:</strong>
                                         <ul class="mt-2" style="list-style-type: none; padding-left: 0;">
                                             <li class="mb-2">
-                                                <button class="btn btn-info btn-sm"><i class="fas fa-list"></i></button> :
-                                                Untuk melihat detail pendaftaran dan memunculkan rincian berkas yang harus
-                                                diupload di tabel bawah.
+                                                <button class="btn btn-sm btn-outline-info"
+                                                    style="border-radius: 6px; padding: 4px 10px; cursor: default;"><i
+                                                        class="fa fa-info-circle"></i></button> :
+                                                Untuk melihat detail pendaftaran.
                                             </li>
                                             <li class="mb-2">
-                                                <button class="btn btn-success btn-sm"><i
-                                                        class="fas fa-upload"></i></button> : Untuk mengunggah berkas PDF
-                                                Anda pertama kali.
+                                                <button class="btn btn-sm btn-outline-success"
+                                                    style="border-radius: 6px; padding: 4px 10px; cursor: default;"><i
+                                                        class="fas fa-upload"></i></button> :
+                                                Untuk mengunggah berkas PDF Anda pertama kali.
                                             </li>
                                             <li class="mb-2">
-                                                <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
-                                                : Muncul jika berkas Anda ditolak/revisi. Gunakan untuk mengunggah ulang
+                                                <button class="btn btn-sm btn-outline-warning"
+                                                    style="border-radius: 6px; padding: 4px 10px; cursor: default;"><i
+                                                        class="fas fa-edit"></i></button> :
+                                                Muncul jika berkas Anda ditolak/revisi. Gunakan untuk mengunggah ulang
                                                 perbaikan berkas.
                                             </li>
                                             <li class="mb-2">
-                                                <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button> :
-                                                Untuk melihat kembali dokumen yang sudah berhasil Anda unggah.
+                                                <button class="btn btn-sm btn-outline-info"
+                                                    style="border-radius: 6px; padding: 4px 10px; cursor: default;"><i
+                                                        class="fas fa-eye"></i></button> :
+                                                Untuk melihat rincian berkas yang harus diupload.
                                             </li>
                                             <li class="mb-2">
-                                                <button class="btn btn-success btn-sm"><i class="fas fa-check"></i></button>
-                                                : Menyetujui untuk <strong>pindah ke Jalur Reguler</strong>.
+                                                <button class="btn btn-sm btn-outline-success"
+                                                    style="border-radius: 6px; padding: 4px 10px; cursor: default;"><i
+                                                        class="fas fa-check"></i></button> :
+                                                Menyetujui untuk <strong>pindah ke Jalur Reguler</strong>.
                                             </li>
                                             <li class="mb-2">
-                                                <button class="btn btn-danger btn-sm"><i class="fas fa-times"></i></button>
-                                                : Menolak pindah jalur <strong>(Perhatian: Anda akan dianggap mengundurkan
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                    style="border-radius: 6px; padding: 4px 10px; cursor: default;"><i
+                                                        class="fas fa-times"></i></button> :
+                                                Menolak pindah jalur <strong>(Perhatian: Anda akan dianggap mengundurkan
                                                     diri)</strong>.
                                             </li>
                                         </ul>
@@ -242,6 +252,8 @@
                                 <th id="o-durasis1" class="o-detaildaftar"></th>
                             </tr>
                             <tr>
+                                <th>Rekomedator</th>
+                                <th id="o-rekomendator" class="o-detaildaftar"3></th>
                                 <th>Berkas Beasiswa</th>
                                 <th colspan="3" class="o-detaildaftar" id="o-berkasbeasiswa"></th>
                             </tr>
@@ -416,16 +428,16 @@
                                 if (b.is_uploaded) {
                                     let fileUrl = `{!! asset('sources/storage/app/FILE_KHUSUS/') !!}/${b.file_name}`;
                                     actionBtn +=
-                                        `<a href="${fileUrl}" target="_blank" class="btn btn-sm btn-info mr-1" title="Lihat"><i class="fas fa-eye"></i></a>`;
+                                        `<a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-info mr-1" style="border-radius: 6px; padding: 4px 10px;" title="Lihat"><i class="fas fa-eye"></i></a>`;
 
                                     // Jika belum disetujui (1), boleh edit/upload ulang
                                     if (b.status_angka != 1) {
                                         actionBtn +=
-                                            `<button class="btn btn-sm btn-warning btn-upload-modal" data-idberkas="${b.id_berkas}" data-kodeberkas="${b.kode_berkas}" data-namaberkas="${b.nama_berkas}" data-kodedaftar="${response.kode_daftar}"><i class="fas fa-edit"></i></button>`;
+                                            `<button class="btn btn-sm btn-outline-warning btn-upload-modal" style="border-radius: 6px; padding: 4px 10px;" data-idberkas="${b.id_berkas}" data-kodeberkas="${b.kode_berkas}" data-namaberkas="${b.nama_berkas}" data-kodedaftar="${response.kode_daftar}"><i class="fas fa-edit"></i></button>`;
                                     }
                                 } else {
                                     actionBtn +=
-                                        `<button class="btn btn-sm btn-success btn-upload-modal" data-idberkas="${b.id_berkas}" data-kodeberkas="${b.kode_berkas}" data-namaberkas="${b.nama_berkas}" data-kodedaftar="${response.kode_daftar}"><i class="fas fa-upload"></i></button>`;
+                                        `<button class="btn btn-sm btn-outline-success btn-upload-modal" style="border-radius: 6px; padding: 4px 10px;" data-idberkas="${b.id_berkas}" data-kodeberkas="${b.kode_berkas}" data-namaberkas="${b.nama_berkas}" data-kodedaftar="${response.kode_daftar}"><i class="fas fa-upload"></i></button>`;
                                 }
 
                                 html += `<tr>
@@ -528,6 +540,8 @@
 
                                 $('#o-tgldaftar').html(data.daftar.tgl_daftar);
                                 $('#o-waktukuliah').html(data.daftar.waktukuliah.waktu);
+
+                                $('#o-rekomendator').html(data.rekomendator);
 
                                 let statusUkt = data.daftar.jalur.status_ukt == '0' ? 'Gratis' :
                                     'Bayar';

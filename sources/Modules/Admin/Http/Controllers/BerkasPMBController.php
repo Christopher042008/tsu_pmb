@@ -2,9 +2,12 @@
 
 namespace Modules\Admin\Http\Controllers;
 
+use App\Models\MasterData\Master_Berkas;
+use App\Models\MasterData\Master_TarifUKT;
+use App\Models\MasterData\Master_JenisPendaftaran;
 use App\Models\Parameter;
 use App\Models\User\Pendaftaran;
-use App\Models\MasterData\Master_TarifUKT;
+use App\Models\User\BerkasPendaftaran;
 use Yajra\DataTables\DataTables;
 
 use Illuminate\Routing\Controller;
@@ -28,14 +31,14 @@ class BerkasPMBController extends Controller
 
     public function tabelBerkasPMB()
     {
-        // 1. QUERY BUILDER TANPA ->get()
         $data = Pendaftaran::join('pmb_master_jenispendaftaran as a', 'pmb_pendaftaran.jalur_daftar', '=', 'a.id')
             ->select('pmb_pendaftaran.*')
-            ->whereNotNull('a.berkas_khusus') // Lebih bersih daripada whereRaw('... is not null')
-            ->with(['biodata', 'batch', 'jalur', 'jenisbeasiswa']);
-        // ->get() DIHAPUS agar DataTables yang memotong datanya via limit database
-
-        return DataTables::of($data)
+            ->whereNotNull('a.berkas_khusus')
+            ->with(['biodata', 'batch', 'jalur', 'jenisbeasiswa'])
+            ->orderBy('pmb_pendaftaran.created_at', 'asc');
+            return DataTables::of($data)
+            ->addIndexColumn()
+            // ... (kode Anda di bawahnya tidak perlu diubah)
             ->addIndexColumn()
             // 2. TAMBAHKAN FALLBACK (?) AGAR TIDAK ERROR JIKA DATA RELASI KOSONG
             ->addColumn('nama', function ($d) {
@@ -118,39 +121,37 @@ class BerkasPMBController extends Controller
         try {
             $id = $request->id;
             if (empty($id)) {
-                return \DataTables::of([])->make(true);
+                return DataTables::of([])->make(true);
             }
 
             // 1. Dekripsi ID untuk mendapatkan Kode Pendaftaran
             $kode_daftar = decrypt($id);
-            $pendaftaran = DB::table('pmb_pendaftaran')->where('KodePendaftaran', $kode_daftar)->first();
+            $pendaftaran = Pendaftaran::where('KodePendaftaran', $kode_daftar)->first();
 
             if (!$pendaftaran) {
-                return \DataTables::of([])->make(true);
+                return DataTables::of([])->make(true);
             }
 
-            // 2. Ambil persyaratan berkas berdasarkan jalur pendaftaran
-            // Jika Anda sudah menggunakan optimasi kolom 'berkas_khusus' langsung di pmb_pendaftaran:
+            // 2. Ambil persyaratan berkas
             $id_jenis_berkas = $pendaftaran->berkas_khusus;
-
-            // Jika masih melalui pmb_master_jenispendaftaran:
-            // $jenis_daftar = DB::table('pmb_master_jenispendaftaran')->where('id', $pendaftaran->jalur_daftar)->first();
-            // $id_jenis_berkas = $jenis_daftar->berkas_khusus;
-
-            $master_berkas = DB::table('pmb_master_berkas')->where('IdJenis', $id_jenis_berkas)->get();
+            $master_berkas = Master_Berkas::where('IdJenis', $id_jenis_berkas)->get();
 
             // 3. Tentukan folder penyimpanan berkas
-            $params1 = DB::table('parameter')->where('id', 1)->first();
+            $params1 = Parameter::where('id', 1)->first();
             $folder = $params1 ? $params1->file_khusus : 'berkas_khusus';
+
+            // OPTIMASI: Ambil SEMUA berkas yang sudah diupload pendaftar ini dalam 1x Query
+            // keyBy('id_berkas') akan mengubah index array menjadi ID Berkas, sehingga mudah dicari
+            $berkas_diupload = BerkasPendaftaran::where('kode_daftar', $kode_daftar)
+                ->get()
+                ->keyBy('id_berkas');
 
             $list_berkas = [];
 
             foreach ($master_berkas as $mb) {
-                // Cek apakah user sudah upload berkas ini
-                $cek_upload = DB::table('pmb_berkas_pendaftaran')
-                    ->where('kode_daftar', $kode_daftar)
-                    ->where('id_berkas', $mb->id)
-                    ->first();
+                // OPTIMASI: Cukup cari di dalam Collection yang sudah ditarik, tidak perlu ke database lagi!
+                // Ini setara dengan mengecek array, prosesnya instan.
+                $cek_upload = $berkas_diupload->get($mb->id);
 
                 $status_html = '<span class="badge bg-secondary">Belum Diupload</span>';
                 $keterangan_html = '-';
@@ -175,18 +176,13 @@ class BerkasPMBController extends Controller
                         $status_html = '<span class="badge bg-warning text-dark">Menunggu Validasi</span>';
                     }
 
-                    // LOGIKA ACTION (Hiding Verification Button)
+                    // LOGIKA ACTION
                     $link = asset('sources/storage/app/' . $folder . '/' . $cek_upload->nama_berkas);
 
-                    // Tombol Mata (Lihat) selalu muncul jika berkas ada
-                    // LOGIKA ACTION DI GetBerkasUser
-                    $action_html = '<a href="' . $link . '" target="_blank" class="btn btn-sm btn-info mb-1 mr-1" title="Lihat Berkas"><i class="fa fa-eye"></i></a>';
+                    $action_html = '<a href="' . $link . '" target="_blank" class="btn btn-sm btn-outline-info mb-1 mr-1" style="border-radius: 6px; padding: 4px 10px;" title="Lihat Berkas"><i class="fa fa-eye"></i></a>';
 
-                    // Tombol Verifikasi muncul jika: 
-                    // - Statusnya '0' (Menunggu)
-                    // - ATAU Statusnya '-1' (Ditolak) -> Supaya admin bisa edit kalau salah tolak
                     if ($cek_upload->status_berkas != '1') {
-                        $action_html .= '<button class="btn btn-sm btn-warning btn-validasi-item mb-1" 
+                        $action_html .= '<button class="btn btn-sm btn-outline-warning btn-validasi-item mb-1 style="border-radius: 6px; padding: 4px 10px;"" 
                             data-kodedaftar="' . $kode_daftar . '" 
                             data-idberkas="' . $mb->id . '" 
                             data-namaberkas="' . $mb->nama_berkas . '" 
@@ -203,7 +199,7 @@ class BerkasPMBController extends Controller
                 ];
             }
 
-            return \DataTables::of($list_berkas)
+            return DataTables::of($list_berkas)
                 ->addIndexColumn()
                 ->rawColumns(['status', 'keterangan', 'action', 'validator'])
                 ->make(true);
@@ -220,14 +216,15 @@ class BerkasPMBController extends Controller
             // Mengambil NIP dari session sesuai standar kode utama Anda
             $nip_admin = session('session')->nip ?? 'Admin';
 
-            $update = DB::table('pmb_berkas_pendaftaran')
-                ->where('kode_daftar', $request->kode_daftar)
+            // PERBAIKAN: Langsung tembak ke kolom yang dicari
+            $update = BerkasPendaftaran::where('kode_daftar', $request->kode_daftar)
                 ->where('id_berkas', $request->id_berkas)
                 ->update([
                     'status_berkas'       => $request->status,
                     'keterangan_berkas'   => $request->keterangan,
                     'nik_validasi_berkas' => $nip_admin,
-                    'updated_at'          => date('Y-m-d H:i:s')
+                    // Opsional: Gunakan now() bawaan Laravel agar lebih elegan
+                    'updated_at'          => now()
                 ]);
 
             DB::commit();
@@ -238,30 +235,32 @@ class BerkasPMBController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['title' => 'Error!', 'message' => $e->getMessage(), 'status' => 'error']);
+            return response()->json([
+                'title'   => 'Error!',
+                'message' => $e->getMessage(),
+                'status'  => 'error'
+            ]);
         }
     }
 
     public function saveApprovalBerkas(Request $post)
     {
         try {
-            // Pastikan kodedaftar memang dienkripsi dari View. Jika dari View tidak dienkripsi, 
-            // hapus fungsi decrypt() dan gunakan langsung $post->kodedaftar;
             $id = decrypt($post->kodedaftar);
 
-            // KITA HILANGKAN ->where('current_step', 5) AGAR LEBIH FLEKSIBEL
+            // --- 1. AMBIL DATA PENDAFTARAN ---
             $cek = Pendaftaran::where('KodePendaftaran', $id)->first();
 
             if (!$cek) {
                 return response()->json([
-                    'title' => 'Gagal!',
+                    'title'   => 'Gagal!',
                     'message' => 'Data Pendaftaran tidak ditemukan!',
-                    'status' => 'error'
+                    'status'  => 'error'
                 ], Response::HTTP_OK);
             }
 
-            // --- 1. PENGECEKAN STATUS BERKAS PER ITEM ---
-            $berkas_items = DB::table('pmb_berkas_pendaftaran')->where('kode_daftar', $id)->get();
+            // --- 2. PENGECEKAN STATUS BERKAS PER ITEM ---
+            $berkas_items = BerkasPendaftaran::where('kode_daftar', $id)->get();
 
             $ada_yang_menunggu = false;
             $ada_yang_ditolak = false;
@@ -275,54 +274,82 @@ class BerkasPMBController extends Controller
                 }
             }
 
-            // --- 2. LOGIKA PENENTUAN STATUS GLOBAL ---
+            // --- 3. LOGIKA PENENTUAN STATUS GLOBAL ---
             $status_global = $post->status == 'null' ? '0' : $post->status;
 
-            // Jika Admin memilih "OK" tapi ada berkas yang menunggu atau ditolak
             if ($status_global == '1') {
                 if ($ada_yang_menunggu) {
                     return response()->json([
-                        'title' => 'Peringatan!',
+                        'title'   => 'Peringatan!',
                         'message' => 'Masih ada berkas yang belum divalidasi secara individual.',
-                        'status' => 'warning'
+                        'status'  => 'warning'
                     ], Response::HTTP_OK);
                 }
                 if ($ada_yang_ditolak) {
                     return response()->json([
-                        'title' => 'Peringatan!',
+                        'title'   => 'Peringatan!',
                         'message' => 'Tidak bisa meluluskan pendaftar ini karena ada berkas yang berstatus Ditolak/Revisi.',
-                        'status' => 'warning'
+                        'status'  => 'warning'
                     ], Response::HTTP_OK);
                 }
             }
 
-            // --- 3. PROSES SIMPAN KE DATABASE ---
+            // --- 4. PENGECEKAN JALUR REGULER BERDASARKAN TARIF UKT ---
+            $pindahjalur = $post->pindahjalur == '0' ? null : '0';
+
+            // Jika admin memilih opsi pindah jalur (artinya $post->pindahjalur bukan '0')
+            if ($post->pindahjalur != '0') {
+
+                // Cari ID Jalur "Reguler" di tabel master jalur
+                $jalur_reguler = Master_JenisPendaftaran::where('jenis_pendaftaran', 'LIKE', '%Reguler%')
+                    ->first();
+
+                if (!$jalur_reguler) {
+                    return response()->json([
+                        'title'   => 'Peringatan!',
+                        'message' => 'Jalur Reguler tidak ditemukan di Master Database.',
+                        'status'  => 'warning'
+                    ], Response::HTTP_OK);
+                }
+
+                // Cek ketersediaan Tarif UKT (SESUAIKAN NAMA KOLOM & TABEL DI BAWAH INI)
+                // Asumsi: Kita mengecek prodi pilihan 1 dari si pendaftar
+                $tarif_aktif = Master_TarifUKT::where('idbatch', $cek->batch_daftar)      // -> Ganti dengan kolom relasi Batch
+                    ->where('idjalur', $jalur_reguler->id) // -> Ganti dengan kolom relasi Jalur
+                    ->where('idjurusan', $cek->prodi1->id)     // -> Ganti dengan kolom relasi Prodi
+                    ->first();
+
+                if (!$tarif_aktif) {
+                    return response()->json([
+                        'title'   => 'Tidak Bisa Pindah Jalur!',
+                        'message' => 'Jalur Reguler belum diaktifkan (Tarif UKT belum disetting) untuk Batch dan Program Studi pilihan pendaftar ini.',
+                        'status'  => 'warning'
+                    ], Response::HTTP_OK);
+                }
+            }
+
+            // --- 5. PROSES SIMPAN KE DATABASE ---
             DB::beginTransaction();
 
             $stepku = $cek->current_step;
             if ($status_global == '1') {
-                // Pastikan jika stepnya sudah 6 atau lebih, tidak perlu ditambah lagi
                 $stepku = ($cek->current_step < 6) ? 6 : $cek->current_step;
             }
 
-            $pindahjalur = $post->pindahjalur == '0' ? null : '0';
-            $keterangan = $post->keterangan;
+            // OPTIMASI: Langsung update dari instansiasi model $cek
+            $updt = $cek->update([
+                'validasi_berkas_khusus'     => $status_global,
+                'update_berkaskhusus'        => null,
+                'nik_validasi_berkas_khusus' => session('session')->nip ?? 'Admin',
+                'tgl_validasi_berkas_khusus' => date('Y-m-d H:i:s'),
+                'status_pindah_jalur'        => $pindahjalur,
+                'keterangan'                 => $post->keterangan,
+                'current_step'               => $stepku,
+                'stop_step'                  => null,
+                'isactive'                   => '1'
+            ]);
 
-            $updt = Pendaftaran::where('KodePendaftaran', $id)
-                ->update([
-                    'validasi_berkas_khusus'     => $status_global,
-                    'update_berkaskhusus'        => null,
-                    'nik_validasi_berkas_khusus' => session('session')->nip ?? 'Admin',
-                    'tgl_validasi_berkas_khusus' => date('Y-m-d H:i:s'),
-                    'status_pindah_jalur'        => $pindahjalur,
-                    'keterangan'                 => $keterangan,
-                    'current_step'               => $stepku,
-                    'stop_step'                  => null,
-                    'updated_at'                 => date('Y-m-d H:i:s'),
-                    'isactive'                   => '1'
-                ]);
-
-            if ($updt !== false) {
+            if ($updt) {
                 DB::commit();
                 return response()->json([
                     'title'   => 'Berhasil!',

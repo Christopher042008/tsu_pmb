@@ -12,6 +12,7 @@ use App\Models\MasterData\Master_TarifUKT;
 use App\Models\MasterData\Master_Rekomendator;
 use App\Models\Parameter;
 use App\Models\User\Biodata;
+use App\Models\User\BerkasPendaftaran;
 use Illuminate\Support\Facades\Storage;
 
 use App\Models\User\Pendaftaran;
@@ -190,7 +191,9 @@ class FinalPMBController extends Controller
             $linkumum = asset('sources/storage/app/'.$params1->file_umum.'/'.$datadaftar->biodata->berkas_umum);
         }
 
-        $berkasumum = Master_Berkas::where('IdJenis',$datadaftar->jalur->berkas_umum)->get();
+        $berkasumum = Master_Berkas::where('IdJenis', $datadaftar->jalur->berkas_umum)->get();
+
+        $berkasPendaftar = BerkasPendaftaran::where('kode_daftar', $datadaftar->KodePendaftaran)->get();
 
         $halaman = '';
         $title = '';
@@ -251,6 +254,7 @@ class FinalPMBController extends Controller
             'berkas_khusus'     => $linkkhusus,
             'berkas_umum'       => $linkumum,
             'detailberkas_umum' => $berkasumum,
+            'berkasPendaftar'   => $berkasPendaftar,
             'provinsi'          => $provinsi,
             'kabupaten'         => $kabupaten,
             'kecamatan'         => $kecamatan,
@@ -265,29 +269,14 @@ class FinalPMBController extends Controller
 
     public function update(Request $post)
     {
-        $file = $post->file('berkasumum');
         $parameter = Parameter::where('id',1)->first();
         $cek = Pendaftaran::where('KodePendaftaran',$post->kodedaftar)->first();
         $bioId = $cek->biodata_id;
-        $cek1 = Biodata::where('biodata_id',$bioId)->where('isactive',1)->first();
-        $filename = $cek1->berkas_umum;
-
         $jmlsaudara = $post->jumlah_saudara;
-
-        if($file){
-            $ext = $file->getClientOriginalExtension();
-            $filename = 'BERKAS_UMUM_'.$cek->KodePendaftaran.'_'.date('YmdHis').'.'.$ext;
-            // if($cek1->berkas_umum!=null){
-            //     $path = $parameter->file_umum.'/'.$cek1->berkas_umum;
-            //     if (Storage::exists($path)) {
-            //         Storage::delete($path);
-            //     }
-            // }
-            // $file->storeAs($parameter->file_umum, $filename);
-        }
 
         DB::beginTransaction();
 
+        try {
         $databio = array(
             'nik' => $post->nik,
             'nokk' => $post->nokk,
@@ -334,53 +323,75 @@ class FinalPMBController extends Controller
             'npsn' => $post->npsn,
             'nisn' => $post->nisn,
             'nilai_akhir' => $post->nilai_akhir,
-            'berkas_umum' => $filename,
             'updated_at' => now()
         );
 
         $upbio = Biodata::where('biodata_id',$bioId)->where('isactive',1)->update($databio);
 
         $updaftar = Pendaftaran::where('KodePendaftaran',$post->kodedaftar)->update([
-            'tahun_lulus' => $post->tahun_lulus,
-            'updated_at' => now()
-        ]);
+                'tahun_lulus' => $post->tahun_lulus,
+                'updated_at' => now()
+            ]);
 
         $count = 0;
-        if($jmlsaudara>0){
-            $cek2 = Saudara::where('bio_id',$bioId);
-            if($cek2->exists()){
-                $cek2->delete();
-            }
-            foreach ($post->nama_saudara as $key => $p) {
-                $saudara = array(
-                    'bio_id' => $bioId,
-                    'nama' => $p,
-                    'pekerjaan' => $post->pekerjaan_saudara[$key],
-                    'status_hidup' => $post->statushidup_saudara[$key],
-                    'status_kekerabatan' => $post->statuskekerabatan_saudara[$key],
-                    'created_at' => now()
-                );
-                $ups = Saudara::insert($saudara);
-                if($ups){
-                    $count++;
+            if($jmlsaudara > 0){
+                $cek2 = Saudara::where('bio_id',$bioId);
+                if($cek2->exists()){ $cek2->delete(); }
+                foreach ($post->nama_saudara as $key => $p) {
+                    $saudara = array(
+                        'bio_id' => $bioId,
+                        'nama' => $p,
+                        'pekerjaan' => $post->pekerjaan_saudara[$key],
+                        'status_hidup' => $post->statushidup_saudara[$key],
+                        'status_kekerabatan' => $post->statuskekerabatan_saudara[$key],
+                        'created_at' => now()
+                    );
+                    if(Saudara::insert($saudara)){ $count++; }
                 }
             }
-        }
-        if($upbio&&$updaftar&&$count==$jmlsaudara){
-            if($file){
-                if($cek1->berkas_umum!=null){
-                    $path = $parameter->file_umum.'/'.$cek1->berkas_umum;
-                    if (Storage::exists($path)) {
-                        Storage::delete($path);
+
+        if ($post->hasFile('berkas_baru')) {
+                foreach ($post->file('berkas_baru') as $id_berkas => $file) {
+                    $ext = $file->getClientOriginalExtension();
+                    // Format Nama File: Kodependaftaran_IDBerkas_Timestamp.pdf
+                    $filename = $post->kodedaftar . '_' . $id_berkas . '_' . date('YmdHis') . '.' . $ext;
+
+                    // Upload file ke folder
+                    $file->storeAs($parameter->file_umum, $filename);
+
+                    // Cek apakah data di tabel pmb_berkas_pendaftaran sudah ada
+                    $berkasLama = BerkasPendaftaran::where('kode_daftar', $post->kodedaftar)
+                                        ->where('id_berkas', $id_berkas)->first();
+
+                    if ($berkasLama) {
+                        // Hapus fisik file lama (jika ingin hemat storage)
+                        $path = $parameter->file_umum.'/'.$berkasLama->nama_berkas;
+                        if (Storage::exists($path)) {
+                            Storage::delete($path);
+                        }
+                        // Update nama file baru di database
+                        $berkasLama->update(['nama_berkas' => $filename]);
+                    } else {
+                        // Insert data baru ke database
+                        BerkasPendaftaran::create([
+                            'kode_daftar' => $post->kodedaftar,
+                            'id_berkas' => $id_berkas,
+                            'nama_berkas' => $filename,
+                            'isactive' => 1
+                        ]);
                     }
                 }
-                $file->storeAs($parameter->file_umum, $filename);
             }
+
+            // 4. COMMIT & REDIRECT
             DB::commit();
-            return redirect()->back()->with('alert',['title' => 'Berhasil', 'message' => 'Update Biodata Berhasil !', 'status' => 'success']);
-        }else{
+            return redirect()->back()->with('alert',['title' => 'Berhasil', 'message' => 'Update Biodata & Berkas Berhasil !', 'status' => 'success']);
+
+        } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()->with('alert',['title' => 'Error', 'message' => 'Update Biodata Gagal !', 'status' => 'error']);
+            // Tampilkan pesan error aslinya agar gampang diperbaiki kalau ada masalah
+            return redirect()->back()->with('alert',['title' => 'Error', 'message' => 'Gagal: ' . $e->getMessage(), 'status' => 'error']);
         }
     }
 }
+

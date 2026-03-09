@@ -41,6 +41,15 @@
                             <code>* Tekan </code> <i title="Bayar Sekarang" class="fas fa-money-bill text-green"></i> <code>  Untuk Pembayaran</code> <br>
                             <code>* Tekan </code> <i title="Detail Pendaftaran" class="fa fa-info-circle text-blue"></i> <code>  Untuk Melihat Detail Pendaftaran dan dan Pembayaran</code><br>
                             <code>* Jika Status sudah </code> <span class="badge bg-success">paid</span> <code> Maka Pembayaran Sudah Lunas</code><br>
+                            <div class="callout callout-info mt-3" style="background-color: #f8f9fa;">
+                                <h5><i class="fas fa-university text-info"></i> Informasi Rekening Pembayaran</h5>
+                                <p class="mb-1">Silakan lakukan transfer pembayaran UKT ke rekening resmi berikut:</p>
+                                <ul class="mb-0" style="list-style-type: none; padding-left: 0;">
+                                    <li><strong>Bank:</strong> Bank Mandiri</li>
+                                    <li><strong>No. Rekening:</strong> <span class="text-danger" style="font-size: 1.2em; font-weight: bold;">1380026961560</span></li>
+                                    <li><strong>Atas Nama:</strong> PMB Universitas Tiga Serangkai</li>
+                                </ul>
+                            </div>
                             <table id="example2" class="table table-bordered table-hover" style="width: 100%;">
                                 <thead>
                                     <tr>
