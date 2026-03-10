@@ -241,3 +241,4 @@ class DataBeasiswaContoller extends Controller
         }
     }
 }
+    

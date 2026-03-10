@@ -91,9 +91,6 @@ class PendaftaranController extends Controller
         ->addColumn('rekomendator', function ($d) {
             return $d->rekomendator != null ? $d->rekomendator : '-';
         })
-        ->addColumn('rekomendator', function ($d) {
-            return $d->rekomendator != null ? $d->rekomendator : '-';
-        })
         ->addColumn('status', function ($d) {
             $role = '-';
             $warna = '';
@@ -191,39 +188,6 @@ class PendaftaranController extends Controller
         $data['bea'] = $cek1;
         return response()->json($data, Response::HTTP_OK);
     }
-    // public function showProdi($batch,$jalur,$jurusansekolah) versi tanpa filter jurusan sekolah
-    // {
-    //     header("Access-Control-Allow-Origin: *");
-    //     header("Access-Control-Allow-Headers: *");
-
-    //     $idbatch = $batch;
-    //     $idjalur = $jalur;
-    //     $idjurusansekolah = $jurusansekolah;
-
-    //     $cek1 = Master_JurusanKuliah::selectRaw('id,KodeJurusan,idfakultas,idjenjang,idjurusansekolah,jurusan')->with('jenjang')->where('isactive',1)->get();
-
-    //     $prodi = [];
-    //     foreach($cek1 as $q){
-    //         $cek2 = Master_TarifUKT::where('idbatch',$idbatch)->where('idjalur',$idjalur)->where('idjurusan',$q->id)->exists();
-    //         if($cek2){
-    //             $prodi[] = $q;
-    //         }
-    //     }
-
-    //     // Ambil data Fakultas pakai Query Builder agar aman dari Fatal Error jika Model tidak ada
-    //     $fakultas = DB::table('pmb_master_fakultas')->select('KodeFakultas', 'namafakultas')->where('isactive', '1')->get();
-
-    //     if(count($prodi)>0){
-    //         $data['hasil'] = 1;
-    //         $data['jurusan'] = $prodi;
-    //         $data['fakultas'] = $fakultas; // Dikirim ke frontend untuk pop-up
-    //     }else{
-    //         $data['hasil'] = 0;
-    //         $data['jurusan'] = $prodi;
-    //         $data['fakultas'] = null;
-    //     }
-    //     return response()->json($data, Response::HTTP_OK);
-    // }
     public function showProdi($batch,$jalur,$jurusansekolah)
     {
         header("Access-Control-Allow-Origin: *");
@@ -239,12 +203,6 @@ class PendaftaranController extends Controller
         $cek1 = Master_JurusanKuliah::selectRaw('id,KodeJurusan,idfakultas,idjenjang,idjurusansekolah,jurusan')
             ->with('jenjang')
             ->where('isactive', 1)
-            ->where(function ($q) use ($idjurusansekolah) {
-                $q->whereRaw("FIND_IN_SET(?, idjurusansekolah)", [$idjurusansekolah])
-                  ->orWhere('idjurusansekolah', '0')
-                  ->orWhereNull('idjurusansekolah')
-                  ->orWhere('idjurusansekolah', '');
-            })
             ->get();
         // ----------------------------------------
 
@@ -272,24 +230,6 @@ class PendaftaranController extends Controller
         
         return response()->json($data, Response::HTTP_OK);
     }
-
-    // public function cariRekomendator(Request $request)
-    // {
-    //     $search = $request->q;
-        
-    //     $query = Master_Rekomendator::where('isactive', 1)
-    //                 ->select('kode_rekomendator', 'nama_rekomendator');
-
-    //     if ($search) {
-    //         $query->where(function($q) use ($search) {
-    //             $q->where('nama_rekomendator', 'like', '%' . $search . '%')
-    //               ->orWhere('kode_rekomendator', 'like', '%' . $search . '%');
-    //         });
-    //     }
-        
-    //     $data = $query->orderBy('nama_rekomendator', 'asc')->limit(15)->get();
-    //     return response()->json($data);
-    // }
 
     public function cariRekomendator(Request $request)
     {
@@ -404,12 +344,7 @@ class PendaftaranController extends Controller
         $rekomendator = $post->rekomendator;
         $bioId = decrypt(session('user')->_biodata);
 
-        // Validasi Duplikat Prodi
-        if ($prodi1 == $prodi2 || $prodi1 == $prodi3 || $prodi2 == $prodi3) {
-            return ['title' => 'Peringatan', 'message' => 'Program Studi Pilihan tidak boleh ada yang sama!', 'status' => 'warning'];
-        }
-
-        // Validasi Fakultas
+        // --- VALIDASI FAKULTAS BERBEDA ---
         $fakultas1 = Master_JurusanKuliah::where('KodeJurusan', $prodi1)->value('idfakultas');
         $fakultas2 = Master_JurusanKuliah::where('KodeJurusan', $prodi2)->value('idfakultas');
         $fakultas3 = Master_JurusanKuliah::where('KodeJurusan', $prodi3)->value('idfakultas');
@@ -504,17 +439,14 @@ class PendaftaranController extends Controller
             $rekomendator = $post->rekomendator;
             $bioId = decrypt(session('user')->_biodata);
 
-            if ($prodi1 == $prodi2 || $prodi1 == $prodi3 || $prodi2 == $prodi3) {
-                return ['title' => 'Peringatan', 'message' => 'Program Studi Pilihan tidak boleh ada yang sama!', 'status' => 'warning'];
-            }
+            // --- VALIDASI FAKULTAS BERBEDA ---
+        $fakultas1 = Master_JurusanKuliah::where('KodeJurusan', $prodi1)->value('idfakultas');
+        $fakultas2 = Master_JurusanKuliah::where('KodeJurusan', $prodi2)->value('idfakultas');
+        $fakultas3 = Master_JurusanKuliah::where('KodeJurusan', $prodi3)->value('idfakultas');
 
-            $fakultas1 = Master_JurusanKuliah::where('KodeJurusan', $prodi1)->value('idfakultas');
-            $fakultas2 = Master_JurusanKuliah::where('KodeJurusan', $prodi2)->value('idfakultas');
-            $fakultas3 = Master_JurusanKuliah::where('KodeJurusan', $prodi3)->value('idfakultas');
-
-            if (($fakultas1 == $fakultas2 && $fakultas1 != null) || ($fakultas1 == $fakultas3 && $fakultas1 != null) || ($fakultas2 == $fakultas3 && $fakultas2 != null)) {
-                return ['title' => 'Peringatan', 'message' => 'Setiap Pilihan Program Studi harus berasal dari Fakultas yang berbeda!', 'status' => 'warning'];
-            }
+        if (($fakultas1 == $fakultas2 && $fakultas1 != null) || ($fakultas1 == $fakultas3 && $fakultas1 != null) || ($fakultas2 == $fakultas3 && $fakultas2 != null)) {
+            return ['title' => 'Peringatan', 'message' => 'Setiap Pilihan Program Studi harus berasal dari Fakultas yang berbeda!', 'status' => 'warning'];
+        }
 
             DB::beginTransaction();
             $cekbiayadaftar = Master_JenisPendaftaran::where('id',$jalur)->where('isactive',1)->first();
