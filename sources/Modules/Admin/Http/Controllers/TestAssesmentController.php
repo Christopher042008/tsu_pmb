@@ -60,11 +60,11 @@ class TestAssesmentController extends Controller
             ->addColumn('validator', function ($d) {
                 // Tangani jika nilai null
                 $validasi = $d->validasi_test === null ? '0' : (string)$d->validasi_test;
-                
+
                 if($validasi == '0'){
                     return '<span class="badge bg-warning">Waiting</span>';
                 }else{
-                    return '<span class="badge bg-success">'.namaku($d->nik_validasi_test).'</span>'; 
+                    return '<span class="badge bg-success">'.namaku($d->nik_validasi_test).'</span>';
                 }
             })
             ->addColumn('status', function ($d) {
@@ -73,7 +73,7 @@ class TestAssesmentController extends Controller
                     ->where('kodependaftaran', $d->KodePendaftaran)
                     ->where('status', 'finished')
                     ->count();
-                
+
                 // Hitung apakah sudah pernah mulai test sama sekali
                 $totalAttempts = DB::table('pmb_assessment_attempts')
                     ->where('kodependaftaran', $d->KodePendaftaran)
@@ -89,7 +89,7 @@ class TestAssesmentController extends Controller
             })
             ->addColumn('hasil', function ($d) {
                 $id = encrypt($d->KodePendaftaran);
-                
+
                 // Cek status pengerjaan test
                 $finishedTests = DB::table('pmb_assessment_attempts')
                     ->where('kodependaftaran', $d->KodePendaftaran)
@@ -100,7 +100,7 @@ class TestAssesmentController extends Controller
                 $validasi = $d->validasi_test === null ? '0' : (string)$d->validasi_test;
 
                 $show = '<span class="badge bg-warning">Waiting</span>';
-                
+
                 if($validasi == '0'){
                     if ($finishedTests >= 3) {
                         $show = '<a href="#" class="tidaklolos" data-id="'.$id.'"><i title="Tidak Lolos" class="fa fa-window-close fa-lg text-red"></i></a>
@@ -125,7 +125,7 @@ class TestAssesmentController extends Controller
             ->make(true);
     }
 
-   public function showDetailTest($params)
+    public function showDetailTest($params)
     {
         $id = decrypt($params);
         $cek = Pendaftaran::where('KodePendaftaran', $id)->exists();
@@ -141,14 +141,14 @@ class TestAssesmentController extends Controller
         // Ambil Data Attempts Assessment
         $attempts = DB::table('pmb_assessment_attempts as a')
             ->join('pmb_assessment_tipe_test as t', 'a.tipe_test_id', '=', 't.id')
-            ->join('pmb_assessment_engine_test as e', 't.tipe_engine', '=', 'e.tipe_engine') 
+            ->join('pmb_assessment_engine_test as e', 't.tipe_engine', '=', 'e.tipe_engine')
             ->where('a.kodependaftaran', $id)
             ->select('a.*', 't.nama_test as tipe_test_nama', 'e.tipe_engine')
             ->orderBy('a.id', 'asc')
             ->get();
 
         $attemptData = [];
-        
+
         foreach ($attempts as $attempt) {
             $answers = DB::table('pmb_assessment_answers as ans')
                 ->join('pmb_assessment_questions as q', 'ans.question_id', '=', 'q.id')
@@ -158,7 +158,7 @@ class TestAssesmentController extends Controller
                 ->where('ans.attempt_id', $attempt->id)
                 ->select(
                     'q.urutan',
-                    'q.pertanyaan', 
+                    'q.pertanyaan',
                     'ans.jawaban_1',
                     'ans.jawaban_2',
                     'opt.label as option_label',
@@ -177,7 +177,7 @@ class TestAssesmentController extends Controller
             $result = DB::table('pmb_assessment_test_results')
                 ->where('attempt_id', $attempt->id)
                 ->first();
-            
+
             $hasil_disc = null;
             if ($result && $result->hasil_json) {
                 $hasil_disc = json_decode($result->hasil_json, true);
@@ -197,7 +197,7 @@ class TestAssesmentController extends Controller
 
         $data['hasil'] = 1;
         $data['daftar'] = $daftar;
-        $data['attempts'] = $attemptData; 
+        $data['attempts'] = $attemptData;
 
         return response()->json($data, Response::HTTP_OK);
     }
@@ -218,14 +218,14 @@ class TestAssesmentController extends Controller
                 $jurusan1 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan1)->with('jenjang')->first();
                 if ($jurusan1) array_push($jurusan, $jurusan1);
             }
-            
+
             // Pilihan 2
             if ($mhs->pilihan2 != null) {
                 $jurusan2 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan2)->with('jenjang')->first();
                 if ($jurusan2) array_push($jurusan, $jurusan2);
             }
 
-            // Pilihan 3 
+            // Pilihan 3
             if ($mhs->pilihan3 != null) {
                 $jurusan3 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan3)->with('jenjang')->first();
                 if ($jurusan3) array_push($jurusan, $jurusan3);
@@ -302,10 +302,22 @@ class TestAssesmentController extends Controller
             }
 
         }
-    // Fungsi show_jurusan dan hasil_test() tetap sama persis seperti aslinya
-    // (Silakan copy-paste dari method aslimu agar tidak mengubah logic transaksi UKT)
-}
-public function printDisc($attempt_id)
+        if($updt&&$t1==0){ //&&$t2==0
+            DB::commit();
+            $data['title'] = 'Berhasil';
+            $data['message'] = 'Data Test Online Sudah divalidasi !';
+            $data['status'] = 'success';
+        }else{
+            DB::rollback();
+            $data['title'] = 'Gagal';
+            $data['message'] = 'Data Test Online Gagal divalidasi !';
+            $data['status'] = 'error';
+        }
+        return response()->json($data, Response::HTTP_OK);
+        // Fungsi show_jurusan dan hasil_test() tetap sama persis seperti aslinya
+        // (Silakan copy-paste dari method aslimu agar tidak mengubah logic transaksi UKT)
+    }
+    public function printDisc($attempt_id)
     {
         $attempt = DB::table('pmb_assessment_attempts')->where('id', $attempt_id)->first();
         if (!$attempt) return abort(404, 'Data Assessment tidak ditemukan.');
@@ -350,10 +362,10 @@ public function printDisc($attempt_id)
             'l1'    => $l1,
             'l2'    => $l2,
             'l3'    => $l3,
-            'hasil' => $hasil 
+            'hasil' => $hasil
         ];
 
         // Sesuaikan path view-nya dengan folder modul kamu
-        return view('admin::hasilassesment.pdf_disc', $data); 
+        return view('admin::hasilassesment.pdf_disc', $data);
     }
 }
