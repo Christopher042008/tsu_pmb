@@ -204,36 +204,58 @@ class TestAssesmentController extends Controller
 
     public function show_jurusan($params)
     {
-        // dd($params);
-        $id = decrypt($params);
-        $cek = Pendaftaran::where('KodePendaftaran',$id)->exists();
-        if(!$cek){
-            $data['hasil'] = 0;
-        }else{
-            $mhs = Pendaftaran::where('KodePendaftaran',$id)->first();
-            $jurusan = array();
-            // $jurusan = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan1)->orwhere('KodeJurusan',$mhs->pilihan2)->with('jenjang')->get();
-           // Pilihan 1
-            if ($mhs->pilihan1 != null) {
-                $jurusan1 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan1)->with('jenjang')->first();
-                if ($jurusan1) array_push($jurusan, $jurusan1);
-            }
+        try {
+            $id = decrypt($params);
             
-            // Pilihan 2
-            if ($mhs->pilihan2 != null) {
-                $jurusan2 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan2)->with('jenjang')->first();
-                if ($jurusan2) array_push($jurusan, $jurusan2);
+            // Ambil pendaftar sekalian dengan relasi prodinya
+            $mhs = Pendaftaran::where('KodePendaftaran', $id)
+                ->with(['prodi1.jenjang', 'prodi2.jenjang', 'prodi3.jenjang'])
+                ->first();
+
+            if(!$mhs){
+                return response()->json(['hasil' => 0], Response::HTTP_OK);
             }
 
-            // Pilihan 3 
-            if ($mhs->pilihan3 != null) {
-                $jurusan3 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan3)->with('jenjang')->first();
-                if ($jurusan3) array_push($jurusan, $jurusan3);
+            $jurusan = [];
+            
+            // 1. Coba ambil dari relasi langsung (Jauh lebih aman dari Error 500)
+            if ($mhs->prodi1) $jurusan[] = $mhs->prodi1;
+            if ($mhs->prodi2) $jurusan[] = $mhs->prodi2;
+            if ($mhs->prodi3) $jurusan[] = $mhs->prodi3;
+
+            // 2. Jika lewat relasi kosong, ambil manual dari kolom pilihan (dengan validasi object)
+            if (empty($jurusan)) {
+                // Pastikan yang diambil murni teks ID, bukan objek
+                $p1 = is_object($mhs->pilihan1) ? $mhs->pilihan1->KodeJurusan ?? null : $mhs->pilihan1;
+                $p2 = is_object($mhs->pilihan2) ? $mhs->pilihan2->KodeJurusan ?? null : $mhs->pilihan2;
+                $p3 = is_object($mhs->pilihan3) ? $mhs->pilihan3->KodeJurusan ?? null : $mhs->pilihan3;
+
+                if ($p1) {
+                    $j1 = Master_JurusanKuliah::where('KodeJurusan', $p1)->with('jenjang')->first();
+                    if ($j1) $jurusan[] = $j1;
+                }
+                if ($p2) {
+                    $j2 = Master_JurusanKuliah::where('KodeJurusan', $p2)->with('jenjang')->first();
+                    if ($j2) $jurusan[] = $j2;
+                }
+                if ($p3) {
+                    $j3 = Master_JurusanKuliah::where('KodeJurusan', $p3)->with('jenjang')->first();
+                    if ($j3) $jurusan[] = $j3;
+                }
             }
-            $data['hasil'] = 1;
-            $data['jurusan'] = $jurusan;
+
+            return response()->json([
+                'hasil' => 1,
+                'jurusan' => $jurusan
+            ], Response::HTTP_OK);
+
+        } catch (\Exception $e) {
+            // Menangkap error 500 agar website tidak hang
+            return response()->json([
+                'hasil' => 0,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
-        return response()->json($data, Response::HTTP_OK);
     }
 
     public function hasil_test(Request $post)
@@ -246,7 +268,7 @@ class TestAssesmentController extends Controller
             $jur = Master_JurusanKuliah::where('KodeJurusan',$post->jurusan_diterima)->with('jenjang')->first();
             $ket = 'Selamat Anda diterima di Jurusan : '.$jur->jenjang->jenjang.'-'.$jur->jurusan.'. Silahkan Selesaikan Step Selanjutnya.';
         }else{
-            $ket = 'Mohon maaf anda belum lolos seleksi.';
+            $ket = 'anda belum lolos seleksi,Silahkan Daftar kembali pada batch selanjutnya';
         }
         $data = array(
             'validasi_test' => $post->status_diterima,
@@ -302,6 +324,18 @@ class TestAssesmentController extends Controller
             }
 
         }
+         if($updt&&$t1==0){ //&&$t2==0
+            DB::commit();
+            $data['title'] = 'Berhasil';
+            $data['message'] = 'Data Test Online Sudah divalidasi !';
+            $data['status'] = 'success';
+        }else{
+            DB::rollback();
+            $data['title'] = 'Gagal';
+            $data['message'] = 'Data Test Online Gagal divalidasi !';
+            $data['status'] = 'error';
+        }
+        return response()->json($data, Response::HTTP_OK);
     // Fungsi show_jurusan dan hasil_test() tetap sama persis seperti aslinya
     // (Silakan copy-paste dari method aslimu agar tidak mengubah logic transaksi UKT)
 }

@@ -48,16 +48,17 @@
         .box-content { border: 1px solid #000; padding: 8px; text-align: justify; line-height: 1.4; background-color: #fff; }
 
         /* Footer */
-        .footer { text-align: right; border-right: 4px solid #d4af37; padding-right: 10px; font-size: 9px; color: #555; }
+        .footer-wrap {position: fixed; bottom: 15mm; left: 15mm;   right: 15mm;  width: calc(100% - 30mm); }
+        .footer-table { display: table; width: 100%; font-size: 9px; color: #555; }
+        .footer-left { display: table-cell; text-align: left; vertical-align: bottom; }
+        .footer-right { display: table-cell; text-align: right; border-right: 4px solid #d4af37; padding-right: 10px; }
         
-        /* PENGATURAN KHUSUS KERTAS A4 SAAT PRINT */
-        @media print {
+        /* PENGATURAN KERTAS A4 SAAT PRINT */
+       @media print {
             .no-print { display: none !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            @page { size: A4 portrait; margin: 10mm 15mm; } /* Margin dipepetkan agar muat banyak */
-            body { padding: 0; }
-            .footer { position: fixed; bottom: 0; right: 0; }
-            /* Mencegah elemen terpotong ke halaman 2 */
+            @page { size: A4 portrait; margin: 0; }  
+            body { padding: 15mm 15mm 35mm 15mm !important; }
             .chart-container, .desc-container, .box-section { page-break-inside: avoid; }
         }
     </style>
@@ -195,10 +196,17 @@
         </div>
     @endif
 
-    <div class="footer">
-        <strong>Tiga Serangkai University</strong><br>
-        KH. Samanhudi St. No. 84 - 86, Laweyan, Surakarta 57142<br>
-        Phone: 0271 - 716 500 | E-mail: info@tsu.ac.id
+    <div class="footer-wrap">
+        <div class="footer-table">
+            <div class="footer-left">
+                Dicetak pada: {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }} pukul {{ date('H.i') }} WIB
+            </div>
+            <div class="footer-right">
+                <strong>Tiga Serangkai University</strong><br>
+                KH. Samanhudi St. No. 84 - 86, Laweyan, Surakarta 57142<br>
+                Phone: 0271 - 716 500 | E-mail: info@tsu.ac.id
+            </div>
+        </div>
     </div>
 
     <script>
@@ -206,7 +214,6 @@
             let canvas = document.getElementById(canvasId);
             let ctx = canvas.getContext('2d');
 
-            // Memaksa dimensi canvas agar tidak membesar sendiri
             canvas.width = 170;
             canvas.height = 170;
 
@@ -235,7 +242,6 @@
                 }
             });
 
-            // Jadikan gambar agar 100% aman saat dicetak
             let imgUrl = myChart.toBase64Image();
             let img = document.createElement('img');
             img.src = imgUrl;
