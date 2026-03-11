@@ -202,38 +202,66 @@ class TestAssesmentController extends Controller
         return response()->json($data, Response::HTTP_OK);
     }
 
-    public function show_jurusan($params)
+   public function show_jurusan($params)
     {
-        // dd($params);
-        $id = decrypt($params);
-        $cek = Pendaftaran::where('KodePendaftaran',$id)->exists();
-        if(!$cek){
-            $data['hasil'] = 0;
-        }else{
-            $mhs = Pendaftaran::where('KodePendaftaran',$id)->first();
-            $jurusan = array();
-            // $jurusan = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan1)->orwhere('KodeJurusan',$mhs->pilihan2)->with('jenjang')->get();
-           // Pilihan 1
-            if ($mhs->pilihan1 != null) {
-                $jurusan1 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan1)->with('jenjang')->first();
-                if ($jurusan1) array_push($jurusan, $jurusan1);
+        try {
+            $id = decrypt($params);
+            
+            // Ambil pendaftar sekalian dengan relasi prodi
+            $mhs = Pendaftaran::where('KodePendaftaran', $id)
+                ->with(['prodi1.jenjang', 'prodi2.jenjang', 'prodi3.jenjang'])
+                ->first();
+
+            if(!$mhs){
+                return response()->json(['hasil' => 0], Response::HTTP_OK);
             }
 
-            // Pilihan 2
-            if ($mhs->pilihan2 != null) {
-                $jurusan2 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan2)->with('jenjang')->first();
-                if ($jurusan2) array_push($jurusan, $jurusan2);
+            $jurusan = [];
+
+            // PILIHAN 1
+            if (is_object($mhs->pilihan1)) {
+                // Jika sudah berupa objek, langsung masukkan
+                $jurusan[] = $mhs->pilihan1;
+            } elseif (!empty($mhs->pilihan1)) {
+                // Jika berupa teks string ID, query ke database
+                $j1 = Master_JurusanKuliah::where('KodeJurusan', $mhs->pilihan1)->with('jenjang')->first();
+                if ($j1) $jurusan[] = $j1;
             }
 
-            // Pilihan 3
-            if ($mhs->pilihan3 != null) {
-                $jurusan3 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan3)->with('jenjang')->first();
-                if ($jurusan3) array_push($jurusan, $jurusan3);
+            // PILIHAN 2
+            if (is_object($mhs->pilihan2)) {
+                $jurusan[] = $mhs->pilihan2;
+            } elseif (!empty($mhs->pilihan2)) {
+                $j2 = Master_JurusanKuliah::where('KodeJurusan', $mhs->pilihan2)->with('jenjang')->first();
+                if ($j2) $jurusan[] = $j2;
             }
-            $data['hasil'] = 1;
-            $data['jurusan'] = $jurusan;
+
+            // PILIHAN 3
+            if (is_object($mhs->pilihan3)) {
+                $jurusan[] = $mhs->pilihan3;
+            } elseif (!empty($mhs->pilihan3)) {
+                $j3 = Master_JurusanKuliah::where('KodeJurusan', $mhs->pilihan3)->with('jenjang')->first();
+                if ($j3) $jurusan[] = $j3;
+            }
+
+            // BACKUP AMAN: Jika array masih kosong, ambil dari relasi prodi
+            if (empty($jurusan)) {
+                if ($mhs->prodi1) $jurusan[] = $mhs->prodi1;
+                if ($mhs->prodi2) $jurusan[] = $mhs->prodi2;
+                if ($mhs->prodi3) $jurusan[] = $mhs->prodi3;
+            }
+
+            return response()->json([
+                'hasil' => 1,
+                'jurusan' => $jurusan
+            ], Response::HTTP_OK);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'hasil' => 0,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
-        return response()->json($data, Response::HTTP_OK);
     }
 
     public function hasil_test(Request $post)
@@ -246,7 +274,7 @@ class TestAssesmentController extends Controller
             $jur = Master_JurusanKuliah::where('KodeJurusan',$post->jurusan_diterima)->with('jenjang')->first();
             $ket = 'Selamat Anda diterima di Jurusan : '.$jur->jenjang->jenjang.'-'.$jur->jurusan.'. Silahkan Selesaikan Step Selanjutnya.';
         }else{
-            $ket = 'Mohon maaf anda belum lolos seleksi.';
+            $ket = 'anda belum lolos seleksi,Silahkan Daftar kembali pada batch selanjutnya';
         }
         $data = array(
             'validasi_test' => $post->status_diterima,
@@ -302,7 +330,7 @@ class TestAssesmentController extends Controller
             }
 
         }
-        if($updt&&$t1==0){ //&&$t2==0
+         if($updt&&$t1==0){ //&&$t2==0
             DB::commit();
             $data['title'] = 'Berhasil';
             $data['message'] = 'Data Test Online Sudah divalidasi !';

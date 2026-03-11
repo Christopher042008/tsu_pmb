@@ -53,12 +53,11 @@ pdf_disc.blade.php
         .footer-table { display: table; width: 100%; font-size: 9px; color: #555; }
         .footer-left { display: table-cell; text-align: left; vertical-align: bottom; }
         .footer-right { display: table-cell; text-align: right; border-right: 4px solid #d4af37; padding-right: 10px; }
-
         /* PENGATURAN KERTAS A4 SAAT PRINT */
        @media print {
             .no-print { display: none !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            @page { size: A4 portrait; margin: 0; }
+            @page { size: A4 portrait; margin: 0; }  
             body { padding: 15mm 15mm 35mm 15mm !important; }
             .chart-container, .desc-container, .box-section { page-break-inside: avoid; }
         }

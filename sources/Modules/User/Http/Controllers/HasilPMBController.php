@@ -17,7 +17,7 @@ use App\Models\Parameter;
 use App\Models\User\Biodata;
 use App\Models\User\Pendaftaran;
 use App\Models\User\Saudara;
-use App\Models\User\BerkasPendaftaran; // <-- [TAMBAHKAN INI] Pastikan namespace model ini sesuai dengan kodemu
+use App\Models\User\BerkasPendaftaran; 
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Storage;
 use Session, Crypt, DB;
@@ -118,7 +118,7 @@ class HasilPMBController extends Controller
             'berkas_khusus'     => $linkkhusus,
             'berkas_umum'       => $linkumum,
             'detailberkas_umum' => $berkasumum,
-            'berkasPendaftar'   => $berkasPendaftar, // <-- [TAMBAHKAN INI] Lempar ke blade
+            'berkasPendaftar'   => $berkasPendaftar,
             'provinsi'          => $provinsi,
             'kabupaten'         => $kabupaten,
             'kecamatan'         => $kecamatan,

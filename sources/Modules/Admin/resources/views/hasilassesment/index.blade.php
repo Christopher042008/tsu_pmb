@@ -642,10 +642,14 @@
             function lolostest() {
                 $('.lolos').off('click').on('click', function (e) {
                     e.preventDefault();
-                    let params = $(this).data('id');
+                    
+                    // Gunakan attr('data-id') agar string enkripsi murni tidak dikonversi oleh jQuery
+                    let params = $(this).attr('data-id'); 
+                    
                     $.ajax({
                         type: "GET",
-                        url: '{!! url('admin/TestAssesment/ShowJurusanDiterima') !!}'+'/'+params,
+                        // Menambahkan encodeURIComponent agar string base64 / karakter unik aman di URL
+                        url: '{!! url("admin/TestAssesment/ShowJurusanDiterima") !!}' + '/' + encodeURIComponent(params),
                         dataType: "JSON",
                         beforeSend: function() {
                             $('#loading').show();
@@ -675,6 +679,11 @@
                                 $('#form-diterima').slideDown('slow');
                                 $('#modal-detail').modal('show');
                             }
+                        },
+                        error: function(xhr) {
+                            $('#loading').hide();
+                            // Menampilkan error jika server gagal / 500 error
+                            Swal.fire({ title: 'Error Server!', text: 'Gagal mengambil daftar jurusan pendaftar.', icon: 'error' });
                         }
                     });
                 });
