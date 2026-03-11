@@ -23,7 +23,8 @@ use Modules\User\Http\Controllers\ValidasiBerkasController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::prefix('')->group(function() {
+
+Route::prefix('')->group(function () {
     Route::get('/', [UserController::class, 'index'])->name('indexing');
     Route::middleware(['web'])->group(function () {
         Route::get('/jalur-pendaftaran', [UserController::class, 'jalurPendaftaran'])->name('jalur_pendaftaran');
@@ -49,7 +50,7 @@ Route::prefix('')->group(function() {
             Route::post('/ChangePasswordSave', [UserController::class, 'update'])->name('user.ChangePasswordSave');
             Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
-            Route::prefix('Pendaftaran')->group(function(){
+            Route::prefix('Pendaftaran')->group(function () {
                 Route::get('/', [PendaftaranController::class, 'index'])->name('pendaftaran');
                 Route::get('/ShowJalur/{params}', [PendaftaranController::class, 'showJalur'])->name('Daftar.ShowJalur');
                 Route::get('/ShowBeasiswa/{params}', [PendaftaranController::class, 'showBeasiswa'])->name('Daftar.ShowBeasiswa');
@@ -61,10 +62,9 @@ Route::prefix('')->group(function() {
                 Route::get('/KonfirmasiDaftar/{params}', [PendaftaranController::class, 'ConfirmDaftar'])->name('Daftar.KonfirmasiDaftar');
                 Route::get('/ShowDaftar/{params}', [PendaftaranController::class, 'showDaftar'])->name('Daftar.ShowDaftar');
                 Route::get('/DeleteDaftar/{params}', [PendaftaranController::class, 'delete'])->name('Daftar.DeleteDaftar');
-
             });
 
-            Route::prefix('BerkasBeasiswa')->group(function(){
+            Route::prefix('BerkasBeasiswa')->group(function () {
                 Route::get('/', [ValidasiBerkasController::class, 'index'])->name('BksBeasiswa');
                 Route::get('/TabelBerkasBeasiswa', [ValidasiBerkasController::class, 'tabelBerkasBeasiswa'])->name('BksBeasiswa.Tabel');
                 Route::get('/ShowBerkasBeasiswa/{params}', [ValidasiBerkasController::class, 'showBerkasBeasiswa']);
@@ -73,14 +73,13 @@ Route::prefix('')->group(function() {
                 Route::get('/GetBerkasUser', [ValidasiBerkasController::class, 'GetBerkasUser']);
             });
 
-            Route::prefix('OnlineTest')->group(function(){
+            Route::prefix('OnlineTest')->group(function () {
                 Route::get('/', [OnlineTestController::class, 'index'])->name('test');
                 Route::get('/cek_test/{params}', [OnlineTestController::class, 'cek_test']);
                 Route::post('/SaveTest', [OnlineTestController::class, 'saveTest'])->name('test.save');
-
             });
 
-            Route::prefix('Pembayaran')->group(function(){
+            Route::prefix('Pembayaran')->group(function () {
                 Route::get('/', [PembayaranController::class, 'index'])->name('pembayaran');
                 Route::get('/TabelPembayaran', [PembayaranController::class, 'tabelPembayaran'])->name('Pembayaran.TabelBayar');
                 Route::get('/ShowPayment/{params}', [PembayaranController::class, 'ShowPayment']);
@@ -89,7 +88,7 @@ Route::prefix('')->group(function() {
                 Route::post('/payment', [PembayaranController::class, 'test_bayar'])->name('payment.create'); //tdk dipake
             });
 
-            Route::prefix('PembayaranUKT')->group(function(){
+            Route::prefix('PembayaranUKT')->group(function () {
                 Route::get('/', [PembayaranUKTController::class, 'index'])->name('pembayaranUKT');
                 Route::get('/TabelPembayaranUKT', [PembayaranUKTController::class, 'tabelPembayaran'])->name('PembayaranUKT.TabelBayar');
                 Route::get('/ShowPaymentUKT/{params}', [PembayaranUKTController::class, 'ShowPayment']);
@@ -98,7 +97,7 @@ Route::prefix('')->group(function() {
                 Route::post('/paymentUKT', [PembayaranUKTController::class, 'test_bayar'])->name('paymentUKT.create'); //tdk dipake
             });
 
-            Route::prefix('Biodata')->group(function(){
+            Route::prefix('Biodata')->group(function () {
                 Route::get('/', [BiodataController::class, 'index'])->name('biodata');
                 Route::get('/ChangeKabupaten/{prov}', [BiodataController::class, 'ChangeKabupaten']);
                 Route::get('/ChangeKecamatan/{prov}/{kab}', [BiodataController::class, 'ChangeKecamatan']);
@@ -106,11 +105,15 @@ Route::prefix('')->group(function() {
                 Route::post('/SaveBiodata', [BiodataController::class, 'save_biodata'])->name('biodata.Save');
             });
 
-            Route::prefix('HasilPMB')->group(function(){
+            Route::prefix('HasilPMB')->group(function () {
                 Route::get('/', [HasilPMBController::class, 'index'])->name('HasilPMB');
             });
-            Route::prefix('Assessment')->group(function(){
-                Route::get('/', [AssessmentController::class, 'index'])->name('assessment.show');
+            Route::prefix('Assessment')->group(function () {
+
+                Route::get('/', [AssessmentController::class, 'index'])->name('assessment.index');
+                Route::post('/start', [AssessmentController::class, 'startTest'])->name('assessment.start');
+                Route::post('/save-answer', [AssessmentController::class, 'saveAnswer'])->name('assessment.save_answer');
+                Route::post('/finish', [AssessmentController::class, 'finishTest'])->name('assessment.finish');
             });
         });
     });
