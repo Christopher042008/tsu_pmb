@@ -32,7 +32,7 @@ class TestAssesmentController extends Controller
     public function tabelTestPMB()
     {
         $data = Pendaftaran::where('isactive', 1)
-            ->with(['biodata', 'batch', 'jalur', 'jenisbeasiswa', 'jurusan_acc' => function($q) {
+            ->with(['biodata', 'batch', 'jalur', 'jenisbeasiswa', 'jurusan_acc' => function ($q) {
                 $q->with('jenjang');
             }])
             ->get();
@@ -55,16 +55,16 @@ class TestAssesmentController extends Controller
                 return $d->jenisbeasiswa ? $d->jenisbeasiswa->jenis_beasiswa : '-';
             })
             ->addColumn('diterima', function ($d) {
-                return $d->jurusan_diterima && $d->jurusan_acc ? $d->jurusan_acc->jenjang->jenjang.' - '.$d->jurusan_acc->jurusan : '-';
+                return $d->jurusan_diterima && $d->jurusan_acc ? $d->jurusan_acc->jenjang->jenjang . ' - ' . $d->jurusan_acc->jurusan : '-';
             })
             ->addColumn('validator', function ($d) {
                 // Tangani jika nilai null
                 $validasi = $d->validasi_test === null ? '0' : (string)$d->validasi_test;
-                
-                if($validasi == '0'){
+
+                if ($validasi == '0') {
                     return '<span class="badge bg-warning">Waiting</span>';
-                }else{
-                    return '<span class="badge bg-success">'.namaku($d->nik_validasi_test).'</span>'; 
+                } else {
+                    return '<span class="badge bg-success">' . namaku($d->nik_validasi_test) . '</span>';
                 }
             })
             ->addColumn('status', function ($d) {
@@ -73,7 +73,7 @@ class TestAssesmentController extends Controller
                     ->where('kodependaftaran', $d->KodePendaftaran)
                     ->where('status', 'finished')
                     ->count();
-                
+
                 // Hitung apakah sudah pernah mulai test sama sekali
                 $totalAttempts = DB::table('pmb_assessment_attempts')
                     ->where('kodependaftaran', $d->KodePendaftaran)
@@ -89,7 +89,7 @@ class TestAssesmentController extends Controller
             })
             ->addColumn('hasil', function ($d) {
                 $id = encrypt($d->KodePendaftaran);
-                
+
                 // Cek status pengerjaan test
                 $finishedTests = DB::table('pmb_assessment_attempts')
                     ->where('kodependaftaran', $d->KodePendaftaran)
@@ -100,37 +100,37 @@ class TestAssesmentController extends Controller
                 $validasi = $d->validasi_test === null ? '0' : (string)$d->validasi_test;
 
                 $show = '<span class="badge bg-warning">Waiting</span>';
-                
-                if($validasi == '0'){
+
+                if ($validasi == '0') {
                     if ($finishedTests >= 3) {
-                        $show = '<a href="#" class="tidaklolos" data-id="'.$id.'"><i title="Tidak Lolos" class="fa fa-window-close fa-lg text-red"></i></a>
-                                 <a href="#" class="lolos" data-id="'.$id.'"><i title="Lolos" class="fa fa-check-square fa-lg text-green"></i></a>';
+                        $show = '<a href="#" class="tidaklolos" data-id="' . $id . '"><i title="Tidak Lolos" class="fa fa-window-close fa-lg text-red"></i></a>
+                                 <a href="#" class="lolos" data-id="' . $id . '"><i title="Lolos" class="fa fa-check-square fa-lg text-green"></i></a>';
                     } else {
                         $show = '<span class="badge bg-secondary">Menunggu Selesai</span>';
                     }
-                } elseif($validasi == '1'){
+                } elseif ($validasi == '1') {
                     $show = '<span class="badge bg-success">Lolos Test</span>';
-                } elseif($validasi == '-1'){
-                    $show = '<span class="badge bg-danger">Tidak Lolos Test</span> <a href="#" class="lolos" data-id="'.$id.'"><i title="Loloskan Peserta" class="fa fa-check-square fa-lg text-green"></i></a>';
+                } elseif ($validasi == '-1') {
+                    $show = '<span class="badge bg-danger">Tidak Lolos Test</span> <a href="#" class="lolos" data-id="' . $id . '"><i title="Loloskan Peserta" class="fa fa-check-square fa-lg text-green"></i></a>';
                 }
                 return $show;
             })
             ->addColumn('action', function ($d) {
                 $id = encrypt($d->KodePendaftaran);
                 // Tombol detail selalu muncul (atau bisa dibatasi if $totalAttempts > 0)
-                $detail = '<a href="#" data-id="'.$id.'" class="btn_detail"><i title="Detail Test" class="fa fa-info-circle fa-lg"></i></a>';
+                $detail = '<a href="#" data-id="' . $id . '" class="btn_detail"><i title="Detail Test" class="fa fa-info-circle fa-lg"></i></a>';
                 return $detail;
             })
-            ->rawColumns(['action','status','validator','hasil'])
+            ->rawColumns(['action', 'status', 'validator', 'hasil'])
             ->make(true);
     }
 
-   public function showDetailTest($params)
+    public function showDetailTest($params)
     {
         $id = decrypt($params);
         $cek = Pendaftaran::where('KodePendaftaran', $id)->exists();
 
-        if(!$cek){
+        if (!$cek) {
             return response()->json(['hasil' => 0], Response::HTTP_OK);
         }
 
@@ -141,14 +141,14 @@ class TestAssesmentController extends Controller
         // Ambil Data Attempts Assessment
         $attempts = DB::table('pmb_assessment_attempts as a')
             ->join('pmb_assessment_tipe_test as t', 'a.tipe_test_id', '=', 't.id')
-            ->join('pmb_assessment_engine_test as e', 't.tipe_engine', '=', 'e.tipe_engine') 
+            ->join('pmb_assessment_engine_test as e', 't.tipe_engine', '=', 'e.tipe_engine')
             ->where('a.kodependaftaran', $id)
             ->select('a.*', 't.nama_test as tipe_test_nama', 'e.tipe_engine')
             ->orderBy('a.id', 'asc')
             ->get();
 
         $attemptData = [];
-        
+
         foreach ($attempts as $attempt) {
             $answers = DB::table('pmb_assessment_answers as ans')
                 ->join('pmb_assessment_questions as q', 'ans.question_id', '=', 'q.id')
@@ -158,7 +158,7 @@ class TestAssesmentController extends Controller
                 ->where('ans.attempt_id', $attempt->id)
                 ->select(
                     'q.urutan',
-                    'q.pertanyaan', 
+                    'q.pertanyaan',
                     'ans.jawaban_1',
                     'ans.jawaban_2',
                     'opt.label as option_label',
@@ -177,7 +177,7 @@ class TestAssesmentController extends Controller
             $result = DB::table('pmb_assessment_test_results')
                 ->where('attempt_id', $attempt->id)
                 ->first();
-            
+
             $hasil_disc = null;
             if ($result && $result->hasil_json) {
                 $hasil_disc = json_decode($result->hasil_json, true);
@@ -197,7 +197,7 @@ class TestAssesmentController extends Controller
 
         $data['hasil'] = 1;
         $data['daftar'] = $daftar;
-        $data['attempts'] = $attemptData; 
+        $data['attempts'] = $attemptData;
 
         return response()->json($data, Response::HTTP_OK);
     }
@@ -262,7 +262,7 @@ class TestAssesmentController extends Controller
     {
         $id = decrypt($post->kodedaftar);
         DB::beginTransaction();
-        $cek = Pendaftaran::where('KodePendaftaran',$id)->first();
+        $cek = Pendaftaran::where('KodePendaftaran', $id)->first();
         $ket = '';
         if($post->status_diterima=='1'){
             $jur = Master_JurusanKuliah::where('KodeJurusan',$post->jurusan_diterima)->with('jenjang')->first();
@@ -276,19 +276,19 @@ class TestAssesmentController extends Controller
             'tgl_validasi_test' => now(),
             'jurusan_diterima' => $post->jurusan_diterima,
             'keterangan' => $ket,
-            'current_step' =>  $post->status_diterima=='1' ? $cek->current_step+1 : $cek->current_step,
-            'stop_step' =>  $post->status_diterima=='1' ? null : $cek->current_step,
+            'current_step' =>  $post->status_diterima == '1' ? $cek->current_step + 1 : $cek->current_step,
+            'stop_step' =>  $post->status_diterima == '1' ? null : $cek->current_step,
             'updated_at' => now()
         );
 
-        $updt = Pendaftaran::where('KodePendaftaran',$id)->update($data);
+        $updt = Pendaftaran::where('KodePendaftaran', $id)->update($data);
 
-        $t1=0;
+        $t1 = 0;
         // $t2=0;
-        if($post->status_diterima=='1'){
-            $kode = 'UKT-'.$id.'-'.date('YmdHis');
-            $jurusan = Master_JurusanKuliah::where('KodeJurusan',$post->jurusan_diterima)->first();
-            $biaya = Master_TarifUKT::where('idbatch',$cek->batch_daftar)->where('idjalur',$cek->jalur_daftar)->where('idjurusan',$jurusan->id)->first();
+        if ($post->status_diterima == '1') {
+            $kode = 'UKT-' . $id . '-' . date('YmdHis');
+            $jurusan = Master_JurusanKuliah::where('KodeJurusan', $post->jurusan_diterima)->first();
+            $biaya = Master_TarifUKT::where('idbatch', $cek->batch_daftar)->where('idjalur', $cek->jalur_daftar)->where('idjurusan', $jurusan->id)->first();
             $transaksi = Transaksi::insert([
                 'user_id' => $cek->biodata_id,
                 'kategori' => 'ukt',
@@ -300,11 +300,11 @@ class TestAssesmentController extends Controller
                 'created_at' => date('Y-m-d H:i:s')
             ]);
 
-            if(!$transaksi){
+            if (!$transaksi) {
                 $t1++;
             }
 
-            $cek2 = Transaksi::orderby('id','desc')->latest()->first();
+            $cek2 = Transaksi::orderby('id', 'desc')->latest()->first();
             // Simpan history
             // $historyTransaksi = TransaksiHistory::insert([
             //     'transaksi_id' => $cek2->id,
@@ -315,14 +315,13 @@ class TestAssesmentController extends Controller
             // if(!$historyTransaksi){
             //     $t2++;
             // }
-            if($biaya->biaya_ukt==0){
-                $ceklagi = Pendaftaran::where('KodePendaftaran',$id)->first();
-                Pendaftaran::where('KodePendaftaran',$id)->update([
-                    'current_step' => $ceklagi->current_step+2,
+            if ($biaya->biaya_ukt == 0) {
+                $ceklagi = Pendaftaran::where('KodePendaftaran', $id)->first();
+                Pendaftaran::where('KodePendaftaran', $id)->update([
+                    'current_step' => $ceklagi->current_step + 2,
                     'updated_at' => now()
                 ]);
             }
-
         }
          if($updt&&$t1==0){ //&&$t2==0
             DB::commit();
@@ -355,14 +354,16 @@ public function printDisc($attempt_id)
             ->select('opt_most.disc_tipe as most_disc', 'opt_least.disc_tipe as least_disc')
             ->get();
 
-        $l1 = ['D'=>0, 'I'=>0, 'S'=>0, 'C'=>0, 'star'=>0];
-        $l2 = ['D'=>0, 'I'=>0, 'S'=>0, 'C'=>0, 'star'=>0];
+        $l1 = ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, 'star' => 0];
+        $l2 = ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, 'star' => 0];
 
-        foreach($answers as $a) {
+        foreach ($answers as $a) {
             $m = strtoupper($a->most_disc);
             $k = strtoupper($a->least_disc);
-            if(isset($l1[$m])) $l1[$m]++; elseif($m == '*') $l1['star']++;
-            if(isset($l2[$k])) $l2[$k]++; elseif($k == '*') $l2['star']++;
+            if (isset($l1[$m])) $l1[$m]++;
+            elseif ($m == '*') $l1['star']++;
+            if (isset($l2[$k])) $l2[$k]++;
+            elseif ($k == '*') $l2['star']++;
         }
 
         $l3 = [
@@ -384,10 +385,10 @@ public function printDisc($attempt_id)
             'l1'    => $l1,
             'l2'    => $l2,
             'l3'    => $l3,
-            'hasil' => $hasil 
+            'hasil' => $hasil
         ];
 
         // Sesuaikan path view-nya dengan folder modul kamu
-        return view('admin::hasilassesment.pdf_disc', $data); 
+        return view('admin::hasilassesment.pdf_disc', $data);
     }
 }

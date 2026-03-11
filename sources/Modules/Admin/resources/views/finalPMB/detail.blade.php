@@ -102,21 +102,27 @@
                                     </tr>
                                     <tr>
                                         <th>Program Studi Pilihan 1</th>
-                                        <th>: {{$datadaftar->prodi1 ? $datadaftar->prodi1->jenjang->jenjang.'-'.$datadaftar->prodi1->jurusan : '-'}}</th>
+                                        <th>:
+                                            {{ $datadaftar->prodi1 ? $datadaftar->prodi1->jenjang->jenjang . '-' . $datadaftar->prodi1->jurusan : '-' }}
+                                        </th>
                                         <th>UKT Program Studi 1</th>
-                                        <th>: {{$ukt1 ? rupiah($ukt1->biaya_ukt) : '-'}}</th>
+                                        <th>: {{ $ukt1 ? rupiah($ukt1->biaya_ukt) : '-' }}</th>
                                     </tr>
                                     <tr>
                                         <th>Program Studi Pilihan 2</th>
-                                        <th>: {{$datadaftar->prodi2 ? $datadaftar->prodi2->jenjang->jenjang.'-'.$datadaftar->prodi2->jurusan : '-'}}</th>
+                                        <th>:
+                                            {{ $datadaftar->prodi2 ? $datadaftar->prodi2->jenjang->jenjang . '-' . $datadaftar->prodi2->jurusan : '-' }}
+                                        </th>
                                         <th>UKT Program Studi 2</th>
-                                        <th>: {{$ukt2 ? rupiah($ukt2->biaya_ukt) : '-'}}</th>
+                                        <th>: {{ $ukt2 ? rupiah($ukt2->biaya_ukt) : '-' }}</th>
                                     </tr>
                                     <tr>
                                         <th>Program Studi Pilihan 3</th>
-                                        <th>: {{$datadaftar->prodi3 ? $datadaftar->prodi3->jenjang->jenjang.'-'.$datadaftar->prodi3->jurusan : '-'}}</th>
+                                        <th>:
+                                            {{ $datadaftar->prodi3 ? $datadaftar->prodi3->jenjang->jenjang . '-' . $datadaftar->prodi3->jurusan : '-' }}
+                                        </th>
                                         <th>UKT Program Studi 3</th>
-                                        <th>: {{$ukt3 ? rupiah($ukt3->biaya_ukt) : '-'}}</th>
+                                        <th>: {{ $ukt3 ? rupiah($ukt3->biaya_ukt) : '-' }}</th>
                                     </tr>
                                     @php
                                         $tglkonfirm = explode(' ', $datadaftar->tgl_konfirm);
@@ -284,54 +290,60 @@
                                     <div class="circle">1</div>
                                     <label class="step-title">Data Diri</label>
                                 </div>
+
                                 <div class="row mt-3">
-                                    <table id="tabel-detail" class="table" style="width: 100%;">
-                                        <thead>
+                                    <table id="tabel-detail-diri" class="table" style="width: 100%;">
+                                        <tbody>
                                             <tr>
-                                                <th>NIK</th>
-                                                <th>: {{ $datadaftar->biodata->nik }}</th>
-                                                <th>Kecamatan</th>
-                                                <th>: {{ $kecamatan == null ? '' : $kecamatan->nama_kecamatan }}</th>
-                                                <th>Provinsi</th>
-                                                <th>: {{ $provinsi == null ? '-' : $provinsi->nama_provinsi }}</th>
+                                                <th style="width: 15%;">NIK</th>
+                                                <td style="width: 35%;">: {{ $datadaftar->biodata->nik }}</td>
+                                                <th style="width: 15%;">Provinsi</th>
+                                                <td style="width: 35%;">: {{ $provinsi->nama_provinsi }}</td>
                                             </tr>
                                             <tr>
                                                 <th>No KK</th>
-                                                <th>: {{ $datadaftar->biodata->nokk }}</th>
-                                                <th>Desa/Kelurahan</th>
-                                                <th>: {{ $kelurahan == null ? '' : $kelurahan->nama_kelurahan }}</th>
+                                                <td>: {{ $datadaftar->biodata->nokk }}</td>
                                                 <th>Kabupaten/Kota</th>
-                                                <th>: {{ $kabupaten == null ? '-' : $kabupaten->nama_kabupaten }}</th>
+                                                <td>: {{ $kabupaten->nama_kabupaten }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Nama</th>
-                                                <th>: {{ $datadaftar->biodata->nama }}</th>
-                                                <th>Agama</th>
-                                                <th>: {{ $datadaftar->biodata->agama }}</th>
-                                                <th>RT /RW / Kode Pos</th>
-                                                <th>: {{ $datadaftar->biodata->rt }}/{{ $datadaftar->biodata->rw }}/{{ $datadaftar->biodata->kodepos }}</th>
+                                                <td>: {{ $datadaftar->biodata->nama }}</td>
+                                                <th>Kecamatan</th>
+                                                <td>: {{ $kecamatan->nama_kecamatan }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Jenis Kelamin</th>
-                                                <th>: {{ $datadaftar->biodata->jenkel }}</th>
-                                                <th>No HP</th>
-                                                <th>: {{ $datadaftar->biodata->nohp }}</th>
-                                                <th>Alamat Lengkap</th>
-                                                <th>: {{ $datadaftar->biodata->alamat_lengkap }}</th>
+                                                <td>: {{ $datadaftar->biodata->jenkel }}</td>
+                                                <th>Desa/Kelurahan</th>
+                                                <td>: {{ $kelurahan->nama_kelurahan }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Tempat Lahir</th>
-                                                <th>: {{ $datadaftar->biodata->tempat_lahir }}</th>
-                                                <th>Email</th>
-                                                <th>: {{ $datadaftar->biodata->akunbio->email }}</th>
+                                                <td>: {{ $datadaftar->biodata->tempat_lahir }}</td>
+                                                <th>RT / RW / Kode Pos</th>
+                                                <td>: {{ $datadaftar->biodata->rt }} / {{ $datadaftar->biodata->rw }} /
+                                                    {{ $datadaftar->biodata->kodepos }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Tanggal Lahir</th>
-                                                <th>: {{ tglIndo($datadaftar->biodata->tgl_lahir) }}</th>
-                                                <th>Ukuran Jas Almamater</th>
-                                                <th>: {{ $datadaftar->biodata->ukuran_jas }}</th>
+                                                <td>: {{ tglIndo($datadaftar->biodata->tgl_lahir) }}</td>
+                                                <th>Alamat Lengkap</th>
+                                                <td>: {{ $datadaftar->biodata->alamat_lengkap }}</td>
                                             </tr>
-                                        </thead>
+                                            <tr>
+                                                <th>Agama</th>
+                                                <td>: {{ $datadaftar->biodata->agama }}</td>
+                                                <th>No HP</th>
+                                                <td>: {{ $datadaftar->biodata->nohp }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Email</th>
+                                                <td>: {{ session('user')->email }}</td>
+                                                <th>Ukuran Jas Almamater</th>
+                                                <td>: {{ $datadaftar->biodata->ukuran_jas }}</td>
+                                            </tr>
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
