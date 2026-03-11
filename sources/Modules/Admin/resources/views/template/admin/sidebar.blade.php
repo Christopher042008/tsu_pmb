@@ -173,13 +173,13 @@
                             </a>
                             <ul class="nav nav-treeview" style="display: none;">
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a href="{{ route('admin.testassesment.show') }}" class="nav-link">
                                     <i class="far fa-dot-circle nav-icon"></i>
                                     <p>Hasil Test</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a href="{{ route('admin.monitoringassesment.show') }}" class="nav-link">
                                     <i class="far fa-dot-circle nav-icon"></i>
                                     <p>Monitoring Test</p>
                                     </a>
@@ -291,7 +291,7 @@
                         <li class="nav-item">
                             <a href="{{route('admin.Rekomendator.show')}}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
-                                Master Rekomendasi
+                                Master Rekomendator
                             </a>
                         </li>
                         @if ($jenisberkas > 0)

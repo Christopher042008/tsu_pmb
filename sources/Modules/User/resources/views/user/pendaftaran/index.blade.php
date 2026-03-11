@@ -483,7 +483,7 @@
                                 results: $.map(data, function(item) {
                                     return {
                                         // PERUBAHAN: Hanya menampilkan nama, tapi ID tetap menyimpan kodenya
-                                        text: item.nama_rekomendator, 
+                                        text: item.nama_rekomendator + ' - ' + item.kode_rekomendator,
                                         id: item.kode_rekomendator 
                                     }
                                 })
@@ -927,22 +927,15 @@
                     
                     if (!currentVal) return;
 
-                    let p1 = $('#prodi1').val();
-                    let p2 = $('#prodi2').val();
-                    let p3 = $('#prodi3').val();
-
-                    let f1 = p1 ? $('#prodi1 option:selected').data('fakultas') : null;
-                    let f2 = p2 ? $('#prodi2 option:selected').data('fakultas') : null;
-                    let f3 = p3 ? $('#prodi3 option:selected').data('fakultas') : null;
+                    let f1 = $('#prodi1').val() ? $('#prodi1 option:selected').data('fakultas') : null;
+                    let f2 = $('#prodi2').val() ? $('#prodi2 option:selected').data('fakultas') : null;
+                    let f3 = $('#prodi3').val() ? $('#prodi3 option:selected').data('fakultas') : null;
 
                     let isConflict = false;
                     let msg = '';
 
-                    if ((p1 && p2 && p1 === p2) || (p1 && p3 && p1 === p3) || (p2 && p3 && p2 === p3)) {
-                        isConflict = true;
-                        msg = 'Program studi tidak boleh ada yang sama!';
-                    }
-                    else if ((f1 && f2 && f1 === f2) || (f1 && f3 && f1 === f3) || (f2 && f3 && f2 === f3)) {
+                    // HANYA CEK FAKULTAS
+                    if ((f1 && f2 && f1 === f2) || (f1 && f3 && f1 === f3) || (f2 && f3 && f2 === f3)) {
                         isConflict = true;
                         msg = 'Program studi tidak boleh berasal dari Fakultas yang sama!';
                     }
@@ -954,7 +947,7 @@
                             icon: 'warning',
                             width: '600px'
                         });
-                        currentSelect.val('').trigger('change.select2');
+                        currentSelect.val('').trigger('change.select2'); // Reset pilihan yang menyebabkan konflik
                     }
                 });
 
@@ -1160,6 +1153,13 @@
                                         $('#jurusansekolah').val(data.daftar.jurusan_sekolah).trigger('change');
                                         $('#waktukuliah').val(data.daftar.waktu_kuliah).trigger('change');
                                         $('#waktukuliah').prop('disabled', false); 
+                                        if (data.daftar.rekomendator) {
+                                            // Format text diambil dari data.rekomendator yang dikirim Controller
+                                            let optionRek = new Option(data.rekomendator, data.daftar.rekomendator, true, true);
+                                            $('#rekomendator').append(optionRek).trigger('change');
+                                        } else {
+                                            $('#rekomendator').val(null).trigger('change');
+                                        }
 
                                         var onProdiFinished = function() {
                                             setTimeout(() => {
