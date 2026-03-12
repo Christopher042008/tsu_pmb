@@ -13,11 +13,16 @@ use App\Models\MasterData\Master_Provinsi;
 use App\Models\MasterData\Master_TarifUKT;
 use App\Models\MasterData\Master_Rekomendator;
 
+use App\Models\Assessment\Assessment_Attempts;
+use App\Models\Assessment\Assessment_TipeTest;
+use App\Models\Assessment\Assessment_Questions;
+use App\Models\Assessment\Assessment_Answers;
+
 use App\Models\Parameter;
 use App\Models\User\Biodata;
 use App\Models\User\Pendaftaran;
 use App\Models\User\Saudara;
-use App\Models\User\BerkasPendaftaran; // <-- [TAMBAHKAN INI] Pastikan namespace model ini sesuai dengan kodemu
+use App\Models\User\BerkasPendaftaran; 
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Storage;
 use Session, Crypt, DB;
@@ -108,6 +113,13 @@ class HasilPMBController extends Controller
             }
         }
 
+        $completedTestIds = Assessment_Attempts::where('kodependaftaran', $datadaftar->KodePendaftaran)
+            ->where('status', 'finished') // <-- CATATAN: Pastikan ini sesuai dengan status selesaimu (misal: 'selesai' atau 'finished')
+            ->pluck('tipe_test_id');
+
+        // 2. Ambil data nama tes berdasarkan ID tersebut
+        $subtesSelesai = Assessment_TipeTest::whereIn('id', $completedTestIds)->get();
+
         $data = array(
             'title'             => 'Hasil PMB',
             'menu'              => 'Hasil Akhir Pendaftaran Calon Mahasiswa Baru',
@@ -118,14 +130,15 @@ class HasilPMBController extends Controller
             'berkas_khusus'     => $linkkhusus,
             'berkas_umum'       => $linkumum,
             'detailberkas_umum' => $berkasumum,
-            'berkasPendaftar'   => $berkasPendaftar, // <-- [TAMBAHKAN INI] Lempar ke blade
+            'berkasPendaftar'   => $berkasPendaftar,
             'provinsi'          => $provinsi,
             'kabupaten'         => $kabupaten,
             'kecamatan'         => $kecamatan,
             'kelurahan'         => $kelurahan,
             'provinsi_sekolah'  => $provinsi_sekolah,
             'kabupaten_sekolah' => $kabupaten_sekolah,
-            'rekomendator'      => $rekomendator_text
+            'rekomendator'      => $rekomendator_text,
+            'subtes_selesai'    => $subtesSelesai
         );
         
         return view('user::user.hasil.index', $data);

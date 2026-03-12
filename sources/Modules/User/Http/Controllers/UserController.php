@@ -57,7 +57,7 @@ class UserController extends Controller
         });
         
         // 3. Lempar data $groupedJurusans ke view
-        return view('user::halamandepannew.programstudi.index', compact('title', 'groupedJurusans'));
+        return view('user::halamandepannew.programstudi.index', compact('title', 'groupedJurusans', 'jurusans'));
 
     }
 

@@ -415,7 +415,7 @@
                     <div class="p-3 border-top bg-light">
                         <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
                             <h5 class="font-weight-bold text-info mb-0">REKAPITULASI & GRAFIK DISC</h5>
-                            <a href="${urlPdf}" target="_blank" class="btn btn-warning btn-sm text-dark font-weight-bold"><i class="fas fa-print"></i> Cetak PDF DISC</a>
+                            <a href="${urlPdf}" target="_blank" class="btn btn-warning btn-sm text-dark font-weight-bold "><i class="fas fa-print"></i> Cetak PDF DISC</a>
                         </div>
                 `;
 

@@ -32,7 +32,7 @@ class TestAssesmentController extends Controller
     public function tabelTestPMB()
     {
         $data = Pendaftaran::where('isactive', 1)
-            ->with(['biodata', 'batch', 'jalur', 'jenisbeasiswa', 'jurusan_acc' => function($q) {
+            ->with(['biodata', 'batch', 'jalur', 'jenisbeasiswa', 'jurusan_acc' => function ($q) {
                 $q->with('jenjang');
             }])
             ->get();
@@ -55,16 +55,16 @@ class TestAssesmentController extends Controller
                 return $d->jenisbeasiswa ? $d->jenisbeasiswa->jenis_beasiswa : '-';
             })
             ->addColumn('diterima', function ($d) {
-                return $d->jurusan_diterima && $d->jurusan_acc ? $d->jurusan_acc->jenjang->jenjang.' - '.$d->jurusan_acc->jurusan : '-';
+                return $d->jurusan_diterima && $d->jurusan_acc ? $d->jurusan_acc->jenjang->jenjang . ' - ' . $d->jurusan_acc->jurusan : '-';
             })
             ->addColumn('validator', function ($d) {
                 // Tangani jika nilai null
                 $validasi = $d->validasi_test === null ? '0' : (string)$d->validasi_test;
 
-                if($validasi == '0'){
+                if ($validasi == '0') {
                     return '<span class="badge bg-warning">Waiting</span>';
-                }else{
-                    return '<span class="badge bg-success">'.namaku($d->nik_validasi_test).'</span>';
+                } else {
+                    return '<span class="badge bg-success">' . namaku($d->nik_validasi_test) . '</span>';
                 }
             })
             ->addColumn('status', function ($d) {
@@ -101,27 +101,27 @@ class TestAssesmentController extends Controller
 
                 $show = '<span class="badge bg-warning">Waiting</span>';
 
-                if($validasi == '0'){
+                if ($validasi == '0') {
                     if ($finishedTests >= 3) {
-                        $show = '<a href="#" class="tidaklolos" data-id="'.$id.'"><i title="Tidak Lolos" class="fa fa-window-close fa-lg text-red"></i></a>
-                                 <a href="#" class="lolos" data-id="'.$id.'"><i title="Lolos" class="fa fa-check-square fa-lg text-green"></i></a>';
+                        $show = '<a href="#" class="tidaklolos" data-id="' . $id . '"><i title="Tidak Lolos" class="fa fa-window-close fa-lg text-red"></i></a>
+                                 <a href="#" class="lolos" data-id="' . $id . '"><i title="Lolos" class="fa fa-check-square fa-lg text-green"></i></a>';
                     } else {
                         $show = '<span class="badge bg-secondary">Menunggu Selesai</span>';
                     }
-                } elseif($validasi == '1'){
+                } elseif ($validasi == '1') {
                     $show = '<span class="badge bg-success">Lolos Test</span>';
-                } elseif($validasi == '-1'){
-                    $show = '<span class="badge bg-danger">Tidak Lolos Test</span> <a href="#" class="lolos" data-id="'.$id.'"><i title="Loloskan Peserta" class="fa fa-check-square fa-lg text-green"></i></a>';
+                } elseif ($validasi == '-1') {
+                    $show = '<span class="badge bg-danger">Tidak Lolos Test</span> <a href="#" class="lolos" data-id="' . $id . '"><i title="Loloskan Peserta" class="fa fa-check-square fa-lg text-green"></i></a>';
                 }
                 return $show;
             })
             ->addColumn('action', function ($d) {
                 $id = encrypt($d->KodePendaftaran);
                 // Tombol detail selalu muncul (atau bisa dibatasi if $totalAttempts > 0)
-                $detail = '<a href="#" data-id="'.$id.'" class="btn_detail"><i title="Detail Test" class="fa fa-info-circle fa-lg"></i></a>';
+                $detail = '<a href="#" data-id="' . $id . '" class="btn_detail"><i title="Detail Test" class="fa fa-info-circle fa-lg"></i></a>';
                 return $detail;
             })
-            ->rawColumns(['action','status','validator','hasil'])
+            ->rawColumns(['action', 'status', 'validator', 'hasil'])
             ->make(true);
     }
 
@@ -130,7 +130,7 @@ class TestAssesmentController extends Controller
         $id = decrypt($params);
         $cek = Pendaftaran::where('KodePendaftaran', $id)->exists();
 
-        if(!$cek){
+        if (!$cek) {
             return response()->json(['hasil' => 0], Response::HTTP_OK);
         }
 
@@ -202,51 +202,80 @@ class TestAssesmentController extends Controller
         return response()->json($data, Response::HTTP_OK);
     }
 
-    public function show_jurusan($params)
+   public function show_jurusan($params)
     {
-        // dd($params);
-        $id = decrypt($params);
-        $cek = Pendaftaran::where('KodePendaftaran',$id)->exists();
-        if(!$cek){
-            $data['hasil'] = 0;
-        }else{
-            $mhs = Pendaftaran::where('KodePendaftaran',$id)->first();
-            $jurusan = array();
-            // $jurusan = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan1)->orwhere('KodeJurusan',$mhs->pilihan2)->with('jenjang')->get();
-           // Pilihan 1
-            if ($mhs->pilihan1 != null) {
-                $jurusan1 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan1)->with('jenjang')->first();
-                if ($jurusan1) array_push($jurusan, $jurusan1);
+        try {
+            $id = decrypt($params);
+            
+            // Ambil pendaftar sekalian dengan relasi prodinya
+            $mhs = Pendaftaran::where('KodePendaftaran', $id)
+                ->with(['prodi1.jenjang', 'prodi2.jenjang', 'prodi3.jenjang'])
+                ->first();
+
+            if(!$mhs){
+                return response()->json(['hasil' => 0], Response::HTTP_OK);
             }
 
-            // Pilihan 2
-            if ($mhs->pilihan2 != null) {
-                $jurusan2 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan2)->with('jenjang')->first();
-                if ($jurusan2) array_push($jurusan, $jurusan2);
+            $jurusan = [];
+
+            // PILIHAN 1
+            if (is_object($mhs->pilihan1)) {
+                // Jika sudah berupa objek, langsung masukkan
+                $jurusan[] = $mhs->pilihan1;
+            } elseif (!empty($mhs->pilihan1)) {
+                // Jika berupa teks string ID, query ke database
+                $j1 = Master_JurusanKuliah::where('KodeJurusan', $mhs->pilihan1)->with('jenjang')->first();
+                if ($j1) $jurusan[] = $j1;
             }
 
-            // Pilihan 3
-            if ($mhs->pilihan3 != null) {
-                $jurusan3 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan3)->with('jenjang')->first();
-                if ($jurusan3) array_push($jurusan, $jurusan3);
+            // PILIHAN 2
+            if (is_object($mhs->pilihan2)) {
+                $jurusan[] = $mhs->pilihan2;
+            } elseif (!empty($mhs->pilihan2)) {
+                $j2 = Master_JurusanKuliah::where('KodeJurusan', $mhs->pilihan2)->with('jenjang')->first();
+                if ($j2) $jurusan[] = $j2;
             }
-            $data['hasil'] = 1;
-            $data['jurusan'] = $jurusan;
+
+            // PILIHAN 3
+            if (is_object($mhs->pilihan3)) {
+                $jurusan[] = $mhs->pilihan3;
+            } elseif (!empty($mhs->pilihan3)) {
+                $j3 = Master_JurusanKuliah::where('KodeJurusan', $mhs->pilihan3)->with('jenjang')->first();
+                if ($j3) $jurusan[] = $j3;
+            }
+
+            // BACKUP AMAN: Jika array masih kosong, ambil dari relasi prodi
+            if (empty($jurusan)) {
+                if ($mhs->prodi1) $jurusan[] = $mhs->prodi1;
+                if ($mhs->prodi2) $jurusan[] = $mhs->prodi2;
+                if ($mhs->prodi3) $jurusan[] = $mhs->prodi3;
+            }
+
+            return response()->json([
+                'hasil' => 1,
+                'jurusan' => $jurusan
+            ], Response::HTTP_OK);
+
+        } catch (\Exception $e) {
+            // Menangkap error 500 agar website tidak hang
+            return response()->json([
+                'hasil' => 0,
+                'message' => 'Terjadi kesalahan Sistem' 
+            ], 500);
         }
-        return response()->json($data, Response::HTTP_OK);
     }
 
     public function hasil_test(Request $post)
     {
         $id = decrypt($post->kodedaftar);
         DB::beginTransaction();
-        $cek = Pendaftaran::where('KodePendaftaran',$id)->first();
+        $cek = Pendaftaran::where('KodePendaftaran', $id)->first();
         $ket = '';
         if($post->status_diterima=='1'){
             $jur = Master_JurusanKuliah::where('KodeJurusan',$post->jurusan_diterima)->with('jenjang')->first();
             $ket = 'Selamat Anda diterima di Jurusan : '.$jur->jenjang->jenjang.'-'.$jur->jurusan.'. Silahkan Selesaikan Step Selanjutnya.';
         }else{
-            $ket = 'Mohon maaf anda belum lolos seleksi.';
+            $ket = 'anda belum lolos seleksi,Silahkan Daftar kembali pada batch selanjutnya';
         }
         $data = array(
             'validasi_test' => $post->status_diterima,
@@ -254,19 +283,19 @@ class TestAssesmentController extends Controller
             'tgl_validasi_test' => now(),
             'jurusan_diterima' => $post->jurusan_diterima,
             'keterangan' => $ket,
-            'current_step' =>  $post->status_diterima=='1' ? $cek->current_step+1 : $cek->current_step,
-            'stop_step' =>  $post->status_diterima=='1' ? null : $cek->current_step,
+            'current_step' =>  $post->status_diterima == '1' ? $cek->current_step + 1 : $cek->current_step,
+            'stop_step' =>  $post->status_diterima == '1' ? null : $cek->current_step,
             'updated_at' => now()
         );
 
-        $updt = Pendaftaran::where('KodePendaftaran',$id)->update($data);
+        $updt = Pendaftaran::where('KodePendaftaran', $id)->update($data);
 
-        $t1=0;
+        $t1 = 0;
         // $t2=0;
-        if($post->status_diterima=='1'){
-            $kode = 'UKT-'.$id.'-'.date('YmdHis');
-            $jurusan = Master_JurusanKuliah::where('KodeJurusan',$post->jurusan_diterima)->first();
-            $biaya = Master_TarifUKT::where('idbatch',$cek->batch_daftar)->where('idjalur',$cek->jalur_daftar)->where('idjurusan',$jurusan->id)->first();
+        if ($post->status_diterima == '1') {
+            $kode = 'UKT-' . $id . '-' . date('YmdHis');
+            $jurusan = Master_JurusanKuliah::where('KodeJurusan', $post->jurusan_diterima)->first();
+            $biaya = Master_TarifUKT::where('idbatch', $cek->batch_daftar)->where('idjalur', $cek->jalur_daftar)->where('idjurusan', $jurusan->id)->first();
             $transaksi = Transaksi::insert([
                 'user_id' => $cek->biodata_id,
                 'kategori' => 'ukt',
@@ -278,11 +307,11 @@ class TestAssesmentController extends Controller
                 'created_at' => date('Y-m-d H:i:s')
             ]);
 
-            if(!$transaksi){
+            if (!$transaksi) {
                 $t1++;
             }
 
-            $cek2 = Transaksi::orderby('id','desc')->latest()->first();
+            $cek2 = Transaksi::orderby('id', 'desc')->latest()->first();
             // Simpan history
             // $historyTransaksi = TransaksiHistory::insert([
             //     'transaksi_id' => $cek2->id,
@@ -293,16 +322,15 @@ class TestAssesmentController extends Controller
             // if(!$historyTransaksi){
             //     $t2++;
             // }
-            if($biaya->biaya_ukt==0){
-                $ceklagi = Pendaftaran::where('KodePendaftaran',$id)->first();
-                Pendaftaran::where('KodePendaftaran',$id)->update([
-                    'current_step' => $ceklagi->current_step+2,
+            if ($biaya->biaya_ukt == 0) {
+                $ceklagi = Pendaftaran::where('KodePendaftaran', $id)->first();
+                Pendaftaran::where('KodePendaftaran', $id)->update([
+                    'current_step' => $ceklagi->current_step + 2,
                     'updated_at' => now()
                 ]);
             }
-
         }
-        if($updt&&$t1==0){ //&&$t2==0
+         if($updt&&$t1==0){ //&&$t2==0
             DB::commit();
             $data['title'] = 'Berhasil';
             $data['message'] = 'Data Test Online Sudah divalidasi !';
@@ -333,14 +361,16 @@ class TestAssesmentController extends Controller
             ->select('opt_most.disc_tipe as most_disc', 'opt_least.disc_tipe as least_disc')
             ->get();
 
-        $l1 = ['D'=>0, 'I'=>0, 'S'=>0, 'C'=>0, 'star'=>0];
-        $l2 = ['D'=>0, 'I'=>0, 'S'=>0, 'C'=>0, 'star'=>0];
+        $l1 = ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, 'star' => 0];
+        $l2 = ['D' => 0, 'I' => 0, 'S' => 0, 'C' => 0, 'star' => 0];
 
-        foreach($answers as $a) {
+        foreach ($answers as $a) {
             $m = strtoupper($a->most_disc);
             $k = strtoupper($a->least_disc);
-            if(isset($l1[$m])) $l1[$m]++; elseif($m == '*') $l1['star']++;
-            if(isset($l2[$k])) $l2[$k]++; elseif($k == '*') $l2['star']++;
+            if (isset($l1[$m])) $l1[$m]++;
+            elseif ($m == '*') $l1['star']++;
+            if (isset($l2[$k])) $l2[$k]++;
+            elseif ($k == '*') $l2['star']++;
         }
 
         $l3 = [

@@ -299,22 +299,6 @@
                     ajax: {
                         url: '{!! url('admin/PembayaranPMB/TabelPembayaranPMB') !!}',
                         type: 'GET',
-                        // --- TAMBAHAN PELACAK ERROR DATATABLES ---
-                        error: function (xhr, error, thrown) {
-                            console.error("🚨 [DEBUG DATATABLES] TERJADI ERROR DARI SERVER:");
-                            console.error("👉 Status Code:", xhr.status);
-                            console.error("👉 Pesan Error Detail:", xhr.responseText);
-                            
-                            // Matikan paksa icon loading DataTables
-                            $('#example2_processing').hide(); 
-
-                            Swal.fire({
-                                title: 'Gagal Memuat Tabel',
-                                text: 'Terjadi Error PHP. Silakan buka Console (F12) untuk melihat detail merahnya.',
-                                icon: 'error'
-                            });
-                        }
-                        // ------------------------------------------
                     },
                     columns: [
                         { data: 'DT_RowIndex', orderable: false, searchable: false },

@@ -246,4 +246,5 @@ class AssessmentController extends Controller
 
         return response()->json(['status' => 'success', 'message' => 'Tersimpan']);
     }
+    
 }

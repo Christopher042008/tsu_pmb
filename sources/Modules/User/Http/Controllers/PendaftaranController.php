@@ -417,7 +417,7 @@ class PendaftaranController extends Controller
         DB::rollback();
         return [
             'title' => 'Server Error',
-            'message' => 'PHP Error: ' . $e->getMessage() . ' pada baris ' . $e->getLine(),
+            'message' => 'Terjadi kendala pada server saat memproses data. Silakan coba beberapa saat lagi.',
             'status' => 'error'
         ];
     }
@@ -479,7 +479,7 @@ class PendaftaranController extends Controller
             DB::rollback();
             return [
                 'title' => 'Server Error',
-                'message' => 'PHP Error: ' . $e->getMessage() . ' pada baris ' . $e->getLine(),
+                'message' => 'Terjadi kendala pada server saat memproses data. Silakan coba beberapa saat lagi.',
                 'status' => 'error'
             ];
         }

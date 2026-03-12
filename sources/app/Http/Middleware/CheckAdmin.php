@@ -26,12 +26,18 @@ class CheckAdmin
             $request->session()->regenerateToken();
             return redirect(route('loginadmin'))->with('alert', ['title' => 'Information', 'message' => 'Silahkan Login Kembali', 'status' => 'warning']);
         }
+        //Pembayaran Pendaftaran
+        $pembayaranpendaftaran = Pendaftaran::where('current_step',3)->where('isactive',1)->count(); 
+        session(['notifapprovalpembayaranpendaftaran'=>$pembayaranpendaftaran]);
         //Berkas Khusus
-        $berkaskhusus = Pendaftaran::where('current_step',4)->where('isactive',1)->count(); //where('validasi_berkas_khusus','0')
-        session(['notifapprovalberkaskhusus'=>$berkaskhusus]);
+        $berkaskhusus = Pendaftaran::where('current_step',5)->where('isactive',1)->count(); //where('validasi_berkas_khusus','0')
+        session(['notifapprovalberkaskhusus'=>$berkaskhusus]);  
         //Test
-        $test = Pendaftaran::where('validasi_test','0')->where('isactive',1)->count();
+        $test = Pendaftaran::where('current_step',7)->where('validasi_test','0')->where('isactive',1)->count();
         session(['notifapprovaltest'=>$test]);
+        //Pembayaran UKT
+        $pembayaranukt = Pendaftaran::where('current_step',9)->where('isactive',1)->count(); 
+        session(['notifapprovalpembayaranukt'=>$pembayaranukt]);
         return $next($request);
     }
 }
