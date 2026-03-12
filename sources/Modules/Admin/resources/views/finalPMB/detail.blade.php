@@ -285,267 +285,313 @@
                         <div class="card-header">
                             <h5 class="card-title">Biodata</h5>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                                        class="fas fa-plus"></i></button>
                             </div>
                         </div>
                         <div class="card-body">
-                            <div id="page-1">
-                                <div class="step-header">
-                                    <div class="circle">1</div>
-                                    <label class="step-title">Data Diri</label>
+                            @if (empty($datadaftar->biodata))
+                                <div class="alert alert-warning text-center">
+                                    <i class="fas fa-exclamation-triangle"></i> Pendaftar belum mencapai atau belum
+                                    menyelesaikan tahap pengisian Biodata.
                                 </div>
+                            @else
+                                <div id="page-1">
+                                    <div class="step-header">
+                                        <div class="circle">1</div>
+                                        <label class="step-title">Data Diri</label>
+                                    </div>
 
-                                <div class="row mt-3">
-                                    <table id="tabel-detail-diri" class="table" style="width: 100%;">
-                                        <tbody>
-                                            <tr>
-                                                <th style="width: 15%;">NIK</th>
-                                                <td style="width: 35%;">: {{ $datadaftar->biodata->nik }}</td>
-                                                <th style="width: 15%;">Provinsi</th>
-                                                <td style="width: 35%;">: {{ $provinsi->nama_provinsi }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>No KK</th>
-                                                <td>: {{ $datadaftar->biodata->nokk }}</td>
-                                                <th>Kabupaten/Kota</th>
-                                                <td>: {{ $kabupaten->nama_kabupaten }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Nama</th>
-                                                <td>: {{ $datadaftar->biodata->nama }}</td>
-                                                <th>Kecamatan</th>
-                                                <td>: {{ $kecamatan ? $kecamatan->nama_kecamatan : '' }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Jenis Kelamin</th>
-                                                <td>: {{ $datadaftar->biodata->jenkel }}</td>
-                                                <th>Desa/Kelurahan</th>
-                                                <td>: {{ $kelurahan ? $kelurahan->nama_kelurahan : '' }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Tempat Lahir</th>
-                                                <td>: {{ $datadaftar->biodata->tempat_lahir }}</td>
-                                                <th>RT / RW / Kode Pos</th>
-                                                <td>: {{ $datadaftar->biodata->rt }} / {{ $datadaftar->biodata->rw }} /
-                                                    {{ $datadaftar->biodata->kodepos }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Tanggal Lahir</th>
-                                                <td>: {{ tglIndo($datadaftar->biodata->tgl_lahir) }}</td>
-                                                <th>Alamat Lengkap</th>
-                                                <td>: {{ $datadaftar->biodata->alamat_lengkap }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Agama</th>
-                                                <td>: {{ $datadaftar->biodata->agama }}</td>
-                                                <th>No HP</th>
-                                                <td>: {{ $datadaftar->biodata->nohp }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Email</th>
-                                                <td>: {{ $datadaftar->biodata->akunbio->email }}</td>
-                                                <th>Ukuran Jas Almamater</th>
-                                                <td>: {{ $datadaftar->biodata->ukuran_jas }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div id="page-2" style="display: none;">
-                                <div class="step-header">
-                                    <div class="circle">2</div>
-                                    <label class="step-title">Data Keluarga</label>
-                                </div>
-                                <div class="row mt-3">
-                                    <table id="tabel-detail" class="table" style="width: 100%;">
-                                        <thead>
-                                            <tr>
-                                                <th colspan="2" class="text-bold"><span class="badge bg-warning text-bold" style="font-size: 18px;">Data Ayah</span></th>
-                                                <th colspan="2" class="text-bold"><span class="badge bg-warning text-bold" style="font-size: 18px;">Data Ibu</span></th>
-                                            </tr>
-                                            <tr>
-                                                <th>Nama Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->nama_ayah }}</th>
-                                                <th>Nama Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->nama_ibu }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Tempat Lahir Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->tempat_lahir_ayah }}</th>
-                                                <th>Tempat Lahir Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->tempat_lahir_ibu }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Tgl Lahir Ayah</th>
-                                                <th>: {{ tglIndo($datadaftar->biodata->tgl_lahir_ayah) }}</th>
-                                                <th>Tgl Lahir Ibu</th>
-                                                <th>: {{ tglIndo($datadaftar->biodata->tgl_lahir_ibu) }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Status Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->statushidup_ayah }}</th>
-                                                <th>Status Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->statushidup_ibu }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Status Kekerabatan Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->status_ayah }}</th>
-                                                <th>Status Kekerabatan Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->status_ibu }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>No HP Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->nohp_ayah }}</th>
-                                                <th>No HP Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->nohp_ibu }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Pekerjaan Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->pekerjaan_ayah }}</th>
-                                                <th>pekerjaan Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->pekerjaan_ibu }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Penghasilan Ayah</th>
-                                                <th>: {{ rupiah($datadaftar->biodata->penghasilan_ayah) }}</th>
-                                                <th>Penghasilan Ibu</th>
-                                                <th>: {{ rupiah($datadaftar->biodata->penghasilan_ibu) }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Alamat Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->alamat_ayah }}</th>
-                                                <th>Alamat Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->alamat_ibu }}</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                    <br>
-                                    <table id="tabel-detail" class="table" style="width: 100%;">
-                                        <thead>
-                                            <tr>
-                                                <th colspan="8"><span class="badge bg-warning text-bold" style="font-size: 18px;">Data Saudara</span></th>
-                                            </tr>
-                                            <tr>
-                                                <th colspan="8">Jumlah Saudara : {{ $datadaftar->biodata->jumlah_saudara }}</th>
-                                            </tr>
-                                            @if ($datadaftar->biodata->jumlah_saudara > 0)
-                                                <tr style="background-color: aqua;">
-                                                    <th>Nama Saudara</th>
-                                                    <th>Pekerjaan Saudara</th>
-                                                    <th>Status</th>
-                                                    <th>Status Kekerabatan</th>
+                                    <div class="row mt-3">
+                                        <table id="tabel-detail-diri" class="table" style="width: 100%;">
+                                            <tbody>
+                                                <tr>
+                                                    <th style="width: 15%;">NIK</th>
+                                                    <td style="width: 35%;">: {{ $datadaftar->biodata->nik ?? '-' }}</td>
+                                                    <th style="width: 15%;">Provinsi</th>
+                                                    <td style="width: 35%;">:
+                                                        {{ $provinsi == null ? '-' : $provinsi->nama_provinsi }}</td>
                                                 </tr>
-                                                @foreach ($datadaftar->biodata->saudara as $v)
+                                                <tr>
+                                                    <th>No KK</th>
+                                                    <td>: {{ $datadaftar->biodata->nokk ?? '-' }}</td>
+                                                    <th>Kabupaten/Kota</th>
+                                                    <td>: {{ $kabupaten == null ? '-' : $kabupaten->nama_kabupaten }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Nama</th>
+                                                    <td>: {{ $datadaftar->biodata->nama ?? '-' }}</td>
+                                                    <th>Kecamatan</th>
+                                                    <td>: {{ $kecamatan == null ? '-' : $kecamatan->nama_kecamatan }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Jenis Kelamin</th>
+                                                    <td>: {{ $datadaftar->biodata->jenkel ?? '-' }}</td>
+                                                    <th>Desa/Kelurahan</th>
+                                                    <td>: {{ $kelurahan == null ? '-' : $kelurahan->nama_kelurahan }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Tempat Lahir</th>
+                                                    <td>: {{ $datadaftar->biodata->tempat_lahir ?? '-' }}</td>
+                                                    <th>RT / RW / Kode Pos</th>
+                                                    <td>: {{ $datadaftar->biodata->rt ?? '-' }} /
+                                                        {{ $datadaftar->biodata->rw ?? '-' }} /
+                                                        {{ $datadaftar->biodata->kodepos ?? '-' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Tanggal Lahir</th>
+                                                    <td>:
+                                                        {{ $datadaftar->biodata->tgl_lahir ? tglIndo($datadaftar->biodata->tgl_lahir) : '-' }}
+                                                    </td>
+                                                    <th>Alamat Lengkap</th>
+                                                    <td>: {{ $datadaftar->biodata->alamat_lengkap ?? '-' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Agama</th>
+                                                    <td>: {{ $datadaftar->biodata->agama ?? '-' }}</td>
+                                                    <th>No HP</th>
+                                                    <td>: {{ $datadaftar->biodata->nohp ?? '-' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Email</th>
+                                                    <td>: {{ session('user')->email ?? '-' }}</td>
+                                                    <th>Ukuran Jas Almamater</th>
+                                                    <td>: {{ $datadaftar->biodata->ukuran_jas ?? '-' }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div id="page-2" style="display: none;">
+                                    <div class="step-header">
+                                        <div class="circle">2</div>
+                                        <label class="step-title">Data Keluarga</label>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <table id="tabel-detail" class="table" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="2" class="text-bold"><span
+                                                            class="badge bg-warning text-bold"
+                                                            style="font-size: 18px;">Data Ayah</span></th>
+                                                    <th colspan="2" class="text-bold"><span
+                                                            class="badge bg-warning text-bold"
+                                                            style="font-size: 18px;">Data Ibu</span></th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Nama Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->nama_ayah ?? '-' }}</th>
+                                                    <th>Nama Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->nama_ibu ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Tempat Lahir Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->tempat_lahir_ayah ?? '-' }}</th>
+                                                    <th>Tempat Lahir Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->tempat_lahir_ibu ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Tgl Lahir Ayah</th>
+                                                    <th>:
+                                                        {{ $datadaftar->biodata->tgl_lahir_ayah ? tglIndo($datadaftar->biodata->tgl_lahir_ayah) : '-' }}
+                                                    </th>
+                                                    <th>Tgl Lahir Ibu</th>
+                                                    <th>:
+                                                        {{ $datadaftar->biodata->tgl_lahir_ibu ? tglIndo($datadaftar->biodata->tgl_lahir_ibu) : '-' }}
+                                                    </th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Status Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->statushidup_ayah ?? '-' }}</th>
+                                                    <th>Status Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->statushidup_ibu ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Status Kekerabatan Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->status_ayah ?? '-' }}</th>
+                                                    <th>Status Kekerabatan Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->status_ibu ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>No HP Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->nohp_ayah ?? '-' }}</th>
+                                                    <th>No HP Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->nohp_ibu ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Pekerjaan Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->pekerjaan_ayah ?? '-' }}</th>
+                                                    <th>pekerjaan Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->pekerjaan_ibu ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Penghasilan Ayah</th>
+                                                    <th>:
+                                                        {{ $datadaftar->biodata->penghasilan_ayah ? rupiah($datadaftar->biodata->penghasilan_ayah) : '-' }}
+                                                    </th>
+                                                    <th>Penghasilan Ibu</th>
+                                                    <th>:
+                                                        {{ $datadaftar->biodata->penghasilan_ibu ? rupiah($datadaftar->biodata->penghasilan_ibu) : '-' }}
+                                                    </th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Alamat Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->alamat_ayah ?? '-' }}</th>
+                                                    <th>Alamat Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->alamat_ibu ?? '-' }}</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        <br>
+                                        <table id="tabel-detail" class="table" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="8"><span class="badge bg-warning text-bold"
+                                                            style="font-size: 18px;">Data Saudara</span></th>
+                                                </tr>
+                                                <tr>
+                                                    <th colspan="8">Jumlah Saudara :
+                                                        {{ $datadaftar->biodata->jumlah_saudara ?? 0 }}</th>
+                                                </tr>
+                                                @if (!empty($datadaftar->biodata->jumlah_saudara) && $datadaftar->biodata->jumlah_saudara > 0)
+                                                    <tr style="background-color: aqua;">
+                                                        <th>Nama Saudara</th>
+                                                        <th>Pekerjaan Saudara</th>
+                                                        <th>Status</th>
+                                                        <th>Status Kekerabatan</th>
+                                                    </tr>
+                                                    @foreach ($datadaftar->biodata->saudara as $v)
+                                                        <tr>
+                                                            <th>{{ $v->nama }}</th>
+                                                            <th>{{ $v->pekerjaan }}</th>
+                                                            <th>{{ $v->status_hidup }}</th>
+                                                            <th>{{ $v->status_kekerabatan }}</th>
+                                                        </tr>
+                                                    @endforeach
+                                                @endif
+                                            </thead>
+                                        </table>
+                                        <br>
+                                    </div>
+                                </div>
+
+                                <div id="page-3" style="display: none;">
+                                    <div class="step-header">
+                                        <div class="circle">3</div>
+                                        <label class="step-title">Data Sekolah</label>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <table id="tabel-detail" class="table" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nama Sekolah</th>
+                                                    <th>: {{ $datadaftar->biodata->nama_sekolah ?? '-' }}</th>
+                                                    <th>NPSN</th>
+                                                    <th>: {{ $datadaftar->biodata->npsn ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Jenis Sekolah</th>
+                                                    <th>: {{ $datadaftar->biodata->jenis_sekolah ?? '-' }}</th>
+                                                    <th>NISN</th>
+                                                    <th>: {{ $datadaftar->biodata->nisn ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Provinsi Sekolah</th>
+                                                    <th>:
+                                                        {{ $provinsi_sekolah == null ? '-' : $provinsi_sekolah->nama_provinsi }}
+                                                    </th>
+                                                    <th>Tahun Lulus</th>
+                                                    <th>: {{ $datadaftar->tahun_lulus ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Kabupaten/Kota Sekolah</th>
+                                                    <th>:
+                                                        {{ $kabupaten_sekolah == null ? '-' : $kabupaten_sekolah->nama_kabupaten }}
+                                                    </th>
+                                                    <th>Nilai Akhir</th>
+                                                    <th>: {{ $datadaftar->biodata->nilai_akhir ?? '-' }}</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div id="page-4" style="display: none;">
+                                    <div class="step-header">
+                                        <div class="circle">4</div>
+                                        <label class="step-title">Berkas Pendaftaran</label>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <table id="tabel-detail" class="table table-bordered table-striped"
+                                            style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="4" style="background-color: cadetblue; color: white;"
+                                                        class="text-center">Daftar Berkas Pendaftaran</th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="text-center" width="5%">No</th>
+                                                    <th>Nama Berkas yang Diminta</th>
+                                                    <th class="text-center" width="15%">Status Wajib</th>
+                                                    <th class="text-center" width="25%">File Pendaftar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($detailberkas_umum as $row => $b)
+                                                    @php
+                                                        $fileUploaded = $berkasPendaftar
+                                                            ? $berkasPendaftar->firstWhere('id_berkas', $b->id)
+                                                            : null;
+                                                        $warna = $b->keterangan == 'Wajib' ? 'danger' : 'secondary';
+                                                    @endphp
                                                     <tr>
-                                                        <th>{{ $v->nama }}</th>
-                                                        <th>{{ $v->pekerjaan }}</th>
-                                                        <th>{{ $v->status_hidup }}</th>
-                                                        <th>{{ $v->status_kekerabatan }}</th>
+                                                        <td class="text-center">{{ $row + 1 }}</td>
+                                                        <td>
+                                                            {{ $b->nama_berkas }} <br>
+                                                            <small class="text-muted">Format: {{ $b->formatfile }}</small>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span
+                                                                class="badge bg-{{ $warna }}">{{ $b->keterangan }}</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @if ($fileUploaded)
+                                                                @php
+                                                                    $parameter = \App\Models\Parameter::where(
+                                                                        'id',
+                                                                        1,
+                                                                    )->first();
+                                                                    $pathFile = asset(
+                                                                        'sources/storage/app/' .
+                                                                            $parameter->file_umum .
+                                                                            '/' .
+                                                                            $fileUploaded->nama_berkas,
+                                                                    );
+                                                                @endphp
+                                                                <a href="{{ $pathFile }}" target="_blank"
+                                                                    class="btn btn-sm btn-success">
+                                                                    <i class="fa fa-eye"></i> Lihat Berkas
+                                                                </a>
+                                                            @else
+                                                                <span class="badge bg-warning text-dark">Belum
+                                                                    Upload</span>
+                                                            @endif
+                                                        </td>
                                                     </tr>
                                                 @endforeach
-                                            @endif
-                                        </thead>
-                                    </table>
-                                    <br>
+                                            </tbody>
+                                        </table>
+                                        <br>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div id="page-3" style="display: none;">
-                                <div class="step-header">
-                                    <div class="circle">3</div>
-                                    <label class="step-title">Data Sekolah</label>
+                                <div class="col-md-12 d-flex justify-content-center" style="margin-top: 10px;">
+                                    <button type="button" id="btn-prev" class="btn btn-secondary btn-sm mr-2"
+                                        style="display: none;">Prev</button>
+                                    <button type="button" id="btn-next" class="btn btn-secondary btn-sm">Next</button>
                                 </div>
-                                <div class="row mt-3">
-                                    <table id="tabel-detail" class="table" style="width: 100%;">
-                                        <thead>
-                                            <tr>
-                                                <th>Nama Sekolah</th>
-                                                <th>: {{ $datadaftar->biodata->nama_sekolah }}</th>
-                                                <th>NPSN</th>
-                                                <th>: {{ $datadaftar->biodata->npsn }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Jenis Sekolah</th>
-                                                <th>: {{ $datadaftar->biodata->jenis_sekolah }}</th>
-                                                <th>NISN</th>
-                                                <th>: {{ $datadaftar->biodata->nisn }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Provinsi Sekolah</th>
-                                                <th>: {{ $provinsi_sekolah == null ? '-' : $provinsi_sekolah->nama_provinsi }}</th>
-                                                <th>Tahun Lulus</th>
-                                                <th>: {{ $datadaftar->tahun_lulus }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Kabupaten/Kota Sekolah</th>
-                                                <th>: {{ $kabupaten_sekolah == null ? '-' : $kabupaten_sekolah->nama_kabupaten }}</th>
-                                                <th>Nilai Akhir</th>
-                                                <th>: {{ $datadaftar->biodata->nilai_akhir }}</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div id="page-4" style="display: none;">
-                                <div class="step-header">
-                                    <div class="circle">4</div>
-                                    <label class="step-title">Berkas Pendaftaran</label>
-                                </div>
-                                <div class="row mt-3">
-                                    <table id="tabel-detail" class="table table-bordered table-striped" style="width: 100%;">
-                                        <thead>
-                                            <tr>
-                                                <th colspan="4" style="background-color: cadetblue; color: white;" class="text-center">Daftar Berkas Pendaftaran</th>
-                                            </tr>
-                                            <tr>
-                                                <th class="text-center" width="5%">No</th>
-                                                <th>Nama Berkas yang Diminta</th>
-                                                <th class="text-center" width="15%">Status Wajib</th>
-                                                <th class="text-center" width="25%">File Pendaftar</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($detailberkas_umum as $row => $b)
-                                                @php
-                                                    $fileUploaded = $berkasPendaftar->firstWhere('id_berkas', $b->id);
-                                                    $warna = $b->keterangan == 'Wajib' ? 'danger' : 'secondary';
-                                                @endphp
-                                                <tr>
-                                                    <td class="text-center">{{ $row + 1 }}</td>
-                                                    <td>
-                                                        {{ $b->nama_berkas }} <br>
-                                                        <small class="text-muted">Format: {{ $b->formatfile }}</small>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <span class="badge bg-{{ $warna }}">{{ $b->keterangan }}</span>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        @if ($fileUploaded)
-                                                            @php
-                                                                $parameter = \App\Models\Parameter::where('id', 1)->first();
-                                                                $pathFile = asset('sources/storage/app/' . $parameter->file_umum . '/' . $fileUploaded->nama_berkas);
-                                                            @endphp
-                                                            <a href="{{ $pathFile }}" target="_blank" class="btn btn-sm btn-success">
-                                                                <i class="fa fa-eye"></i> Lihat Berkas
-                                                            </a>
-                                                        @else
-                                                            <span class="badge bg-warning text-dark">Belum Upload</span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                    <br>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12 d-flex justify-content-center" style="margin-top: 10px;">
-                                <button type="button" id="btn-prev" class="btn btn-secondary btn-sm mr-2" style="display: none;">Prev</button>
-                                <button type="button" id="btn-next" class="btn btn-secondary btn-sm">Next</button>
-                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
