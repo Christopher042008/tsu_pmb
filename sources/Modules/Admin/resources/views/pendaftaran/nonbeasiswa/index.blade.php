@@ -417,7 +417,7 @@
                             console.error("AJAX ERROR:", xhr.responseText);
                             Swal.fire({
                                 title: 'Gagal Show Data',
-                                text: 'Silakan cek console (F12) untuk detail error.',
+                                text: 'Terjadi masalah saat mengambil data dari server. Silakan coba lagi atau hubungi admin.',
                                 icon: 'error'
                             });
                         }

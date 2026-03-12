@@ -204,7 +204,7 @@ class BerkasPMBController extends Controller
                 ->rawColumns(['status', 'keterangan', 'action', 'validator'])
                 ->make(true);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error Server: ' . $e->getMessage()]);
+            return response()->json(['error' => 'Terjadi Kesalahan Sistem']);
         }
     }
 
@@ -237,7 +237,7 @@ class BerkasPMBController extends Controller
             DB::rollback();
             return response()->json([
                 'title'   => 'Error!',
-                'message' => $e->getMessage(),
+                'message' => 'Terjadi Kesalahan Sistem',
                 'status'  => 'error'
             ]);
         }
@@ -342,7 +342,7 @@ class BerkasPMBController extends Controller
             DB::rollback();
             return response()->json([
                 'title'   => 'Error Server!',
-                'message' => $e->getMessage(),
+                'message' => 'Terjadi Kesalahan Sistem',
                 'status'  => 'error'
             ], Response::HTTP_OK);
         }

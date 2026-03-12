@@ -390,7 +390,7 @@ class FinalPMBController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             // Tampilkan pesan error aslinya agar gampang diperbaiki kalau ada masalah
-            return redirect()->back()->with('alert',['title' => 'Error', 'message' => 'Gagal: ' . $e->getMessage(), 'status' => 'error']);
+            return redirect()->back()->with('alert',['title' => 'Error', 'message' => 'Update Biodata & Berkas Gagal !', 'status' => 'error']);
         }
     }
 }

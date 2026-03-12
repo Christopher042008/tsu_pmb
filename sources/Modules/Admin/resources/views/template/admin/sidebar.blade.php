@@ -109,7 +109,7 @@
                 </li>
                 @endif
                 @if ($dttest>0)
-                <li class="nav-item">
+                <li class="nav-item" style="display: none;">
                     <a href="{{route('admin.testpmb.show')}}" class="nav-link">
                         <i class="nav-icon fas fa-money-check"></i>
                         <p>Data Test PMB</p>

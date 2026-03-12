@@ -519,9 +519,7 @@
                                             $('#example2').DataTable().ajax
                                                 .reload(null, false);
 
-                                            // 2. Jika Anda INGIN MODAL TETAP TERBUKA untuk lanjut verifikasi, 
-                                            // HAPUS atau MATIKAN kode yang menutup modal di bawah ini:
-                                            // $('#btn-closemodalberkas').trigger('click'); 
+                                            $('#modal-approval').modal('hide');
 
                                             // 3. --- INI KUNCI UNTUK MENGEMBALIKAN SCROLL NYA ---
                                             $('body').addClass('modal-open');

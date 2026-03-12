@@ -142,7 +142,8 @@
                                                 <label for="rekomendator">Rekomendator <code>*(Opsional)</code></label>
                                                 <select class="form-control" id="rekomendator" name="rekomendator"
                                                     disabled>
-                                                    <option value="" selected disabled>-- Ketik Nama Rekomendator --</option>
+                                                    <option value="" selected disabled>-- Ketik Nama Rekomendator --
+                                                    </option>
                                                 </select>
                                                 <small class="text-muted">Ketik minimal 2 karakter (Nama)</small>
                                             </div>
@@ -249,7 +250,7 @@
                                 <th>UKT Program Studi 1</th>
                                 <th id="o-uktprodi1" class="o-detaildaftar"></th>
                                 <th>Biaya Pendaftaran</th>
-                                <th id="o-biayadaftar" class="o-detaildaftar"></th> 
+                                <th id="o-biayadaftar" class="o-detaildaftar"></th>
                                 {{-- <th>UKT Program Studi 2</th>
                                 <th id="o-uktprodi2" class="o-detaildaftar"></th> --}}
                                 {{-- <th>UKT Program Studi 3</th>
@@ -385,8 +386,7 @@
 
             window.fakultasHtmlTable = ''; // Menyimpan memori daftar fakultas untuk popup
 
-            function tabelPendaftaran()
-            {
+            function tabelPendaftaran() {
                 let otable = $('#example2').DataTable({
                     destroy: true,
                     processing: true,
@@ -402,18 +402,43 @@
                         url: '{!! route('Daftar.TabelDaftar') !!}',
                         type: 'GET',
                     },
-                    columns: [
-                        { data: 'DT_RowIndex', orderable: false, searchable: false },
-                        { data: 'nama' },
-                        { data: 'noreg' },
-                        { data: 'batch' },
-                        { data: 'jalur' },
-                        { data: 'prodi1' },
-                        { data: 'prodi2' },
-                        { data: 'prodi3' },
-                        { data: 'rekomendator' },
-                        { data: 'status' },
-                        { data: 'action', orderable: false, searchable: false },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'nama'
+                        },
+                        {
+                            data: 'noreg'
+                        },
+                        {
+                            data: 'batch'
+                        },
+                        {
+                            data: 'jalur'
+                        },
+                        {
+                            data: 'prodi1'
+                        },
+                        {
+                            data: 'prodi2'
+                        },
+                        {
+                            data: 'prodi3'
+                        },
+                        {
+                            data: 'rekomendator'
+                        },
+                        {
+                            data: 'status'
+                        },
+                        {
+                            data: 'action',
+                            orderable: false,
+                            searchable: false
+                        },
                     ],
                     language: {
                         processing: '<i class="fa fa-spinner fa-lg fa-spin"></i>'
@@ -427,8 +452,12 @@
                 });
 
                 otable.on('draw', function(event) {
-                    $('[data-toggle="tooltip"]').tooltip({trigger: "hover"});
-                    $('[data-tooltip="tooltip"]').tooltip({trigger: "hover"});
+                    $('[data-toggle="tooltip"]').tooltip({
+                        trigger: "hover"
+                    });
+                    $('[data-tooltip="tooltip"]').tooltip({
+                        trigger: "hover"
+                    });
                 });
             }
 
@@ -468,14 +497,14 @@
                     theme: 'bootstrap4',
                     placeholder: '-- Ketik Nama Rekomendator --',
                     allowClear: true,
-                    minimumInputLength: 2, 
+                    minimumInputLength: 2,
                     ajax: {
                         url: '{!! route('Daftar.CariRekomendator') !!}',
                         dataType: 'json',
-                        delay: 250, 
+                        delay: 250,
                         data: function(params) {
                             return {
-                                q: params.term 
+                                q: params.term
                             };
                         },
                         processResults: function(data) {
@@ -483,8 +512,9 @@
                                 results: $.map(data, function(item) {
                                     return {
                                         // PERUBAHAN: Hanya menampilkan nama, tapi ID tetap menyimpan kodenya
-                                        text: item.nama_rekomendator + ' - ' + item.kode_rekomendator,
-                                        id: item.kode_rekomendator 
+                                        text: item.nama_rekomendator + ' - ' + item
+                                            .kode_rekomendator,
+                                        id: item.kode_rekomendator
                                     }
                                 })
                             };
@@ -627,23 +657,16 @@
             }
 
             function loadBeasiswa(idJalur = null, selectedBea = null) {
-
-
                 // Prioritaskan parameter kiriman, baru ambil dari DOM
                 let params = idJalur ? idJalur : $('#jalur').val();
 
-                // --- PERBAIKAN LOGIC DISINI ---
                 // Kita ambil status REAL dari atribut data-beasiswa di dropdown yang sudah terpilih.
-                // Karena loadJalur sudah selesai, value ini PASTI benar (0 untuk Reguler, 1 untuk Beasiswa).
                 let isBeasiswa = $('#jalur').find(':selected').data('beasiswa');
 
                 // Fallback: Jika undefined (misal DOM belum ready), anggap 0 (Reguler) biar aman dan tidak error
                 if (typeof isBeasiswa === 'undefined') isBeasiswa = 0;
 
-
-
                 if (!params) {
-                    console.warn("Params kosong, dropdown dikosongkan.");
                     $('#beasiswa').empty().append(
                         '<option value="" selected disabled>-- Pilih Jalur Beasiswa --</option>');
                     $('#beasiswa').prop('disabled', true);
@@ -654,8 +677,8 @@
                     type: "GET",
                     url: '{!! url('Pendaftaran/ShowBeasiswa') !!}' + '/' + params,
                     dataType: "JSON",
-                    beforeSend: function(response) {
-                        // Hanya nyalakan loading jika BUKAN mode edit (konsisten dengan function lain)
+                    beforeSend: function() {
+                        // Hanya nyalakan loading jika BUKAN mode edit
                         if (!window.isEditing) {
                             $('#loading').show();
                         }
@@ -665,8 +688,6 @@
                         $('#keterangan').val('');
                     },
                     success: function(data) {
-
-
                         // Matikan loading hanya jika bukan mode edit
                         if (!window.isEditing) {
                             $('#loading').hide();
@@ -678,25 +699,17 @@
 
                         // Cek apakah array 'bea' ada dan isinya lebih dari 0
                         if (data.bea && data.bea.length > 0) {
-
-
                             for (let i = 0; i < data.bea.length; i++) {
-                                // Pakai loose equality (==) biar aman antara string/int
                                 let selected = (selectedBea == data.bea[i].id) ? 'selected' : '';
                                 dis1 += '<option value="' + data.bea[i].id + '" ' + selected + '>' +
                                     data.bea[i].jenis_beasiswa + '</option>';
                             }
                             $('#beasiswa').prop('disabled', false);
                         } else {
-                            console.warn("4. Data beasiswa kosong dari server.");
-
-                            // --- PERBAIKAN LOGIC ALERT ---
                             // Hanya munculkan alert jika 'isBeasiswa' bernilai 1 (True/Beasiswa)
-                            // Jadi kalau Reguler (0), dia akan diam saja meski datanya kosong.
                             if (isBeasiswa == 1) {
                                 notifalert('Information', 'Kategori Beasiswa Belum Ada !', 'warning');
                             }
-
                             $('#beasiswa').prop('disabled', true);
                         }
 
@@ -706,17 +719,21 @@
 
                         // Trigger change untuk memuat detail (Tingkat/Keterangan)
                         if (selectedBea) {
-
                             setTimeout(() => {
                                 $('#beasiswa').val(selectedBea).trigger('change');
                             }, 100);
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error("ERROR Ajax:", error);
+                        // Matikan loading saat terjadi error
                         if (!window.isEditing) {
                             $('#loading').hide();
                         }
+
+                        // Notifikasi ke user saat gagal memuat data dari server/jaringan terputus
+                        notifalert('Error',
+                            'Gagal memuat data. Silakan periksa koneksi internet atau coba lagi nanti.',
+                            'error');
                     }
                 });
             }
@@ -791,7 +808,8 @@
 
             window.fakultasHtmlTable = ''; // Menyimpan memori daftar fakultas untuk popup
 
-            function loadProdi(selectedProdi1 = null, selectedProdi2 = null, selectedProdi3 = null, forceBatch = null, forceJalur = null, forceJurusan = null, callback = null) {
+            function loadProdi(selectedProdi1 = null, selectedProdi2 = null, selectedProdi3 = null, forceBatch =
+                null, forceJalur = null, forceJurusan = null, callback = null) {
                 let batch = forceBatch ? forceBatch : $('#batch').val();
                 let jalur = forceJalur ? forceJalur : $('#jalur').val();
                 let jurusansekolah = forceJurusan ? forceJurusan : $('#jurusansekolah').val();
@@ -803,14 +821,14 @@
 
                 $.ajax({
                     type: "GET",
-                    url: '{!! url("Pendaftaran/ShowProdi") !!}' + '/' + batch + '/' + jalur + '/' + jurusansekolah,
+                    url: '{!! url('Pendaftaran/ShowProdi') !!}' + '/' + batch + '/' + jalur + '/' + jurusansekolah,
                     dataType: "JSON",
                     beforeSend: function() {
                         if (!window.isEditing) $('#loading').show();
                         $('#prodi1, #prodi2, #prodi3').prop('disabled', true);
                     },
                     success: function(data) {
-                        if (!window.isEditing) $('#loading').hide(); 
+                        if (!window.isEditing) $('#loading').hide();
 
                         if (data.hasil == 0) {
                             if (typeof window.isEditing !== 'undefined' && !window.isEditing) {
@@ -819,13 +837,19 @@
                         } else {
                             $('#prodi1, #prodi2, #prodi3').prop('disabled', false);
 
-                            let dis1 = '<option value="" selected disabled>-- Pilih Program Studi 1 --</option>';
-                            let dis2 = '<option value="" selected disabled>-- Pilih Program Studi 2 --</option>';
-                            let dis3 = '<option value="" selected disabled>-- Pilih Program Studi 3 --</option>';
+                            let dis1 =
+                                '<option value="" selected disabled>-- Pilih Program Studi 1 --</option>';
+                            let dis2 =
+                                '<option value="" selected disabled>-- Pilih Program Studi 2 --</option>';
+                            let dis3 =
+                                '<option value="" selected disabled>-- Pilih Program Studi 3 --</option>';
 
-                            let target1 = selectedProdi1 ? $.trim(selectedProdi1.KodeJurusan || selectedProdi1) : null;
-                            let target2 = selectedProdi2 ? $.trim(selectedProdi2.KodeJurusan || selectedProdi2) : null;
-                            let target3 = selectedProdi3 ? $.trim(selectedProdi3.KodeJurusan || selectedProdi3) : null;
+                            let target1 = selectedProdi1 ? $.trim(selectedProdi1.KodeJurusan ||
+                                selectedProdi1) : null;
+                            let target2 = selectedProdi2 ? $.trim(selectedProdi2.KodeJurusan ||
+                                selectedProdi2) : null;
+                            let target3 = selectedProdi3 ? $.trim(selectedProdi3.KodeJurusan ||
+                                selectedProdi3) : null;
 
                             // 1. Buat kamus fakultas agar mudah dicocokkan
                             let kamusFakultas = {};
@@ -836,11 +860,12 @@
                             }
 
                             // 2. Kelompokkan prodi
-                            let groupedOptions = {}; 
+                            let groupedOptions = {};
                             $.each(data.jurusan, function(index, item) {
                                 let fCode = item.idfakultas;
-                                let namaFakultas = kamusFakultas[fCode] ? kamusFakultas[fCode] : 'Fakultas Lainnya';
-                                
+                                let namaFakultas = kamusFakultas[fCode] ? kamusFakultas[fCode] :
+                                    'Fakultas Lainnya';
+
                                 if (!groupedOptions[namaFakultas]) {
                                     groupedOptions[namaFakultas] = [];
                                 }
@@ -856,16 +881,20 @@
                                 $.each(groupedOptions[fakName], function(idx, item) {
                                     let kode = $.trim(item.KodeJurusan);
                                     let jenjangTxt = item.jenjang ? item.jenjang.jenjang : '';
-                                    let teks = jenjangTxt + (jenjangTxt ? ' - ' : '') + item.jurusan; // Menghasilkan: S1 - Informatika
-                                    let fakultasId = item.idfakultas ? item.idfakultas : ''; 
+                                    let teks = jenjangTxt + (jenjangTxt ? ' - ' : '') + item
+                                        .jurusan; // Menghasilkan: S1 - Informatika
+                                    let fakultasId = item.idfakultas ? item.idfakultas : '';
 
                                     let sel1 = (target1 && kode == target1) ? 'selected' : '';
                                     let sel2 = (target2 && kode == target2) ? 'selected' : '';
                                     let sel3 = (target3 && kode == target3) ? 'selected' : '';
 
-                                    dis1 += '<option value="'+kode+'" data-fakultas="'+fakultasId+'" '+sel1+'>'+teks+'</option>';
-                                    dis2 += '<option value="'+kode+'" data-fakultas="'+fakultasId+'" '+sel2+'>'+teks+'</option>';
-                                    dis3 += '<option value="'+kode+'" data-fakultas="'+fakultasId+'" '+sel3+'>'+teks+'</option>';
+                                    dis1 += '<option value="' + kode + '" data-fakultas="' +
+                                        fakultasId + '" ' + sel1 + '>' + teks + '</option>';
+                                    dis2 += '<option value="' + kode + '" data-fakultas="' +
+                                        fakultasId + '" ' + sel2 + '>' + teks + '</option>';
+                                    dis3 += '<option value="' + kode + '" data-fakultas="' +
+                                        fakultasId + '" ' + sel3 + '>' + teks + '</option>';
                                 });
 
                                 dis1 += '</optgroup>';
@@ -876,25 +905,39 @@
                             $('#prodi1').html(dis1).trigger('change');
                             $('#prodi2').html(dis2).trigger('change');
                             $('#prodi3').html(dis3).trigger('change');
-                            $('#prodi1, #prodi2, #prodi3').select2({ theme: 'bootstrap4', width: '100%' });
+                            $('#prodi1, #prodi2, #prodi3').select2({
+                                theme: 'bootstrap4',
+                                width: '100%'
+                            });
 
                             let groupedData = {};
-                            if(data.fakultas) {
+                            if (data.fakultas) {
                                 data.fakultas.forEach(f => {
-                                    groupedData[f.KodeFakultas] = { name: f.namafakultas, prodis: [] };
+                                    groupedData[f.KodeFakultas] = {
+                                        name: f.namafakultas,
+                                        prodis: []
+                                    };
                                 });
                             }
                             data.jurusan.forEach(item => {
                                 let fCode = item.idfakultas;
-                                if (!groupedData[fCode]) groupedData[fCode] = { name: "Fakultas " + fCode, prodis: [] };
+                                if (!groupedData[fCode]) groupedData[fCode] = {
+                                    name: "Fakultas " + fCode,
+                                    prodis: []
+                                };
                                 let jenjangTxt = item.jenjang ? item.jenjang.jenjang : '';
-                                groupedData[fCode].prodis.push(jenjangTxt + ' - ' + item.jurusan);
+                                groupedData[fCode].prodis.push(jenjangTxt + ' - ' + item
+                                    .jurusan);
                             });
 
-                            window.fakultasHtmlTable = '<div style="max-height: 250px; overflow-y: auto; text-align: left; font-size: 14px; background: #f8f9fa; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">';
+                            window.fakultasHtmlTable =
+                                '<div style="max-height: 250px; overflow-y: auto; text-align: left; font-size: 14px; background: #f8f9fa; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">';
                             for (let key in groupedData) {
-                                if(groupedData[key].prodis.length > 0) {
-                                    window.fakultasHtmlTable += '<strong style="color: #007bff; display:block; margin-top:10px;">' + groupedData[key].name + '</strong><ul style="margin-bottom: 5px; padding-left: 20px;">';
+                                if (groupedData[key].prodis.length > 0) {
+                                    window.fakultasHtmlTable +=
+                                        '<strong style="color: #007bff; display:block; margin-top:10px;">' +
+                                        groupedData[key].name +
+                                        '</strong><ul style="margin-bottom: 5px; padding-left: 20px;">';
                                     groupedData[key].prodis.forEach(p => {
                                         window.fakultasHtmlTable += '<li>' + p + '</li>';
                                     });
@@ -907,6 +950,12 @@
                     },
                     error: function(xhr, status, error) {
                         if (!window.isEditing) $('#loading').hide();
+
+                        // --- PERBAIKAN: Alert jika server gagal merespons ---
+                        notifalert('Error',
+                            'Gagal memuat data Program Studi. Silakan periksa koneksi internet atau coba lagi nanti.',
+                            'error');
+
                         if (callback && typeof callback === "function") callback();
                     }
                 });
@@ -921,42 +970,46 @@
             }
 
             function openWaktuKuliah() {
-                $(document).off('change.cekkonflik').on('change.cekkonflik', '#prodi1, #prodi2, #prodi3', function() {
-                    let currentSelect = $(this);
-                    let currentVal = currentSelect.val();
-                    
-                    if (!currentVal) return;
+                $(document).off('change.cekkonflik').on('change.cekkonflik', '#prodi1, #prodi2, #prodi3',
+                    function() {
+                        let currentSelect = $(this);
+                        let currentVal = currentSelect.val();
 
-                    let f1 = $('#prodi1').val() ? $('#prodi1 option:selected').data('fakultas') : null;
-                    let f2 = $('#prodi2').val() ? $('#prodi2 option:selected').data('fakultas') : null;
-                    let f3 = $('#prodi3').val() ? $('#prodi3 option:selected').data('fakultas') : null;
+                        if (!currentVal) return;
 
-                    let isConflict = false;
-                    let msg = '';
+                        let f1 = $('#prodi1').val() ? $('#prodi1 option:selected').data('fakultas') : null;
+                        let f2 = $('#prodi2').val() ? $('#prodi2 option:selected').data('fakultas') : null;
+                        let f3 = $('#prodi3').val() ? $('#prodi3 option:selected').data('fakultas') : null;
 
-                    // HANYA CEK FAKULTAS
-                    if ((f1 && f2 && f1 === f2) || (f1 && f3 && f1 === f3) || (f2 && f3 && f2 === f3)) {
-                        isConflict = true;
-                        msg = 'Program studi tidak boleh berasal dari Fakultas yang sama!';
-                    }
+                        let isConflict = false;
+                        let msg = '';
 
-                    if (isConflict) {
-                        Swal.fire({
-                            title: 'Pilihan Tidak Valid!',
-                            html: '<p style="color:red; font-weight:bold;">' + msg + '</p><b>Daftar Fakultas & Program Studi:</b><hr>' + window.fakultasHtmlTable,
-                            icon: 'warning',
-                            width: '600px'
-                        });
-                        currentSelect.val('').trigger('change.select2'); // Reset pilihan yang menyebabkan konflik
-                    }
-                });
+                        // HANYA CEK FAKULTAS
+                        if ((f1 && f2 && f1 === f2) || (f1 && f3 && f1 === f3) || (f2 && f3 && f2 === f3)) {
+                            isConflict = true;
+                            msg = 'Program studi tidak boleh berasal dari Fakultas yang sama!';
+                        }
+
+                        if (isConflict) {
+                            Swal.fire({
+                                title: 'Pilihan Tidak Valid!',
+                                html: '<p style="color:red; font-weight:bold;">' + msg +
+                                    '</p><b>Daftar Fakultas & Program Studi:</b><hr>' + window
+                                    .fakultasHtmlTable,
+                                icon: 'warning',
+                                width: '600px'
+                            });
+                            currentSelect.val('').trigger(
+                                'change.select2'); // Reset pilihan yang menyebabkan konflik
+                        }
+                    });
 
                 $(document).on('change', '#prodi3', function() {
                     let prodi3 = $(this).val();
-                    if(prodi3 != null && prodi3 !== ''){
-                        $('#waktukuliah, #rekomendator').prop('disabled',false);
+                    if (prodi3 != null && prodi3 !== '') {
+                        $('#waktukuliah, #rekomendator').prop('disabled', false);
                     } else {
-                        $('#waktukuliah, #rekomendator').prop('disabled',true);
+                        $('#waktukuliah, #rekomendator').prop('disabled', true);
                     }
                 });
             }
@@ -996,117 +1049,145 @@
                 });
             }
 
-            function validasiDaftar()
-            {
-                let tahun          = $('#tahunlulus').val();
+            function validasiDaftar() {
+                let tahun = $('#tahunlulus').val();
                 let jurusansekolah = $('#jurusansekolah').val();
-                let prodi1         = $('#prodi1').val();
-                let prodi2         = $('#prodi2').val();
-                let prodi3         = $('#prodi3').val();
-                let waktukuliah    = $('#waktukuliah').val();
+                let prodi1 = $('#prodi1').val();
+                let prodi2 = $('#prodi2').val();
+                let prodi3 = $('#prodi3').val();
+                let waktukuliah = $('#waktukuliah').val();
 
                 let notif = '';
 
-                if(tahun==null){
+                if (tahun == null) {
                     notif = 'Tahun Lulus Tidak Boleh Kosong';
-                }else if(jurusansekolah==null){
+                } else if (jurusansekolah == null) {
                     notif = 'Jurusan Sekolah Tidak Boleh Kosong';
-                }else if(prodi1==null){
+                } else if (prodi1 == null) {
                     notif = 'Program Studi Pilihan 1 Tidak Boleh Kosong';
-                }else if(prodi2==null){
+                } else if (prodi2 == null) {
                     notif = 'Program Studi Pilihan 2 Tidak Boleh Kosong';
-                }else if(prodi3==null){
+                } else if (prodi3 == null) {
                     notif = 'Program Studi Pilihan 3 Tidak Boleh Kosong';
-                }else if(waktukuliah==null){
+                } else if (waktukuliah == null) {
                     notif = 'Waktu Kuliah Tidak Boleh Kosong';
-                }else{
+                } else {
                     notif = 'success';
                 }
                 return notif;
             }
 
-            function submitDaftar()
-            {
-                $('#submit-daftar').click(function (e) {
+            function submitDaftar() {
+                $('#submit-daftar').click(function(e) {
                     e.preventDefault();
-                    let validasiku = validasiDaftar()
-                    if(validasiku != 'success'){
-                        notifalert('Information',validasiku,'warning')
-                    }else{
-                        let dataku = $('#form-fakultas').serialize()
+
+                    let validasiku = validasiDaftar();
+
+                    if (validasiku != 'success') {
+                        notifalert('Information', validasiku, 'warning');
+                    } else {
+                        let dataku = $('#form-fakultas').serialize();
+
                         Swal.fire({
-                            title: "Information",
-                            text: "Apakah Data Pendaftaran Anda Sudah Benar ?",
+                            title: "Konfirmasi",
+                            text: "Apakah Data Pendaftaran Anda Sudah Benar?",
                             icon: "question",
                             showConfirmButton: true,
                             showCancelButton: true,
+                            confirmButtonText: 'Ya, Simpan',
+                            cancelButtonText: 'Batal'
                         }).then((result) => {
-                            if(result.value){
+                            if (result
+                                .isConfirmed) { // Menggunakan isConfirmed lebih standar di SweetAlert2
                                 $.ajax({
                                     type: "POST",
-                                    url: "{{route('Daftar.StoreDaftar')}}",
+                                    url: "{{ route('Daftar.StoreDaftar') }}",
                                     data: dataku,
                                     dataType: "JSON",
-                                    beforeSend: function(response) {
-                                        $('#submit-daftar').html('<i class="fas fa-hourglass"></i> Please Wait')
-                                        $('#submit-daftar').prop('disabled', true)
-                                        $('#loading').show()
+                                    beforeSend: function() {
+                                        $('#submit-daftar').html(
+                                            '<i class="fas fa-hourglass"></i> Please Wait'
+                                            );
+                                        $('#submit-daftar').prop('disabled', true);
+                                        $('#loading').show();
                                     },
                                     success: function(data) {
-                                        $('#loading').hide()
+                                        $('#loading').hide();
                                         Swal.fire({
-                                            title: data.title,
-                                            text: data.message,
-                                            icon: data.status
+                                            title: data.title || "Berhasil",
+                                            text: data.message ||
+                                                "Data berhasil disimpan.",
+                                            icon: data.status || "success"
                                         }).then((result) => {
-                                            $('#submit-daftar').html('<i class="fas fa-paper-plane"></i> Submit')
-                                            $('#submit-daftar').prop('disabled',false)
+                                            $('#submit-daftar').html(
+                                                '<i class="fas fa-paper-plane"></i> Submit'
+                                                );
+                                            $('#submit-daftar').prop('disabled',
+                                                false);
                                             $('#btn-reset').trigger('click');
-                                            $('#example2').DataTable().ajax.reload();
+
+                                            // Pastikan tabel datatable ada sebelum di-reload
+                                            if ($.fn.DataTable.isDataTable(
+                                                    '#example2')) {
+                                                $('#example2').DataTable().ajax
+                                                    .reload();
+                                            }
                                         });
-                                        return;
                                     },
                                     error: function(xhr, status, error) {
                                         $('#loading').hide();
-                                        console.error("AJAX ERROR SAAT SUBMIT:", xhr.responseText);
+
+                                        // Ambil pesan error dari server jika ada, jika tidak gunakan default
+                                        let errorMessage =
+                                            "Terjadi kesalahan saat menyimpan data. Silakan coba lagi nanti atau hubungi admin.";
+                                        if (xhr.responseJSON && xhr.responseJSON
+                                            .message) {
+                                            errorMessage = xhr.responseJSON.message;
+                                        } else if (xhr.status === 422) {
+                                            errorMessage =
+                                                "Mohon periksa kembali isian form Anda.";
+                                        }
+
                                         Swal.fire({
-                                            title: 'Unsuccessfully Saved Data',
-                                            text: 'Silahkan buka Inspect Element -> Console (F12) dan infokan pesan error merahnya.',
+                                            title: 'Gagal Menyimpan Data',
+                                            text: errorMessage,
                                             icon: 'error'
                                         }).then((result) => {
-                                            $('#submit-daftar').html('<i class="fas fa-paper-plane"></i> Submit')
-                                            $('#submit-daftar').prop('disabled',false)
+                                            $('#submit-daftar').html(
+                                                '<i class="fas fa-paper-plane"></i> Submit'
+                                                );
+                                            $('#submit-daftar').prop('disabled',
+                                                false);
                                         });
-                                        return;
                                     }
                                 });
-                            }else{
-                                return false;
                             }
                         });
                     }
                 });
             }
 
-            function resetForm()
-            {
-                $('#btn-reset').click(function (e) {
+            function resetForm() {
+                $('#btn-reset').click(function(e) {
                     $('#IdPendaftaran').val(null)
                     $('#batch').val('').trigger('change')
-                    $('#beasiswa').empty().append('<option value="" selected disabled>-- Pilih Jalur Beasiswa --</option>');
-                    $('#beasiswa').prop('disabled',true)
+                    $('#beasiswa').empty().append(
+                        '<option value="" selected disabled>-- Pilih Jalur Beasiswa --</option>');
+                    $('#beasiswa').prop('disabled', true)
                     $('#tingkat').val('')
                     $('#keterangan').val('')
                     $('#tahunlulus').val('').trigger('change')
                     $('#jurusansekolah').val('').trigger('change')
-                    $('#jurusansekolah').prop('disabled',true)
-                    
+                    $('#jurusansekolah').prop('disabled', true)
+
                     if ($('#prodi1').hasClass("select2-hidden-accessible")) {
-                        $('#prodi1, #prodi2, #prodi3').empty().append('<option value="" selected disabled>-- Pilih Program Studi --</option>').prop('disabled', true);
+                        $('#prodi1, #prodi2, #prodi3').empty().append(
+                                '<option value="" selected disabled>-- Pilih Program Studi --</option>')
+                            .prop('disabled', true);
                     }
 
-                    $('#waktukuliah').prop('disabled',true)
-                    $('#rekomendator').prop('disabled',true)
+                    $('#waktukuliah').prop('disabled', true)
+                    $('#rekomendator').prop('disabled', true)
                     $('#waktukuliah').val('').trigger('change')
                     $('#btn-prev').trigger('click')
                 });
@@ -1115,9 +1196,9 @@
             function editDaftar() {
                 $('.btn_edit').off('click').click(function(e) {
                     e.preventDefault();
-                    window.isEditing = true; 
+                    window.isEditing = true;
                     $('#loading').show();
-                    
+
                     let param = $(this).data('id');
 
                     $.ajax({
@@ -1130,59 +1211,85 @@
                         success: function(data) {
                             if (data.hasil == 0) {
                                 $('#loading').hide();
-                                notifalert('Information', 'Data Pendaftaran Tidak Ditemukan', 'error');
+                                notifalert('Information', 'Data Pendaftaran Tidak Ditemukan',
+                                    'error');
                                 window.isEditing = false;
                             } else {
                                 $('#IdPendaftaran').val(data.IdDaftar);
-                                $('#batch').val(data.daftar.batch_daftar).trigger('change'); 
+                                $('#batch').val(data.daftar.batch_daftar).trigger('change');
 
-                                loadJalur(data.daftar.batch_daftar, data.daftar.jalur_daftar, function() {
-                                    let beaId = null;
-                                    if (data.daftar.beasiswa && typeof data.daftar.beasiswa !== 'object') {
-                                        beaId = data.daftar.beasiswa;
-                                    } else if (data.daftar.beasiswa && data.daftar.beasiswa.id) {
-                                        beaId = data.daftar.beasiswa.id;
-                                    } else if (data.daftar.jenisbeasiswa && data.daftar.jenisbeasiswa.id) {
-                                        beaId = data.daftar.jenisbeasiswa.id;
-                                    }
-                                    
-                                    loadBeasiswa(data.daftar.jalur_daftar, beaId);
-                                    $('#tahunlulus').val(data.daftar.tahun_lulus).trigger('change');
-                                    
-                                    setTimeout(() => {
-                                        $('#jurusansekolah').val(data.daftar.jurusan_sekolah).trigger('change');
-                                        $('#waktukuliah').val(data.daftar.waktu_kuliah).trigger('change');
-                                        $('#waktukuliah').prop('disabled', false); 
-                                        if (data.daftar.rekomendator) {
-                                            // Format text diambil dari data.rekomendator yang dikirim Controller
-                                            let optionRek = new Option(data.rekomendator, data.daftar.rekomendator, true, true);
-                                            $('#rekomendator').append(optionRek).trigger('change');
-                                        } else {
-                                            $('#rekomendator').val(null).trigger('change');
+                                loadJalur(data.daftar.batch_daftar, data.daftar.jalur_daftar,
+                                    function() {
+                                        let beaId = null;
+                                        if (data.daftar.beasiswa && typeof data.daftar
+                                            .beasiswa !== 'object') {
+                                            beaId = data.daftar.beasiswa;
+                                        } else if (data.daftar.beasiswa && data.daftar
+                                            .beasiswa.id) {
+                                            beaId = data.daftar.beasiswa.id;
+                                        } else if (data.daftar.jenisbeasiswa && data.daftar
+                                            .jenisbeasiswa.id) {
+                                            beaId = data.daftar.jenisbeasiswa.id;
                                         }
 
-                                        var onProdiFinished = function() {
-                                            setTimeout(() => {
-                                                window.isEditing = false;
-                                                $('#waktukuliah').prop('disabled', false); 
-                                                $('#loading').fadeOut();
-                                            }, 500); 
-                                        };
+                                        loadBeasiswa(data.daftar.jalur_daftar, beaId);
+                                        $('#tahunlulus').val(data.daftar.tahun_lulus)
+                                            .trigger('change');
 
-                                        if(typeof loadProdi === 'function') {
-                                            loadProdi(data.daftar.prodi1, data.daftar.prodi2, data.daftar.prodi3, null, null, null, onProdiFinished);
-                                        } else {
-                                            onProdiFinished();
-                                        }
+                                        setTimeout(() => {
+                                            $('#jurusansekolah').val(data.daftar
+                                                .jurusan_sekolah).trigger(
+                                                'change');
+                                            $('#waktukuliah').val(data.daftar
+                                                .waktu_kuliah).trigger('change');
+                                            $('#waktukuliah').prop('disabled',
+                                                false);
+                                            if (data.daftar.rekomendator) {
+                                                // Format text diambil dari data.rekomendator yang dikirim Controller
+                                                let optionRek = new Option(data
+                                                    .rekomendator, data.daftar
+                                                    .rekomendator, true, true);
+                                                $('#rekomendator').append(optionRek)
+                                                    .trigger('change');
+                                            } else {
+                                                $('#rekomendator').val(null)
+                                                    .trigger('change');
+                                            }
 
-                                    }, 300); 
-                                });
+                                            var onProdiFinished = function() {
+                                                setTimeout(() => {
+                                                    window.isEditing =
+                                                        false;
+                                                    $('#waktukuliah')
+                                                        .prop(
+                                                            'disabled',
+                                                            false);
+                                                    $('#loading')
+                                                        .fadeOut();
+                                                }, 500);
+                                            };
+
+                                            if (typeof loadProdi === 'function') {
+                                                loadProdi(data.daftar.prodi1, data
+                                                    .daftar.prodi2, data.daftar
+                                                    .prodi3, null, null, null,
+                                                    onProdiFinished);
+                                            } else {
+                                                onProdiFinished();
+                                            }
+
+                                        }, 300);
+                                    });
                             }
                         },
                         error: function(data) {
                             $('#loading').hide();
                             window.isEditing = false;
-                            Swal.fire({ title: 'Error', text: 'Gagal', icon: 'error' });
+                            Swal.fire({
+                                title: 'Gagal Memuat Data',
+                                text: 'Terjadi kendala saat mengambil data dari server. Silakan periksa koneksi internet Anda atau coba beberapa saat lagi.',
+                                icon: 'error'
+                            });
                         }
                     });
                     return false;
@@ -1240,14 +1347,13 @@
                 });
             }
 
-            function ShowDetail()
-            {
-                $('.btn_detail').click(function (e) {
+            function ShowDetail() {
+                $('.btn_detail').click(function(e) {
                     e.preventDefault();
                     let param = $(this).data('id')
                     $.ajax({
                         type: "GET",
-                        url: '{!! url('Pendaftaran/ShowDaftar') !!}'+'/'+param,
+                        url: '{!! url('Pendaftaran/ShowDaftar') !!}' + '/' + param,
                         dataType: "JSON",
                         beforeSend: function(response) {
                             $('#loading').show()
@@ -1255,94 +1361,127 @@
                         },
                         success: function(data) {
                             $('#loading').hide()
-                            if(data.hasil==0){
-                                notifalert('Information', 'Data Pendaftaran Tidak Ditemukan','error')
-                            }else{
+                            if (data.hasil == 0) {
+                                notifalert('Information', 'Data Pendaftaran Tidak Ditemukan',
+                                    'error')
+                            } else {
                                 $('#o-noregist').html(data.daftar.KodePendaftaran)
                                 $('#o-nama').html(data.daftar.biodata.nama)
-                                $('#o-batch').html(data.daftar.batch.nama_batch+' '+data.daftar.batch.tahun_akademik)
+                                $('#o-batch').html(data.daftar.batch.nama_batch + ' ' + data
+                                    .daftar.batch.tahun_akademik)
                                 $('#o-tahunlulus').html(data.daftar.tahun_lulus)
-                                $('#o-jalur').html(data.daftar.jalur.KodeJenis+'-'+data.daftar.jalur.jenis_pendaftaran)
-                                $('#o-jurusansekolah').html(data.daftar.jurusansekolah.sekolah+'/'+data.daftar.jurusansekolah.jurusan_sekolah)
-                                
-                                $('#o-prodi1').html(data.daftar.prodi1.jenjang.jenjang+'-'+data.daftar.prodi1.jurusan)
-                                $('#o-prodi2').html(data.daftar.prodi2 ? data.daftar.prodi2.jenjang.jenjang+'-'+data.daftar.prodi2.jurusan : '-')
-                                let txtProdi3 = data.daftar.prodi3 ? data.daftar.prodi3.jenjang.jenjang+'-'+data.daftar.prodi3.jurusan : '-';
+                                $('#o-jalur').html(data.daftar.jalur.KodeJenis + '-' + data
+                                    .daftar.jalur.jenis_pendaftaran)
+                                $('#o-jurusansekolah').html(data.daftar.jurusansekolah.sekolah +
+                                    '/' + data.daftar.jurusansekolah.jurusan_sekolah)
+
+                                $('#o-prodi1').html(data.daftar.prodi1.jenjang.jenjang + '-' +
+                                    data.daftar.prodi1.jurusan)
+                                $('#o-prodi2').html(data.daftar.prodi2 ? data.daftar.prodi2
+                                    .jenjang.jenjang + '-' + data.daftar.prodi2.jurusan :
+                                    '-')
+                                let txtProdi3 = data.daftar.prodi3 ? data.daftar.prodi3.jenjang
+                                    .jenjang + '-' + data.daftar.prodi3.jurusan : '-';
                                 $('#o-prodi3').html(txtProdi3);
 
-                                let ukt1 = new Intl.NumberFormat('id-ID').format(data.ukt1.biaya_ukt);
-                                $('#o-uktprodi1').html('Rp '+ukt1)
-                                let ukt2 = data.ukt2 ? new Intl.NumberFormat('id-ID').format(data.ukt2.biaya_ukt) : '0';
-                                $('#o-uktprodi2').html('Rp '+ukt2)
-                                let ukt3 = data.ukt3 ? new Intl.NumberFormat('id-ID').format(data.ukt3.biaya_ukt) : '0';
-                                $('#o-uktprodi3').html('Rp '+ukt3)
+                                let ukt1 = new Intl.NumberFormat('id-ID').format(data.ukt1
+                                    .biaya_ukt);
+                                $('#o-uktprodi1').html('Rp ' + ukt1)
+                                let ukt2 = data.ukt2 ? new Intl.NumberFormat('id-ID').format(
+                                    data.ukt2.biaya_ukt) : '0';
+                                $('#o-uktprodi2').html('Rp ' + ukt2)
+                                let ukt3 = data.ukt3 ? new Intl.NumberFormat('id-ID').format(
+                                    data.ukt3.biaya_ukt) : '0';
+                                $('#o-uktprodi3').html('Rp ' + ukt3)
 
-                                let konfirmdaftar = data.daftar.konfirm_pendaftaran=='0' ? 'Belum Konfirmasi' : 'Sudah Konfirmasi';
+                                let konfirmdaftar = data.daftar.konfirm_pendaftaran == '0' ?
+                                    'Belum Konfirmasi' : 'Sudah Konfirmasi';
                                 $('#o-konfirmdaftar').html(konfirmdaftar)
-                                let biayadaftar = data.daftar.jalur.biaya_pendaftaran=='1' ? 'Rp '+new Intl.NumberFormat('id-ID').format(data.daftar.jalur.jml_biaya_pendaftaran) : 'Gratis';
+                                let biayadaftar = data.daftar.jalur.biaya_pendaftaran == '1' ?
+                                    'Rp ' + new Intl.NumberFormat('id-ID').format(data.daftar
+                                        .jalur.jml_biaya_pendaftaran) : 'Gratis';
                                 $('#o-biayadaftar').html(biayadaftar)
                                 $('#o-tgldaftar').html(data.daftar.tgl_daftar)
                                 $('#o-waktukuliah').html(data.daftar.waktukuliah.waktu)
                                 $('#o-rekomendator').html(data.rekomendator)
-                                let statusUkt = data.daftar.jalur.status_ukt=='0' ? 'Gratis' : 'Bayar';
+                                let statusUkt = data.daftar.jalur.status_ukt == '0' ? 'Gratis' :
+                                    'Bayar';
                                 $('#o-statusukt').html(statusUkt)
-                                let beasiswa = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.jenis_beasiswa
+                                let beasiswa = data.daftar.jenisbeasiswa == null ? '-' : data
+                                    .daftar.jenisbeasiswa.jenis_beasiswa
                                 $('#o-beasiswa').html(beasiswa)
-                                let tingkat = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.idtingkat;
-                                $('#o-juarabea').html(tingkat==null||tingkat=='-'?'-':data.daftar.jenisbeasiswa.tingkat.tingkat_kejuaraan)
-                                let ketbea = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.juara_ke
+                                let tingkat = data.daftar.jenisbeasiswa == null ? '-' : data
+                                    .daftar.jenisbeasiswa.idtingkat;
+                                $('#o-juarabea').html(tingkat == null || tingkat == '-' ? '-' :
+                                    data.daftar.jenisbeasiswa.tingkat.tingkat_kejuaraan)
+                                let ketbea = data.daftar.jenisbeasiswa == null ? '-' : data
+                                    .daftar.jenisbeasiswa.juara_ke
                                 $('#o-keteranganbea').html(ketbea)
-                                let durasid3 = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.durasi_d3+' Semester'
+                                let durasid3 = data.daftar.jenisbeasiswa == null ? '-' : data
+                                    .daftar.jenisbeasiswa.durasi_d3 + ' Semester'
                                 $('#o-durasid3').html(durasid3)
-                                let durasis1 = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.durasi_s1+' Semester'
+                                let durasis1 = data.daftar.jenisbeasiswa == null ? '-' : data
+                                    .daftar.jenisbeasiswa.durasi_s1 + ' Semester'
                                 $('#o-durasis1').html(durasis1)
 
                                 let berkas = ''
-                                berkas += '<tr style="background-color: rgb(0, 238, 255);">'+
-                                            '<th colspan="4" class="text-center">'+data.daftar.jalur.berkasumum.jenis_berkas+'</th>'+
-                                          '</tr>'
-                                berkas += '<tr style="background-color: rgb(0, 238, 255);">'+
-                                            '<th>No</td>'+
-                                            '<th>Nama berkas</th>'+
-                                            '<th>Keterangan</th>'+
-                                            '<th>Format File</th>'+
-                                          '</tr>'
+                                berkas += '<tr style="background-color: rgb(0, 238, 255);">' +
+                                    '<th colspan="4" class="text-center">' + data.daftar.jalur
+                                    .berkasumum.jenis_berkas + '</th>' +
+                                    '</tr>'
+                                berkas += '<tr style="background-color: rgb(0, 238, 255);">' +
+                                    '<th>No</td>' +
+                                    '<th>Nama berkas</th>' +
+                                    '<th>Keterangan</th>' +
+                                    '<th>Format File</th>' +
+                                    '</tr>'
 
-                                for(i=0;i<data.daftar.jalur.berkasumum.berkas.length;i++){
-                                    let no = i+1;
-                                    berkas += '<tr>'+
-                                                '<td>'+no+'</td>'+
-                                                '<td>'+data.daftar.jalur.berkasumum.berkas[i].nama_berkas+'</td>'+
-                                                '<td>'+data.daftar.jalur.berkasumum.berkas[i].keterangan+'</td>'+
-                                                '<td>'+data.daftar.jalur.berkasumum.berkas[i].formatfile+'</td>'+
-                                              '</tr>'
+                                for (i = 0; i < data.daftar.jalur.berkasumum.berkas
+                                    .length; i++) {
+                                    let no = i + 1;
+                                    berkas += '<tr>' +
+                                        '<td>' + no + '</td>' +
+                                        '<td>' + data.daftar.jalur.berkasumum.berkas[i]
+                                        .nama_berkas + '</td>' +
+                                        '<td>' + data.daftar.jalur.berkasumum.berkas[i]
+                                        .keterangan + '</td>' +
+                                        '<td>' + data.daftar.jalur.berkasumum.berkas[i]
+                                        .formatfile + '</td>' +
+                                        '</tr>'
                                 }
 
-                                let berkaskhusus = data.daftar.jalur.berkas_khusus ? data.daftar.jalur.berkaskhusus.jenis_berkas : 'Khusus';
-                                berkas += '<tr style="background-color: rgb(0, 238, 255);">'+
-                                            '<th colspan="4" class="text-center">'+berkaskhusus+'</th>'+
-                                          '</tr>'
-                                if(data.daftar.jalur.berkas_khusus){
-                                    berkas += '<tr style="background-color: rgb(0, 238, 255);">'+
-                                                '<th>No</td>'+
-                                                '<th>Nama berkas</th>'+
-                                                '<th>Keterangan</th>'+
-                                                '<th>Format File</th>'+
-                                              '</tr>'
-                                    for(i=0;i<data.daftar.jalur.berkaskhusus.berkas.length;i++){
-                                        let noo = i+1;
-                                        berkas += '<tr>'+
-                                                    '<td>'+noo+'</td>'+
-                                                    '<td>'+data.daftar.jalur.berkaskhusus.berkas[i].nama_berkas+'</td>'+
-                                                    '<td>'+data.daftar.jalur.berkaskhusus.berkas[i].keterangan+'</td>'+
-                                                    '<td>'+data.daftar.jalur.berkaskhusus.berkas[i].formatfile+'</td>'+
-                                                '</tr>'
+                                let berkaskhusus = data.daftar.jalur.berkas_khusus ? data.daftar
+                                    .jalur.berkaskhusus.jenis_berkas : 'Khusus';
+                                berkas += '<tr style="background-color: rgb(0, 238, 255);">' +
+                                    '<th colspan="4" class="text-center">' + berkaskhusus +
+                                    '</th>' +
+                                    '</tr>'
+                                if (data.daftar.jalur.berkas_khusus) {
+                                    berkas +=
+                                        '<tr style="background-color: rgb(0, 238, 255);">' +
+                                        '<th>No</td>' +
+                                        '<th>Nama berkas</th>' +
+                                        '<th>Keterangan</th>' +
+                                        '<th>Format File</th>' +
+                                        '</tr>'
+                                    for (i = 0; i < data.daftar.jalur.berkaskhusus.berkas
+                                        .length; i++) {
+                                        let noo = i + 1;
+                                        berkas += '<tr>' +
+                                            '<td>' + noo + '</td>' +
+                                            '<td>' + data.daftar.jalur.berkaskhusus.berkas[i]
+                                            .nama_berkas + '</td>' +
+                                            '<td>' + data.daftar.jalur.berkaskhusus.berkas[i]
+                                            .keterangan + '</td>' +
+                                            '<td>' + data.daftar.jalur.berkaskhusus.berkas[i]
+                                            .formatfile + '</td>' +
+                                            '</tr>'
                                     }
 
-                                }else{
-                                    berkas += '<tr>'+
-                                            '<th colspan="4" class="text-center">Tidak Ada Berkas Khusus</th>'+
-                                          '</tr>'
+                                } else {
+                                    berkas += '<tr>' +
+                                        '<th colspan="4" class="text-center">Tidak Ada Berkas Khusus</th>' +
+                                        '</tr>'
                                 }
 
                                 $('#detail-berkas').append(berkas)

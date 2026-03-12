@@ -210,10 +210,10 @@
                             $('#tabel-detail').hide();
                             $('#form-diterima').hide();
                             $('#btn-lolos').hide();
-                            
+
                             $('#test-navigation').removeClass('d-flex').hide();
                             $('#assessment-container').hide().empty();
-                            
+
                             assessmentAttempts = [];
                             currentTestIndex = 0;
                         },
@@ -227,11 +227,11 @@
                                 $('#o-nama').html(data.daftar.biodata ? data.daftar.biodata.nama : '-');
                                 $('#o-batch').html(data.daftar.batch ? data.daftar.batch.nama_batch + ' ' + data.daftar.batch.tahun_akademik : '-');
                                 $('#o-jalur').html(data.daftar.jalur ? data.daftar.jalur.jenis_pendaftaran : '-');
-                                
+
                                 $('#o-prodi1').html((data.daftar.prodi1 && data.daftar.prodi1.jenjang ? data.daftar.prodi1.jenjang.jenjang + '-' + data.daftar.prodi1.jurusan : (data.daftar.prodi1 ? data.daftar.prodi1.jurusan : '-')));
                                 $('#o-prodi2').html((data.daftar.prodi2 && data.daftar.prodi2.jenjang ? data.daftar.prodi2.jenjang.jenjang + '-' + data.daftar.prodi2.jurusan : (data.daftar.prodi2 ? data.daftar.prodi2.jurusan : '-')));
                                 $('#o-prodi3').html((data.daftar.prodi3 && data.daftar.prodi3.jenjang ? data.daftar.prodi3.jenjang.jenjang + '-' + data.daftar.prodi3.jurusan : (data.daftar.prodi3 ? data.daftar.prodi3.jurusan : '-')));
-                                
+
                                 let diterima = data.daftar.jurusan_diterima && data.daftar.jurusan_acc ? data.daftar.jurusan_acc.jenjang.jenjang + '-' + data.daftar.jurusan_acc.jurusan : '-';
                                 $('#o-jurusanditerima').html(diterima);
 
@@ -275,7 +275,7 @@
             function renderTestContent(index) {
             let attempt = assessmentAttempts[index];
             let totalTests = assessmentAttempts.length;
-            
+
             $('#test-indicator').text(`Assessment ${index + 1} dari ${totalTests}`);
             $('#btn-prev-test').prop('disabled', index === 0);
             $('#btn-next-test').prop('disabled', index === totalTests - 1);
@@ -302,10 +302,10 @@
                     $.each(attempt.answers, function(i, a) {
                         let jwb1 = (a.jawaban_1 || '').toString().toLowerCase().trim();
                         let optLbl = (a.option_label || '').toString().toLowerCase().trim();
-                        
+
                         // Periksa apakah jawaban_1 berisi angka 1 atau kata "ya"
                         if (a.is_benar == 1 || a.is_benar === '1' || jwb1 === '1' || jwb1 === 'ya' || optLbl === '1' || optLbl === 'ya') {
-                            ya++; 
+                            ya++;
                         } else if (jwb1 !== '' && !isNaN(jwb1) && parseInt(jwb1) > 0) {
                             // Tangani juga jika ternyata isinya angka skala likert (2, 3, 4, 5)
                             ya++;
@@ -314,7 +314,7 @@
                         }
                     });
                 }
-                summaryHtml = `<div class="alert alert-info py-2 mb-3"><strong>Ringkasan Minat Bakat:</strong> Mendapat Nilai: <span class="badge bg-success">${ya}</span> | Nilai 0: <span class="badge bg-secondary">${tidak}</span> | Total Soal: ${attempt.answers ? attempt.answers.length : 0}</div>`;
+                summaryHtml = `<div class="alert alert-info py-2 mb-3"><strong>Ringkasan Minat Bakat:</strong> Mendapat Nilai 1: <span class="badge bg-success">${ya}</span> | Nilai 0: <span class="badge bg-secondary">${tidak}</span> | Total Soal: ${attempt.answers ? attempt.answers.length : 0}</div>`;
             }
 
             // 2. HEADER & TABEL JAWABAN AKTUAL
@@ -335,9 +335,9 @@
                                 <td>${formatTanggalWaktuIndo(attempt.selesai_at)}</td>
                             </tr>
                         </table>
-                        
+
                         <div class="p-3">${summaryHtml}</div>
-                        
+
                         <h6 class="font-weight-bold ml-3 mt-2">Daftar Jawaban Peserta:</h6>
                         <div class="table-responsive p-2 mb-3" style="max-height: 350px; overflow-y: auto;">
                             <table class="table table-striped table-bordered text-sm text-left">
@@ -387,11 +387,11 @@
                         } else if (jwb1 !== '' && !isNaN(jwb1)) {
                             nilai = parseInt(jwb1); // Jika nilainya berupa angka lain (2, 3, 4, dst)
                         }
-                        
+
                         // Tampilkan teks dari option_label, tapi jika kosong baru tampilkan jawaban_1
                         let jwbAktual = ans.option_label || ans.jawaban_1 || '-';
                         // Opsional: Jika jwbAktual malah menampilkan angka "1", dan kamu ingin melihat teks soalnya, pastikan relasi option_id-nya sudah terisi.
-                        
+
                         html += `
                             <tr>
                                 <td class="text-center">${i + 1}</td>
@@ -421,7 +421,7 @@
                 let ans = attempt.answers || [];
                 let l1 = {D:0, I:0, S:0, C:0, star:0};
                 let l2 = {D:0, I:0, S:0, C:0, star:0};
-                
+
                 ans.forEach(a => {
                     let m = a.most_disc ? a.most_disc.toUpperCase() : '';
                     let k = a.least_disc ? a.least_disc.toUpperCase() : '';
@@ -441,7 +441,7 @@
                             <a href="${urlPdf}" target="_blank" class="btn btn-warning btn-sm text-dark font-weight-bold "><i class="fas fa-print"></i> Cetak PDF DISC</a>
                         </div>
                 `;
-                
+
                 html += `
                     <div class="table-responsive mb-4">
                         <table class="table table-bordered text-center table-sm font-weight-bold" style="border: 2px solid #000; font-size: 13px;">
@@ -532,7 +532,7 @@
                                 // Coba cari key yang umum dipakai, jika tidak ada tampilkan raw JSON
                                 if (val.nama) return val.nama;
                                 if (val.karakter) return val.karakter;
-                                return JSON.stringify(val); 
+                                return JSON.stringify(val);
                             }
                             return val;
                         };
@@ -574,7 +574,7 @@
                 setTimeout(() => {
                     renderDiscChart('discChart1', l1);
                     renderDiscChart('discChart2', l2);
-                    renderDiscChart('discChart3', l3, true); 
+                    renderDiscChart('discChart3', l3, true);
                 }, 500);
             }
 
@@ -584,7 +584,7 @@
 
             function formatJawaban(engine, ans) {
                 if (engine === 'disc') {
-                    return `<span class="text-success font-weight-bold">P:</span> ${ans.most_label || '-'} <br> 
+                    return `<span class="text-success font-weight-bold">P:</span> ${ans.most_label || '-'} <br>
                             <span class="text-danger font-weight-bold">K:</span> ${ans.least_label || '-'}`;
                 } else if (engine === 'multiple_choice') {
                     let text = ans.option_label || '-';
@@ -600,7 +600,7 @@
             function renderDiscChart(canvasId, dataSkor, isLine3 = false) {
                 let canvas = document.getElementById(canvasId);
                 if(!canvas) return;
-                
+
                 if(window[canvasId] instanceof Chart) {
                     window[canvasId].destroy();
                 }
@@ -627,13 +627,13 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         scales: {
-                            y: { 
-                                min: yMin, 
-                                max: yMax, 
+                            y: {
+                                min: yMin,
+                                max: yMax,
                             }
                         },
-                        plugins: { 
-                            legend: { display: false } 
+                        plugins: {
+                            legend: { display: false }
                         }
                     }
                 });
@@ -657,7 +657,7 @@
                             $('#status_diterima').val(null);
                             $('#jurusan_diterima').empty();
                             $('#tabel-detail').hide();
-                            
+
                             $('#test-navigation').removeClass('d-flex').hide();
                             $('#assessment-container').hide().empty();
                         },
@@ -793,7 +793,7 @@
                 $('#kodedaftar').val(null);
                 $('#status_diterima').val(null);
                 $('#jurusan_diterima').empty();
-                
+
                 $('#test-navigation').removeClass('d-flex').hide();
                 $('#assessment-container').hide().empty();
             });

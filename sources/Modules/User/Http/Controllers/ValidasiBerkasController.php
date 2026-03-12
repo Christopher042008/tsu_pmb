@@ -84,9 +84,9 @@ class ValidasiBerkasController extends Controller
                     return '<span class="badge bg-danger"><i class="fas fa-times-circle"></i> Tidak Lolos</span>';
                 } else {
                     if ($d->jml_diupload >= $d->jml_diminta && $d->jml_diminta > 0) {
-                        return '<span class="badge bg-primary"><i class="fas fa-list-check"></i> Berkas Lengkap</span>';
+                        return '<span class="badge bg-warning"><i class="fas fa-list-check"></i> Menunggu..</span>';
                     } else {
-                        return '<span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle"></i> Belum Lengkap</span>';
+                        return '<span class="badge bg-primary text-dark"><i class="fas fa-exclamation-triangle"></i> Belum Lengkap</span>';
                     }
                 }
             })
@@ -396,7 +396,7 @@ class ValidasiBerkasController extends Controller
         return response()->json([
             'status'  => 'error',
             'title'   => 'Gagal',
-            'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            'message' => 'Terjadi kesalahan pada server saat memproses file Anda. Silakan coba lagi.'
         ], 500);
     }
 }
@@ -529,9 +529,9 @@ class ValidasiBerkasController extends Controller
             DB::rollback();
             return response()->json([
                 'title' => 'Gagal',
-                'message' => 'Gagal Berpindah Jalur. Error: ' . $e->getMessage(), // Tambahkan exception saat dev untuk ngecek error
+                'message' => 'Gagal Berpindah Jalur, Silahkan coba lagi.',
                 'status' => 'error'
-            ], 200); // Response HTTP_OK (200) agar alert di frontend tetap muncul
+            ], 200);
         }
     }
 }

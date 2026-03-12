@@ -202,7 +202,7 @@ class TestAssesmentController extends Controller
         return response()->json($data, Response::HTTP_OK);
     }
 
-    public function show_jurusan($params)
+   public function show_jurusan($params)
     {
         try {
             $id = decrypt($params);
@@ -217,31 +217,38 @@ class TestAssesmentController extends Controller
             }
 
             $jurusan = [];
-            
-            // 1. Coba ambil dari relasi langsung (Jauh lebih aman dari Error 500)
-            if ($mhs->prodi1) $jurusan[] = $mhs->prodi1;
-            if ($mhs->prodi2) $jurusan[] = $mhs->prodi2;
-            if ($mhs->prodi3) $jurusan[] = $mhs->prodi3;
 
-            // 2. Jika lewat relasi kosong, ambil manual dari kolom pilihan (dengan validasi object)
+            // PILIHAN 1
+            if (is_object($mhs->pilihan1)) {
+                // Jika sudah berupa objek, langsung masukkan
+                $jurusan[] = $mhs->pilihan1;
+            } elseif (!empty($mhs->pilihan1)) {
+                // Jika berupa teks string ID, query ke database
+                $j1 = Master_JurusanKuliah::where('KodeJurusan', $mhs->pilihan1)->with('jenjang')->first();
+                if ($j1) $jurusan[] = $j1;
+            }
+
+            // PILIHAN 2
+            if (is_object($mhs->pilihan2)) {
+                $jurusan[] = $mhs->pilihan2;
+            } elseif (!empty($mhs->pilihan2)) {
+                $j2 = Master_JurusanKuliah::where('KodeJurusan', $mhs->pilihan2)->with('jenjang')->first();
+                if ($j2) $jurusan[] = $j2;
+            }
+
+            // PILIHAN 3
+            if (is_object($mhs->pilihan3)) {
+                $jurusan[] = $mhs->pilihan3;
+            } elseif (!empty($mhs->pilihan3)) {
+                $j3 = Master_JurusanKuliah::where('KodeJurusan', $mhs->pilihan3)->with('jenjang')->first();
+                if ($j3) $jurusan[] = $j3;
+            }
+
+            // BACKUP AMAN: Jika array masih kosong, ambil dari relasi prodi
             if (empty($jurusan)) {
-                // Pastikan yang diambil murni teks ID, bukan objek
-                $p1 = is_object($mhs->pilihan1) ? $mhs->pilihan1->KodeJurusan ?? null : $mhs->pilihan1;
-                $p2 = is_object($mhs->pilihan2) ? $mhs->pilihan2->KodeJurusan ?? null : $mhs->pilihan2;
-                $p3 = is_object($mhs->pilihan3) ? $mhs->pilihan3->KodeJurusan ?? null : $mhs->pilihan3;
-
-                if ($p1) {
-                    $j1 = Master_JurusanKuliah::where('KodeJurusan', $p1)->with('jenjang')->first();
-                    if ($j1) $jurusan[] = $j1;
-                }
-                if ($p2) {
-                    $j2 = Master_JurusanKuliah::where('KodeJurusan', $p2)->with('jenjang')->first();
-                    if ($j2) $jurusan[] = $j2;
-                }
-                if ($p3) {
-                    $j3 = Master_JurusanKuliah::where('KodeJurusan', $p3)->with('jenjang')->first();
-                    if ($j3) $jurusan[] = $j3;
-                }
+                if ($mhs->prodi1) $jurusan[] = $mhs->prodi1;
+                if ($mhs->prodi2) $jurusan[] = $mhs->prodi2;
+                if ($mhs->prodi3) $jurusan[] = $mhs->prodi3;
             }
 
             return response()->json([
@@ -253,7 +260,7 @@ class TestAssesmentController extends Controller
             // Menangkap error 500 agar website tidak hang
             return response()->json([
                 'hasil' => 0,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan Sistem' 
             ], 500);
         }
     }
@@ -335,10 +342,10 @@ class TestAssesmentController extends Controller
             $data['status'] = 'error';
         }
         return response()->json($data, Response::HTTP_OK);
-    // Fungsi show_jurusan dan hasil_test() tetap sama persis seperti aslinya
-    // (Silakan copy-paste dari method aslimu agar tidak mengubah logic transaksi UKT)
-}
-public function printDisc($attempt_id)
+        // Fungsi show_jurusan dan hasil_test() tetap sama persis seperti aslinya
+        // (Silakan copy-paste dari method aslimu agar tidak mengubah logic transaksi UKT)
+    }
+    public function printDisc($attempt_id)
     {
         $attempt = DB::table('pmb_assessment_attempts')->where('id', $attempt_id)->first();
         if (!$attempt) return abort(404, 'Data Assessment tidak ditemukan.');

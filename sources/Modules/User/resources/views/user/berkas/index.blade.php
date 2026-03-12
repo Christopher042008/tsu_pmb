@@ -41,6 +41,8 @@
                                     </li>
                                     <li>Jika Status sudah <span class="badge badge-success">OK / Sesuai</span>, berkas telah
                                         disetujui dan <strong>tidak bisa diganti</strong>.</li>
+                                    <li>Jika Status sudah <span class="badge bg-warning">Menunggu..</span>, berkas telah
+                                        lengkap dan <strong>menunggu validasi dari admin</strong>.</li>
                                     <li class="mt-2">
                                         <strong>Fungsi Tombol pada Tabel:</strong>
                                         <ul class="mt-2" style="list-style-type: none; padding-left: 0;">
