@@ -63,15 +63,19 @@
                             <h5 class="card-title">Pengumuman Diterima</h5>
                         </div>
                         <div class="card-body">
-                            <p class="text-bold">Diterima di Universitas Tiga Serangkai pada :</p>
-                            <p class="text-bold">Fakultas : {{ $datadaftar->jurusan_acc->fakultas->namafakultas }}</p>
-                            <p class="text-bold">Jurusan :
-                                {{ $datadaftar->jurusan_acc->jenjang->jenjang }}-{{ $datadaftar->jurusan_acc->jurusan }}</p>
+                            @if($datadaftar->jurusan_acc)
+                                <p class="text-bold">Diterima di Universitas Tiga Serangkai pada :</p>
+                                <p class="text-bold">Fakultas : {{ $datadaftar->jurusan_acc->fakultas->namafakultas }}</p>
+                                <p class="text-bold">Jurusan :
+                                    {{ $datadaftar->jurusan_acc->jenjang->jenjang }}-{{ $datadaftar->jurusan_acc->jurusan }}</p>
+                            @else
+                                <p class="text-bold">Belum Ada Pengumuman Diterima</p>
+                            @endif
                             <a href="{{ route('admin.finalpmb.show') }}"
                                 class="btn btn-secondary btn-sm float-right">Kembali</a>
                         </div>
                     </div>
-                    
+
                     <div class="card card-primary collapsed-card">
                         <div class="card-header">
                             <h5 class="card-title">Data Pendaftaran</h5>
@@ -268,7 +272,7 @@
                                 <h5 id="test-indicator" class="font-weight-bold m-0 text-primary">Assesment 1 dari 3</h5>
                                 <button type="button" id="btn-next-test" class="btn btn-primary btn-sm test-nav-btn">Next <i class="fas fa-chevron-right"></i></button>
                             </div>
-                            
+
                             <div id="assessment-container">
                                 <div class="text-center py-4 text-muted">
                                     <i class="fas fa-spinner fa-spin fa-2x mb-2 text-primary"></i><br>Memuat data assessment...
@@ -310,13 +314,13 @@
                                                 <th>Nama</th>
                                                 <td>: {{ $datadaftar->biodata->nama }}</td>
                                                 <th>Kecamatan</th>
-                                                <td>: {{ $kecamatan->nama_kecamatan }}</td>
+                                                <td>: {{ $kecamatan ? $kecamatan->nama_kecamatan : '' }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Jenis Kelamin</th>
                                                 <td>: {{ $datadaftar->biodata->jenkel }}</td>
                                                 <th>Desa/Kelurahan</th>
-                                                <td>: {{ $kelurahan->nama_kelurahan }}</td>
+                                                <td>: {{ $kelurahan ? $kelurahan->nama_kelurahan : '' }}</td>
                                             </tr>
                                             <tr>
                                                 <th>Tempat Lahir</th>
@@ -339,7 +343,7 @@
                                             </tr>
                                             <tr>
                                                 <th>Email</th>
-                                                <td>: {{ session('user')->email }}</td>
+                                                <td>: {{ $datadaftar->biodata->akunbio->email }}</td>
                                                 <th>Ukuran Jas Almamater</th>
                                                 <td>: {{ $datadaftar->biodata->ukuran_jas }}</td>
                                             </tr>
@@ -347,7 +351,7 @@
                                     </table>
                                 </div>
                             </div>
-                            
+
                             <div id="page-2" style="display: none;">
                                 <div class="step-header">
                                     <div class="circle">2</div>
@@ -446,7 +450,7 @@
                                     <br>
                                 </div>
                             </div>
-                            
+
                             <div id="page-3" style="display: none;">
                                 <div class="step-header">
                                     <div class="circle">3</div>
@@ -483,7 +487,7 @@
                                     </table>
                                 </div>
                             </div>
-                            
+
                             <div id="page-4" style="display: none;">
                                 <div class="step-header">
                                     <div class="circle">4</div>
@@ -537,7 +541,7 @@
                                     <br>
                                 </div>
                             </div>
-                            
+
                             <div class="col-md-12 d-flex justify-content-center" style="margin-top: 10px;">
                                 <button type="button" id="btn-prev" class="btn btn-secondary btn-sm mr-2" style="display: none;">Prev</button>
                                 <button type="button" id="btn-next" class="btn btn-secondary btn-sm">Next</button>
@@ -564,7 +568,7 @@
             // Variabel untuk Form Biodata
             let no = 1;
             let maks = 4;
-            
+
             // Variabel untuk Data Test Online (Terintegrasi)
             let assessmentAttempts = [];
             let currentTestIndex = 0;
@@ -577,14 +581,14 @@
                 nextEvent();
                 prevEvent();
                 handleTestNavigation();
-                
+
                 // Load Test Data ketika Card Data Test Online di-expand
                 $('#card-assessment').on('expanded.lte.cardwidget', function() {
                     if(!assessmentLoaded) {
                         loadAssessmentData();
                     }
                 });
-                
+
                 // Atau load langsung jika tidak ingin menunggu card di-expand
                 loadAssessmentData();
             }
@@ -633,7 +637,7 @@
             function renderTestContent(index) {
                 let attempt = assessmentAttempts[index];
                 let totalTests = assessmentAttempts.length;
-                
+
                 $('#test-indicator').text(`Assesment ${index + 1} dari ${totalTests}`);
                 $('#btn-prev-test').prop('disabled', index === 0);
                 $('#btn-next-test').prop('disabled', index === totalTests - 1);
@@ -658,7 +662,7 @@
                             let jwb1 = (a.jawaban_1 || '').toString().toLowerCase().trim();
                             let optLbl = (a.option_label || '').toString().toLowerCase().trim();
                             if (a.is_benar == 1 || a.is_benar === '1' || jwb1 === '1' || jwb1 === 'ya' || optLbl === '1' || optLbl === 'ya') {
-                                ya++; 
+                                ya++;
                             } else if (jwb1 !== '' && !isNaN(jwb1) && parseInt(jwb1) > 0) {
                                 ya++;
                             } else {
@@ -686,9 +690,9 @@
                                     <td>${formatTanggalWaktuIndo(attempt.selesai_at)}</td>
                                 </tr>
                             </table>
-                            
+
                             <div class="p-3">${summaryHtml}</div>
-                            
+
                             <h6 class="font-weight-bold ml-3 mt-2">Daftar Jawaban Peserta:</h6>
                             <div class="table-responsive p-2 mb-3" style="max-height: 350px; overflow-y: auto;">
                                 <table class="table table-striped table-bordered text-sm text-left">
@@ -726,13 +730,13 @@
                             let jwb1 = (ans.jawaban_1 || '').toString().toLowerCase().trim();
                             let optLbl = (ans.option_label || '').toString().toLowerCase().trim();
 
-                            if (ans.is_benar == 1 || ans.is_benar === '1') { nilai = 1; } 
-                            else if (jwb1 === '1' || jwb1 === 'ya' || jwb1 === 'benar') { nilai = 1; } 
-                            else if (optLbl === '1' || optLbl === 'ya' || optLbl === 'benar') { nilai = 1; } 
+                            if (ans.is_benar == 1 || ans.is_benar === '1') { nilai = 1; }
+                            else if (jwb1 === '1' || jwb1 === 'ya' || jwb1 === 'benar') { nilai = 1; }
+                            else if (optLbl === '1' || optLbl === 'ya' || optLbl === 'benar') { nilai = 1; }
                             else if (jwb1 !== '' && !isNaN(jwb1)) { nilai = parseInt(jwb1); }
-                            
+
                             let jwbAktual = ans.option_label || ans.jawaban_1 || '-';
-                            
+
                             html += `
                                 <tr>
                                     <td class="text-center">${i + 1}</td>
@@ -761,7 +765,7 @@
                     let ans = attempt.answers || [];
                     let l1 = {D:0, I:0, S:0, C:0, star:0};
                     let l2 = {D:0, I:0, S:0, C:0, star:0};
-                    
+
                     ans.forEach(a => {
                         let m = a.most_disc ? a.most_disc.toUpperCase() : '';
                         let k = a.least_disc ? a.least_disc.toUpperCase() : '';
@@ -781,7 +785,7 @@
                                 <a href="${urlPdf}" target="_blank" class="btn btn-warning btn-sm text-dark font-weight-bold "><i class="fas fa-print"></i> Cetak PDF DISC</a>
                             </div>
                     `;
-                    
+
                     html += `
                         <div class="table-responsive mb-4">
                             <table class="table table-bordered text-center table-sm font-weight-bold" style="border: 2px solid #000; font-size: 13px;">
@@ -870,7 +874,7 @@
                             if (typeof val === 'object') {
                                 if (val.nama) return val.nama;
                                 if (val.karakter) return val.karakter;
-                                return JSON.stringify(val); 
+                                return JSON.stringify(val);
                             }
                             return val;
                         };
@@ -907,12 +911,12 @@
                             </div>
                         `;
                     }
-                    html += `</div>`; 
+                    html += `</div>`;
 
                     setTimeout(() => {
                         renderDiscChart('discChart1', l1);
                         renderDiscChart('discChart2', l2);
-                        renderDiscChart('discChart3', l3, true); 
+                        renderDiscChart('discChart3', l3, true);
                     }, 500);
                 }
 
@@ -922,7 +926,7 @@
 
             function formatJawaban(engine, ans) {
                 if (engine === 'disc') {
-                    return `<span class="text-success font-weight-bold">P:</span> ${ans.most_label || '-'} <br> 
+                    return `<span class="text-success font-weight-bold">P:</span> ${ans.most_label || '-'} <br>
                             <span class="text-danger font-weight-bold">K:</span> ${ans.least_label || '-'}`;
                 } else if (engine === 'multiple_choice') {
                     let text = ans.option_label || '-';
@@ -938,7 +942,7 @@
             function renderDiscChart(canvasId, dataSkor, isLine3 = false) {
                 let canvas = document.getElementById(canvasId);
                 if(!canvas) return;
-                
+
                 if(window[canvasId] instanceof Chart) { window[canvasId].destroy(); }
 
                 let yMin = isLine3 ? -24 : 0;
