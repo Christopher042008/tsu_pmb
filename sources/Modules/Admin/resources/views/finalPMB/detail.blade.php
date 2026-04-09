@@ -30,8 +30,9 @@
             text-align: center;
         }
 
-        /* Tambahan CSS untuk tombol navigasi test */
-        .test-nav-btn { width: 100px; }
+        .test-nav-btn {
+            width: 100px;
+        }
     </style>
 
 @endsection
@@ -63,20 +64,25 @@
                             <h5 class="card-title">Pengumuman Diterima</h5>
                         </div>
                         <div class="card-body">
+                            @if ($datadaftar->jurusan_acc)
                             <p class="text-bold">Diterima di Universitas Tiga Serangkai pada :</p>
                             <p class="text-bold">Fakultas : {{ $datadaftar->jurusan_acc->fakultas->namafakultas }}</p>
                             <p class="text-bold">Jurusan :
                                 {{ $datadaftar->jurusan_acc->jenjang->jenjang }}-{{ $datadaftar->jurusan_acc->jurusan }}</p>
+                            @else
+                                <p class="text-bold">Belum Ada Pengumuman Diterima</p>
+                            @endif
                             <a href="{{ route('admin.finalpmb.show') }}"
                                 class="btn btn-secondary btn-sm float-right">Kembali</a>
                         </div>
                     </div>
-                    
+
                     <div class="card card-primary collapsed-card">
                         <div class="card-header">
                             <h5 class="card-title">Data Pendaftaran</h5>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                                        class="fas fa-plus"></i></button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -90,7 +96,8 @@
                                     </tr>
                                     <tr>
                                         <th>Batch Daftar</th>
-                                        <th>: {{ $datadaftar->batch->nama_batch }} {{ $datadaftar->batch->tahun_akademik }}</th>
+                                        <th>: {{ $datadaftar->batch->nama_batch }}
+                                            {{ $datadaftar->batch->tahun_akademik }}</th>
                                         <th>Tahun Lulus</th>
                                         <th>: {{ $datadaftar->tahun_lulus }}</th>
                                     </tr>
@@ -98,7 +105,9 @@
                                         <th>Jalur Daftar</th>
                                         <th>: {{ $datadaftar->jalur->jenis_pendaftaran }}</th>
                                         <th>Jurusan Sekolah</th>
-                                        <th>: {{ $datadaftar->jurusansekolah->sekolah }}/{{ $datadaftar->jurusansekolah->jurusan_sekolah }}</th>
+                                        <th>:
+                                            {{ $datadaftar->jurusansekolah->sekolah }}/{{ $datadaftar->jurusansekolah->jurusan_sekolah }}
+                                        </th>
                                     </tr>
                                     <tr>
                                         <th>Program Studi Pilihan 1</th>
@@ -132,7 +141,9 @@
                                         <th>Konfirmasi Daftar</th>
                                         <th>: {{ tglIndo($tglkonfirm[0]) }}</th>
                                         <th>Biaya Pendaftaran</th>
-                                        <th>: {{ $datadaftar->jalur->biaya_pendaftaran == '1' ? rupiah($datadaftar->jalur->jml_biaya_pendaftaran) : 'Gratis' }}</th>
+                                        <th>:
+                                            {{ $datadaftar->jalur->biaya_pendaftaran == '1' ? rupiah($datadaftar->jalur->jml_biaya_pendaftaran) : 'Gratis' }}
+                                        </th>
                                     </tr>
                                     <tr>
                                         <th>Tanggal Daftar</th>
@@ -159,7 +170,10 @@
                                             <code>*Khusus Beasiswa</code><br>Tingkat Kejuaraan
                                         </th>
                                         @php
-                                            $tingkat = $datadaftar->jenisbeasiswa == null ? '-' : $datadaftar->jenisbeasiswa->idtingkat;
+                                            $tingkat =
+                                                $datadaftar->jenisbeasiswa == null
+                                                    ? '-'
+                                                    : $datadaftar->jenisbeasiswa->idtingkat;
                                         @endphp
                                         <th>:
                                             @if ($tingkat == null || $tingkat == '-')
@@ -209,7 +223,8 @@
                                             @if ($berkas_khusus == null)
                                                 <span class="badge bg-warning">Non Beasiswa</span>
                                             @else
-                                                <a href="{{ $berkas_khusus }}" target="_blank"><span class="badge bg-success">{{ $datadaftar->berkas_khusus }}</span></a>
+                                                <a href="{{ $berkas_khusus }}" target="_blank"><span
+                                                        class="badge bg-success">{{ $datadaftar->berkas_khusus }}</span></a>
                                             @endif
                                         </th>
                                         <th>Rekomendator</th>
@@ -224,7 +239,8 @@
                         <div class="card-header">
                             <h5 class="card-title">Data Pembayaran</h5>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                                        class="fas fa-plus"></i></button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -259,19 +275,24 @@
                         <div class="card-header">
                             <h5 class="card-title">Hasil Assesment</h5>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                                        class="fas fa-plus"></i></button>
                             </div>
                         </div>
                         <div class="card-body">
-                            <div id="test-navigation" style="display: none;" class="justify-content-between align-items-center mb-3">
-                                <button type="button" id="btn-prev-test" class="btn btn-secondary btn-sm test-nav-btn"><i class="fas fa-chevron-left"></i> Previous</button>
+                            <div id="test-navigation" style="display: none;"
+                                class="justify-content-between align-items-center mb-3">
+                                <button type="button" id="btn-prev-test" class="btn btn-secondary btn-sm test-nav-btn"><i
+                                        class="fas fa-chevron-left"></i> Previous</button>
                                 <h5 id="test-indicator" class="font-weight-bold m-0 text-primary">Assesment 1 dari 3</h5>
-                                <button type="button" id="btn-next-test" class="btn btn-primary btn-sm test-nav-btn">Next <i class="fas fa-chevron-right"></i></button>
+                                <button type="button" id="btn-next-test" class="btn btn-primary btn-sm test-nav-btn">Next
+                                    <i class="fas fa-chevron-right"></i></button>
                             </div>
-                            
+
                             <div id="assessment-container">
                                 <div class="text-center py-4 text-muted">
-                                    <i class="fas fa-spinner fa-spin fa-2x mb-2 text-primary"></i><br>Memuat data assessment...
+                                    <i class="fas fa-spinner fa-spin fa-2x mb-2 text-primary"></i><br>Memuat data
+                                    assessment...
                                 </div>
                             </div>
                         </div>
@@ -281,267 +302,313 @@
                         <div class="card-header">
                             <h5 class="card-title">Biodata</h5>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                                        class="fas fa-plus"></i></button>
                             </div>
                         </div>
                         <div class="card-body">
-                            <div id="page-1">
-                                <div class="step-header">
-                                    <div class="circle">1</div>
-                                    <label class="step-title">Data Diri</label>
+                            @if (empty($datadaftar->biodata))
+                                <div class="alert alert-warning text-center">
+                                    <i class="fas fa-exclamation-triangle"></i> Pendaftar belum mencapai atau belum
+                                    menyelesaikan tahap pengisian Biodata.
+                                </div>
+                            @else
+                                <div id="page-1">
+                                    <div class="step-header">
+                                        <div class="circle">1</div>
+                                        <label class="step-title">Data Diri</label>
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <table id="tabel-detail-diri" class="table" style="width: 100%;">
+                                            <tbody>
+                                                <tr>
+                                                    <th style="width: 15%;">NIK</th>
+                                                    <td style="width: 35%;">: {{ $datadaftar->biodata->nik ?? '-' }}</td>
+                                                    <th style="width: 15%;">Provinsi</th>
+                                                    <td style="width: 35%;">:
+                                                        {{ $provinsi == null ? '-' : $provinsi->nama_provinsi }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>No KK</th>
+                                                    <td>: {{ $datadaftar->biodata->nokk ?? '-' }}</td>
+                                                    <th>Kabupaten/Kota</th>
+                                                    <td>: {{ $kabupaten == null ? '-' : $kabupaten->nama_kabupaten }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Nama</th>
+                                                    <td>: {{ $datadaftar->biodata->nama ?? '-' }}</td>
+                                                    <th>Kecamatan</th>
+                                                    <td>: {{ $kecamatan == null ? '-' : $kecamatan->nama_kecamatan }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Jenis Kelamin</th>
+                                                    <td>: {{ $datadaftar->biodata->jenkel ?? '-' }}</td>
+                                                    <th>Desa/Kelurahan</th>
+                                                    <td>: {{ $kelurahan == null ? '-' : $kelurahan->nama_kelurahan }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Tempat Lahir</th>
+                                                    <td>: {{ $datadaftar->biodata->tempat_lahir ?? '-' }}</td>
+                                                    <th>RT / RW / Kode Pos</th>
+                                                    <td>: {{ $datadaftar->biodata->rt ?? '-' }} /
+                                                        {{ $datadaftar->biodata->rw ?? '-' }} /
+                                                        {{ $datadaftar->biodata->kodepos ?? '-' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Tanggal Lahir</th>
+                                                    <td>:
+                                                        {{ $datadaftar->biodata->tgl_lahir ? tglIndo($datadaftar->biodata->tgl_lahir) : '-' }}
+                                                    </td>
+                                                    <th>Alamat Lengkap</th>
+                                                    <td>: {{ $datadaftar->biodata->alamat_lengkap ?? '-' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Agama</th>
+                                                    <td>: {{ $datadaftar->biodata->agama ?? '-' }}</td>
+                                                    <th>No HP</th>
+                                                    <td>: {{ $datadaftar->biodata->nohp ?? '-' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Email</th>
+                                                    <td>: {{ session('user')->email ?? '-' }}</td>
+                                                    <th>Ukuran Jas Almamater</th>
+                                                    <td>: {{ $datadaftar->biodata->ukuran_jas ?? '-' }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
 
-                                <div class="row mt-3">
-                                    <table id="tabel-detail-diri" class="table" style="width: 100%;">
-                                        <tbody>
-                                            <tr>
-                                                <th style="width: 15%;">NIK</th>
-                                                <td style="width: 35%;">: {{ $datadaftar->biodata->nik }}</td>
-                                                <th style="width: 15%;">Provinsi</th>
-                                                <td style="width: 35%;">: {{ $provinsi->nama_provinsi }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>No KK</th>
-                                                <td>: {{ $datadaftar->biodata->nokk }}</td>
-                                                <th>Kabupaten/Kota</th>
-                                                <td>: {{ $kabupaten->nama_kabupaten }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Nama</th>
-                                                <td>: {{ $datadaftar->biodata->nama }}</td>
-                                                <th>Kecamatan</th>
-                                                <td>: {{ $kecamatan->nama_kecamatan }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Jenis Kelamin</th>
-                                                <td>: {{ $datadaftar->biodata->jenkel }}</td>
-                                                <th>Desa/Kelurahan</th>
-                                                <td>: {{ $kelurahan->nama_kelurahan }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Tempat Lahir</th>
-                                                <td>: {{ $datadaftar->biodata->tempat_lahir }}</td>
-                                                <th>RT / RW / Kode Pos</th>
-                                                <td>: {{ $datadaftar->biodata->rt }} / {{ $datadaftar->biodata->rw }} /
-                                                    {{ $datadaftar->biodata->kodepos }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Tanggal Lahir</th>
-                                                <td>: {{ tglIndo($datadaftar->biodata->tgl_lahir) }}</td>
-                                                <th>Alamat Lengkap</th>
-                                                <td>: {{ $datadaftar->biodata->alamat_lengkap }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Agama</th>
-                                                <td>: {{ $datadaftar->biodata->agama }}</td>
-                                                <th>No HP</th>
-                                                <td>: {{ $datadaftar->biodata->nohp }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Email</th>
-                                                <td>: {{ session('user')->email }}</td>
-                                                <th>Ukuran Jas Almamater</th>
-                                                <td>: {{ $datadaftar->biodata->ukuran_jas }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            
-                            <div id="page-2" style="display: none;">
-                                <div class="step-header">
-                                    <div class="circle">2</div>
-                                    <label class="step-title">Data Keluarga</label>
-                                </div>
-                                <div class="row mt-3">
-                                    <table id="tabel-detail" class="table" style="width: 100%;">
-                                        <thead>
-                                            <tr>
-                                                <th colspan="2" class="text-bold"><span class="badge bg-warning text-bold" style="font-size: 18px;">Data Ayah</span></th>
-                                                <th colspan="2" class="text-bold"><span class="badge bg-warning text-bold" style="font-size: 18px;">Data Ibu</span></th>
-                                            </tr>
-                                            <tr>
-                                                <th>Nama Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->nama_ayah }}</th>
-                                                <th>Nama Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->nama_ibu }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Tempat Lahir Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->tempat_lahir_ayah }}</th>
-                                                <th>Tempat Lahir Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->tempat_lahir_ibu }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Tgl Lahir Ayah</th>
-                                                <th>: {{ tglIndo($datadaftar->biodata->tgl_lahir_ayah) }}</th>
-                                                <th>Tgl Lahir Ibu</th>
-                                                <th>: {{ tglIndo($datadaftar->biodata->tgl_lahir_ibu) }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Status Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->statushidup_ayah }}</th>
-                                                <th>Status Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->statushidup_ibu }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Status Kekerabatan Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->status_ayah }}</th>
-                                                <th>Status Kekerabatan Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->status_ibu }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>No HP Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->nohp_ayah }}</th>
-                                                <th>No HP Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->nohp_ibu }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Pekerjaan Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->pekerjaan_ayah }}</th>
-                                                <th>pekerjaan Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->pekerjaan_ibu }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Penghasilan Ayah</th>
-                                                <th>: {{ rupiah($datadaftar->biodata->penghasilan_ayah) }}</th>
-                                                <th>Penghasilan Ibu</th>
-                                                <th>: {{ rupiah($datadaftar->biodata->penghasilan_ibu) }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Alamat Ayah</th>
-                                                <th>: {{ $datadaftar->biodata->alamat_ayah }}</th>
-                                                <th>Alamat Ibu</th>
-                                                <th>: {{ $datadaftar->biodata->alamat_ibu }}</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                    <br>
-                                    <table id="tabel-detail" class="table" style="width: 100%;">
-                                        <thead>
-                                            <tr>
-                                                <th colspan="8"><span class="badge bg-warning text-bold" style="font-size: 18px;">Data Saudara</span></th>
-                                            </tr>
-                                            <tr>
-                                                <th colspan="8">Jumlah Saudara : {{ $datadaftar->biodata->jumlah_saudara }}</th>
-                                            </tr>
-                                            @if ($datadaftar->biodata->jumlah_saudara > 0)
-                                                <tr style="background-color: aqua;">
-                                                    <th>Nama Saudara</th>
-                                                    <th>Pekerjaan Saudara</th>
-                                                    <th>Status</th>
-                                                    <th>Status Kekerabatan</th>
+                                <div id="page-2" style="display: none;">
+                                    <div class="step-header">
+                                        <div class="circle">2</div>
+                                        <label class="step-title">Data Keluarga</label>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <table id="tabel-detail" class="table" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="2" class="text-bold"><span
+                                                            class="badge bg-warning text-bold"
+                                                            style="font-size: 18px;">Data Ayah</span></th>
+                                                    <th colspan="2" class="text-bold"><span
+                                                            class="badge bg-warning text-bold"
+                                                            style="font-size: 18px;">Data Ibu</span></th>
                                                 </tr>
-                                                @foreach ($datadaftar->biodata->saudara as $v)
+                                                <tr>
+                                                    <th>Nama Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->nama_ayah ?? '-' }}</th>
+                                                    <th>Nama Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->nama_ibu ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Tempat Lahir Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->tempat_lahir_ayah ?? '-' }}</th>
+                                                    <th>Tempat Lahir Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->tempat_lahir_ibu ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Tgl Lahir Ayah</th>
+                                                    <th>:
+                                                        {{ $datadaftar->biodata->tgl_lahir_ayah ? tglIndo($datadaftar->biodata->tgl_lahir_ayah) : '-' }}
+                                                    </th>
+                                                    <th>Tgl Lahir Ibu</th>
+                                                    <th>:
+                                                        {{ $datadaftar->biodata->tgl_lahir_ibu ? tglIndo($datadaftar->biodata->tgl_lahir_ibu) : '-' }}
+                                                    </th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Status Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->statushidup_ayah ?? '-' }}</th>
+                                                    <th>Status Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->statushidup_ibu ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Status Kekerabatan Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->status_ayah ?? '-' }}</th>
+                                                    <th>Status Kekerabatan Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->status_ibu ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>No HP Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->nohp_ayah ?? '-' }}</th>
+                                                    <th>No HP Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->nohp_ibu ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Pekerjaan Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->pekerjaan_ayah ?? '-' }}</th>
+                                                    <th>pekerjaan Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->pekerjaan_ibu ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Penghasilan Ayah</th>
+                                                    <th>:
+                                                        {{ $datadaftar->biodata->penghasilan_ayah ? rupiah($datadaftar->biodata->penghasilan_ayah) : '-' }}
+                                                    </th>
+                                                    <th>Penghasilan Ibu</th>
+                                                    <th>:
+                                                        {{ $datadaftar->biodata->penghasilan_ibu ? rupiah($datadaftar->biodata->penghasilan_ibu) : '-' }}
+                                                    </th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Alamat Ayah</th>
+                                                    <th>: {{ $datadaftar->biodata->alamat_ayah ?? '-' }}</th>
+                                                    <th>Alamat Ibu</th>
+                                                    <th>: {{ $datadaftar->biodata->alamat_ibu ?? '-' }}</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                        <br>
+                                        <table id="tabel-detail" class="table" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="8"><span class="badge bg-warning text-bold"
+                                                            style="font-size: 18px;">Data Saudara</span></th>
+                                                </tr>
+                                                <tr>
+                                                    <th colspan="8">Jumlah Saudara :
+                                                        {{ $datadaftar->biodata->jumlah_saudara ?? 0 }}</th>
+                                                </tr>
+                                                @if (!empty($datadaftar->biodata->jumlah_saudara) && $datadaftar->biodata->jumlah_saudara > 0)
+                                                    <tr style="background-color: aqua;">
+                                                        <th>Nama Saudara</th>
+                                                        <th>Pekerjaan Saudara</th>
+                                                        <th>Status</th>
+                                                        <th>Status Kekerabatan</th>
+                                                    </tr>
+                                                    @foreach ($datadaftar->biodata->saudara as $v)
+                                                        <tr>
+                                                            <th>{{ $v->nama }}</th>
+                                                            <th>{{ $v->pekerjaan }}</th>
+                                                            <th>{{ $v->status_hidup }}</th>
+                                                            <th>{{ $v->status_kekerabatan }}</th>
+                                                        </tr>
+                                                    @endforeach
+                                                @endif
+                                            </thead>
+                                        </table>
+                                        <br>
+                                    </div>
+                                </div>
+
+                                <div id="page-3" style="display: none;">
+                                    <div class="step-header">
+                                        <div class="circle">3</div>
+                                        <label class="step-title">Data Sekolah</label>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <table id="tabel-detail" class="table" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nama Sekolah</th>
+                                                    <th>: {{ $datadaftar->biodata->nama_sekolah ?? '-' }}</th>
+                                                    <th>NPSN</th>
+                                                    <th>: {{ $datadaftar->biodata->npsn ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Jenis Sekolah</th>
+                                                    <th>: {{ $datadaftar->biodata->jenis_sekolah ?? '-' }}</th>
+                                                    <th>NISN</th>
+                                                    <th>: {{ $datadaftar->biodata->nisn ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Provinsi Sekolah</th>
+                                                    <th>:
+                                                        {{ $provinsi_sekolah == null ? '-' : $provinsi_sekolah->nama_provinsi }}
+                                                    </th>
+                                                    <th>Tahun Lulus</th>
+                                                    <th>: {{ $datadaftar->tahun_lulus ?? '-' }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Kabupaten/Kota Sekolah</th>
+                                                    <th>:
+                                                        {{ $kabupaten_sekolah == null ? '-' : $kabupaten_sekolah->nama_kabupaten }}
+                                                    </th>
+                                                    <th>Nilai Akhir</th>
+                                                    <th>: {{ $datadaftar->biodata->nilai_akhir ?? '-' }}</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div id="page-4" style="display: none;">
+                                    <div class="step-header">
+                                        <div class="circle">4</div>
+                                        <label class="step-title">Berkas Pendaftaran</label>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <table id="tabel-detail" class="table table-bordered table-striped"
+                                            style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="4" style="background-color: cadetblue; color: white;"
+                                                        class="text-center">Daftar Berkas Pendaftaran</th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="text-center" width="5%">No</th>
+                                                    <th>Nama Berkas yang Diminta</th>
+                                                    <th class="text-center" width="15%">Status Wajib</th>
+                                                    <th class="text-center" width="25%">File Pendaftar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($detailberkas_umum as $row => $b)
+                                                    @php
+                                                        $fileUploaded = $berkasPendaftar
+                                                            ? $berkasPendaftar->firstWhere('id_berkas', $b->id)
+                                                            : null;
+                                                        $warna = $b->keterangan == 'Wajib' ? 'danger' : 'secondary';
+                                                    @endphp
                                                     <tr>
-                                                        <th>{{ $v->nama }}</th>
-                                                        <th>{{ $v->pekerjaan }}</th>
-                                                        <th>{{ $v->status_hidup }}</th>
-                                                        <th>{{ $v->status_kekerabatan }}</th>
+                                                        <td class="text-center">{{ $row + 1 }}</td>
+                                                        <td>
+                                                            {{ $b->nama_berkas }} <br>
+                                                            <small class="text-muted">Format: {{ $b->formatfile }}</small>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span
+                                                                class="badge bg-{{ $warna }}">{{ $b->keterangan }}</span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            @if ($fileUploaded)
+                                                                @php
+                                                                    $parameter = \App\Models\Parameter::where(
+                                                                        'id',
+                                                                        1,
+                                                                    )->first();
+                                                                    $pathFile = asset(
+                                                                        'sources/storage/app/' .
+                                                                            $parameter->file_umum .
+                                                                            '/' .
+                                                                            $fileUploaded->nama_berkas,
+                                                                    );
+                                                                @endphp
+                                                                <a href="{{ $pathFile }}" target="_blank"
+                                                                    class="btn btn-sm btn-success">
+                                                                    <i class="fa fa-eye"></i> Lihat Berkas
+                                                                </a>
+                                                            @else
+                                                                <span class="badge bg-warning text-dark">Belum
+                                                                    Upload</span>
+                                                            @endif
+                                                        </td>
                                                     </tr>
                                                 @endforeach
-                                            @endif
-                                        </thead>
-                                    </table>
-                                    <br>
+                                            </tbody>
+                                        </table>
+                                        <br>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <div id="page-3" style="display: none;">
-                                <div class="step-header">
-                                    <div class="circle">3</div>
-                                    <label class="step-title">Data Sekolah</label>
+
+                                <div class="col-md-12 d-flex justify-content-center" style="margin-top: 10px;">
+                                    <button type="button" id="btn-prev" class="btn btn-secondary btn-sm mr-2"
+                                        style="display: none;">Prev</button>
+                                    <button type="button" id="btn-next" class="btn btn-secondary btn-sm">Next</button>
                                 </div>
-                                <div class="row mt-3">
-                                    <table id="tabel-detail" class="table" style="width: 100%;">
-                                        <thead>
-                                            <tr>
-                                                <th>Nama Sekolah</th>
-                                                <th>: {{ $datadaftar->biodata->nama_sekolah }}</th>
-                                                <th>NPSN</th>
-                                                <th>: {{ $datadaftar->biodata->npsn }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Jenis Sekolah</th>
-                                                <th>: {{ $datadaftar->biodata->jenis_sekolah }}</th>
-                                                <th>NISN</th>
-                                                <th>: {{ $datadaftar->biodata->nisn }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Provinsi Sekolah</th>
-                                                <th>: {{ $provinsi_sekolah == null ? '-' : $provinsi_sekolah->nama_provinsi }}</th>
-                                                <th>Tahun Lulus</th>
-                                                <th>: {{ $datadaftar->tahun_lulus }}</th>
-                                            </tr>
-                                            <tr>
-                                                <th>Kabupaten/Kota Sekolah</th>
-                                                <th>: {{ $kabupaten_sekolah == null ? '-' : $kabupaten_sekolah->nama_kabupaten }}</th>
-                                                <th>Nilai Akhir</th>
-                                                <th>: {{ $datadaftar->biodata->nilai_akhir }}</th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                            </div>
-                            
-                            <div id="page-4" style="display: none;">
-                                <div class="step-header">
-                                    <div class="circle">4</div>
-                                    <label class="step-title">Berkas Pendaftaran</label>
-                                </div>
-                                <div class="row mt-3">
-                                    <table id="tabel-detail" class="table table-bordered table-striped" style="width: 100%;">
-                                        <thead>
-                                            <tr>
-                                                <th colspan="4" style="background-color: cadetblue; color: white;" class="text-center">Daftar Berkas Pendaftaran</th>
-                                            </tr>
-                                            <tr>
-                                                <th class="text-center" width="5%">No</th>
-                                                <th>Nama Berkas yang Diminta</th>
-                                                <th class="text-center" width="15%">Status Wajib</th>
-                                                <th class="text-center" width="25%">File Pendaftar</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($detailberkas_umum as $row => $b)
-                                                @php
-                                                    $fileUploaded = $berkasPendaftar->firstWhere('id_berkas', $b->id);
-                                                    $warna = $b->keterangan == 'Wajib' ? 'danger' : 'secondary';
-                                                @endphp
-                                                <tr>
-                                                    <td class="text-center">{{ $row + 1 }}</td>
-                                                    <td>
-                                                        {{ $b->nama_berkas }} <br>
-                                                        <small class="text-muted">Format: {{ $b->formatfile }}</small>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <span class="badge bg-{{ $warna }}">{{ $b->keterangan }}</span>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        @if ($fileUploaded)
-                                                            @php
-                                                                $parameter = \App\Models\Parameter::where('id', 1)->first();
-                                                                $pathFile = asset('sources/storage/app/' . $parameter->file_umum . '/' . $fileUploaded->nama_berkas);
-                                                            @endphp
-                                                            <a href="{{ $pathFile }}" target="_blank" class="btn btn-sm btn-success">
-                                                                <i class="fa fa-eye"></i> Lihat Berkas
-                                                            </a>
-                                                        @else
-                                                            <span class="badge bg-warning text-dark">Belum Upload</span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                    <br>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-12 d-flex justify-content-center" style="margin-top: 10px;">
-                                <button type="button" id="btn-prev" class="btn btn-secondary btn-sm mr-2" style="display: none;">Prev</button>
-                                <button type="button" id="btn-next" class="btn btn-secondary btn-sm">Next</button>
-                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -561,15 +628,13 @@
 
             $('.select2').select2();
 
-            // Variabel untuk Form Biodata
             let no = 1;
             let maks = 4;
-            
-            // Variabel untuk Data Test Online (Terintegrasi)
+
             let assessmentAttempts = [];
             let currentTestIndex = 0;
             let assessmentLoaded = false;
-            let kodeDaftar = '{{ encrypt($datadaftar->KodePendaftaran) }}'; // Mengambil ID dari blade
+            let kodeDaftar = '{{ encrypt($datadaftar->KodePendaftaran) }}';
 
             LoadEvent();
 
@@ -577,37 +642,37 @@
                 nextEvent();
                 prevEvent();
                 handleTestNavigation();
-                
-                // Load Test Data ketika Card Data Test Online di-expand
+
                 $('#card-assessment').on('expanded.lte.cardwidget', function() {
-                    if(!assessmentLoaded) {
+                    if (!assessmentLoaded) {
                         loadAssessmentData();
                     }
                 });
-                
-                // Atau load langsung jika tidak ingin menunggu card di-expand
+
                 loadAssessmentData();
             }
 
-            // --- JAVASCRIPT UNTUK DATA TEST ONLINE (PERSIS SEPERTI DI HASIL ASSESMENT) ---
             function loadAssessmentData() {
                 $.ajax({
                     type: "GET",
-                    // Mengambil API yang sudah ada di TestAssesmentController
-                    url: '{!! url("admin/TestAssesment/DetailTestOnlinePMB") !!}/' + encodeURIComponent(kodeDaftar),
+                    url: '{!! url('admin/TestAssesment/DetailTestOnlinePMB') !!}/' + encodeURIComponent(kodeDaftar),
                     dataType: "JSON",
                     success: function(data) {
                         assessmentLoaded = true;
-                        if(data.hasil == 1 && data.attempts && data.attempts.length > 0) {
+                        if (data.hasil == 1 && data.attempts && data.attempts.length > 0) {
                             assessmentAttempts = data.attempts;
                             $('#test-navigation').addClass('d-flex').show();
                             renderTestContent(currentTestIndex);
                         } else {
-                            $('#assessment-container').html('<div class="alert alert-warning text-center m-3">Peserta belum menyelesaikan satupun Assessment.</div>');
+                            $('#assessment-container').html(
+                                '<div class="alert alert-warning text-center m-3">Peserta belum menyelesaikan satupun Assessment.</div>'
+                                );
                         }
                     },
                     error: function() {
-                        $('#assessment-container').html('<div class="alert alert-danger text-center m-3">Terjadi kesalahan saat memuat data Assessment.</div>');
+                        $('#assessment-container').html(
+                            '<div class="alert alert-danger text-center m-3">Terjadi kesalahan saat memuat data Assessment.</div>'
+                            );
                     }
                 });
             }
@@ -633,32 +698,40 @@
             function renderTestContent(index) {
                 let attempt = assessmentAttempts[index];
                 let totalTests = assessmentAttempts.length;
-                
+
                 $('#test-indicator').text(`Assesment ${index + 1} dari ${totalTests}`);
                 $('#btn-prev-test').prop('disabled', index === 0);
                 $('#btn-next-test').prop('disabled', index === totalTests - 1);
 
                 let statusIndo = 'Belum Mulai';
                 if (attempt.status === 'finished') statusIndo = 'Selesai';
-                else if (attempt.status === 'on_progress' || attempt.status === 'on progress') statusIndo = 'Sedang Dikerjakan';
+                else if (attempt.status === 'on_progress' || attempt.status === 'on progress') statusIndo =
+                    'Sedang Dikerjakan';
 
                 let summaryHtml = '';
                 let isHIP = (attempt.tipe_engine === 'single_choice' || attempt.tipe_engine === 'likert');
 
                 if (attempt.tipe_engine === 'multiple_choice') {
-                    let benar = 0, salah = 0;
-                    if(attempt.answers) {
-                        $.each(attempt.answers, function(i, a) { if(a.is_benar == 1) benar++; else salah++; });
+                    let benar = 0,
+                        salah = 0;
+                    if (attempt.answers) {
+                        $.each(attempt.answers, function(i, a) {
+                            if (a.is_benar == 1) benar++;
+                            else salah++;
+                        });
                     }
-                    summaryHtml = `<div class="alert alert-info py-2 mb-3"><strong>Ringkasan Assessment TPA:</strong> Benar: <span class="badge bg-success">${benar}</span> | Salah: <span class="badge bg-danger">${salah}</span> | Total Soal: ${attempt.answers ? attempt.answers.length : 0}</div>`;
+                    summaryHtml =
+                        `<div class="alert alert-info py-2 mb-3"><strong>Ringkasan Assessment TPA:</strong> Benar: <span class="badge bg-success">${benar}</span> | Salah: <span class="badge bg-danger">${salah}</span> | Total Soal: ${attempt.answers ? attempt.answers.length : 0}</div>`;
                 } else if (isHIP) {
-                    let ya = 0, tidak = 0;
-                    if(attempt.answers) {
+                    let ya = 0,
+                        tidak = 0;
+                    if (attempt.answers) {
                         $.each(attempt.answers, function(i, a) {
                             let jwb1 = (a.jawaban_1 || '').toString().toLowerCase().trim();
                             let optLbl = (a.option_label || '').toString().toLowerCase().trim();
-                            if (a.is_benar == 1 || a.is_benar === '1' || jwb1 === '1' || jwb1 === 'ya' || optLbl === '1' || optLbl === 'ya') {
-                                ya++; 
+                            if (a.is_benar == 1 || a.is_benar === '1' || jwb1 === '1' || jwb1 === 'ya' ||
+                                optLbl === '1' || optLbl === 'ya') {
+                                ya++;
                             } else if (jwb1 !== '' && !isNaN(jwb1) && parseInt(jwb1) > 0) {
                                 ya++;
                             } else {
@@ -666,7 +739,8 @@
                             }
                         });
                     }
-                    summaryHtml = `<div class="alert alert-info py-2 mb-3"><strong>Ringkasan Minat Bakat:</strong> Mendapat Nilai: <span class="badge bg-success">${ya}</span> | Nilai 0: <span class="badge bg-secondary">${tidak}</span> | Total Soal: ${attempt.answers ? attempt.answers.length : 0}</div>`;
+                    summaryHtml =
+                        `<div class="alert alert-info py-2 mb-3"><strong>Ringkasan Minat Bakat:</strong> Mendapat Nilai: <span class="badge bg-success">${ya}</span> | Nilai 0: <span class="badge bg-secondary">${tidak}</span> | Total Soal: ${attempt.answers ? attempt.answers.length : 0}</div>`;
                 }
 
                 let html = `
@@ -719,20 +793,25 @@
                     `;
                 }
 
-                if(attempt.answers && attempt.answers.length > 0) {
+                if (attempt.answers && attempt.answers.length > 0) {
                     $.each(attempt.answers, function(i, ans) {
                         if (isHIP) {
                             let nilai = 0;
                             let jwb1 = (ans.jawaban_1 || '').toString().toLowerCase().trim();
                             let optLbl = (ans.option_label || '').toString().toLowerCase().trim();
 
-                            if (ans.is_benar == 1 || ans.is_benar === '1') { nilai = 1; } 
-                            else if (jwb1 === '1' || jwb1 === 'ya' || jwb1 === 'benar') { nilai = 1; } 
-                            else if (optLbl === '1' || optLbl === 'ya' || optLbl === 'benar') { nilai = 1; } 
-                            else if (jwb1 !== '' && !isNaN(jwb1)) { nilai = parseInt(jwb1); }
-                            
+                            if (ans.is_benar == 1 || ans.is_benar === '1') {
+                                nilai = 1;
+                            } else if (jwb1 === '1' || jwb1 === 'ya' || jwb1 === 'benar') {
+                                nilai = 1;
+                            } else if (optLbl === '1' || optLbl === 'ya' || optLbl === 'benar') {
+                                nilai = 1;
+                            } else if (jwb1 !== '' && !isNaN(jwb1)) {
+                                nilai = parseInt(jwb1);
+                            }
+
                             let jwbAktual = ans.option_label || ans.jawaban_1 || '-';
-                            
+
                             html += `
                                 <tr>
                                     <td class="text-center">${i + 1}</td>
@@ -753,27 +832,53 @@
                     });
                 } else {
                     let colSpan = isHIP ? 4 : 3;
-                    html += `<tr><td colspan="${colSpan}" class="text-center">Belum ada jawaban tersimpan.</td></tr>`;
+                    html +=
+                        `<tr><td colspan="${colSpan}" class="text-center">Belum ada jawaban tersimpan.</td></tr>`;
                 }
                 html += `</tbody></table></div>`;
 
                 if (attempt.tipe_engine === 'disc') {
                     let ans = attempt.answers || [];
-                    let l1 = {D:0, I:0, S:0, C:0, star:0};
-                    let l2 = {D:0, I:0, S:0, C:0, star:0};
-                    
+                    let l1 = {
+                        D: 0,
+                        I: 0,
+                        S: 0,
+                        C: 0,
+                        star: 0
+                    };
+                    let l2 = {
+                        D: 0,
+                        I: 0,
+                        S: 0,
+                        C: 0,
+                        star: 0
+                    };
+
                     ans.forEach(a => {
                         let m = a.most_disc ? a.most_disc.toUpperCase() : '';
                         let k = a.least_disc ? a.least_disc.toUpperCase() : '';
-                        if(m === 'D') l1.D++; else if(m === 'I') l1.I++; else if(m === 'S') l1.S++; else if(m === 'C') l1.C++; else if(m === '*') l1.star++;
-                        if(k === 'D') l2.D++; else if(k === 'I') l2.I++; else if(k === 'S') l2.S++; else if(k === 'C') l2.C++; else if(k === '*') l2.star++;
+                        if (m === 'D') l1.D++;
+                        else if (m === 'I') l1.I++;
+                        else if (m === 'S') l1.S++;
+                        else if (m === 'C') l1.C++;
+                        else if (m === '*') l1.star++;
+                        if (k === 'D') l2.D++;
+                        else if (k === 'I') l2.I++;
+                        else if (k === 'S') l2.S++;
+                        else if (k === 'C') l2.C++;
+                        else if (k === '*') l2.star++;
                     });
 
                     let tot1 = l1.D + l1.I + l1.S + l1.C + l1.star;
                     let tot2 = l2.D + l2.I + l2.S + l2.C + l2.star;
-                    let l3 = { D: l1.D - l2.D, I: l1.I - l2.I, S: l1.S - l2.S, C: l1.C - l2.C };
+                    let l3 = {
+                        D: l1.D - l2.D,
+                        I: l1.I - l2.I,
+                        S: l1.S - l2.S,
+                        C: l1.C - l2.C
+                    };
 
-                    let urlPdf = '{!! url("admin/TestAssesment/PrintDISC") !!}/' + attempt.id;
+                    let urlPdf = '{!! url('admin/TestAssesment/PrintDISC') !!}/' + attempt.id;
                     html += `
                         <div class="p-3 border-top bg-light">
                             <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
@@ -781,7 +886,7 @@
                                 <a href="${urlPdf}" target="_blank" class="btn btn-warning btn-sm text-dark font-weight-bold "><i class="fas fa-print"></i> Cetak PDF DISC</a>
                             </div>
                     `;
-                    
+
                     html += `
                         <div class="table-responsive mb-4">
                             <table class="table table-bordered text-center table-sm font-weight-bold" style="border: 2px solid #000; font-size: 13px;">
@@ -795,23 +900,26 @@
                                 <tbody>
                     `;
 
-                    for(let i=0; i<8; i++) {
+                    for (let i = 0; i < 8; i++) {
                         let col1 = ans[i] || {};
-                        let col2 = ans[i+8] || {};
-                        let col3 = ans[i+16] || {};
+                        let col2 = ans[i + 8] || {};
+                        let col3 = ans[i + 16] || {};
 
                         html += `<tr>`;
-                        html += `<td style="border-left: 2px solid #000;">${i+1}</td>
+                        html +=
+                            `<td style="border-left: 2px solid #000;">${i+1}</td>
                                  <td style="background:#fff9c4;">${col1.most_urutan || ''}</td>
                                  <td style="background:#a7f3d0;">${col1.least_urutan || ''}</td>
                                  <td style="background:#f3e8ff;">${col1.most_disc || ''}</td>
                                  <td style="background:#f3e8ff; border-right: 2px solid #000;">${col1.least_disc || ''}</td>`;
-                        html += `<td>${i+9}</td>
+                        html +=
+                            `<td>${i+9}</td>
                                  <td style="background:#fff9c4;">${col2.most_urutan || ''}</td>
                                  <td style="background:#a7f3d0;">${col2.least_urutan || ''}</td>
                                  <td style="background:#f3e8ff;">${col2.most_disc || ''}</td>
                                  <td style="background:#f3e8ff; border-right: 2px solid #000;">${col2.least_disc || ''}</td>`;
-                        html += `<td>${i+17}</td>
+                        html +=
+                            `<td>${i+17}</td>
                                  <td style="background:#fff9c4;">${col3.most_urutan || ''}</td>
                                  <td style="background:#a7f3d0;">${col3.least_urutan || ''}</td>
                                  <td style="background:#f3e8ff;">${col3.most_disc || ''}</td>
@@ -863,22 +971,24 @@
                     `;
 
                     let res = attempt.hasil_disc;
-                    if(res) {
+                    if (res) {
                         let safeTitle = (val) => {
                             if (!val) return '-';
                             if (typeof val === 'string') return val;
                             if (typeof val === 'object') {
                                 if (val.nama) return val.nama;
                                 if (val.karakter) return val.karakter;
-                                return JSON.stringify(val); 
+                                return JSON.stringify(val);
                             }
                             return val;
                         };
 
                         let safeList = (val) => {
                             if (!val) return '';
-                            let arr = Array.isArray(val) ? val : (typeof val === 'object' ? Object.values(val) : [val]);
-                            return arr.map(s => `<li>${typeof s === 'object' ? JSON.stringify(s) : s}</li>`).join('');
+                            let arr = Array.isArray(val) ? val : (typeof val === 'object' ? Object.values(val) :
+                                [val]);
+                            return arr.map(s => `<li>${typeof s === 'object' ? JSON.stringify(s) : s}</li>`)
+                                .join('');
                         };
 
                         html += `
@@ -907,12 +1017,12 @@
                             </div>
                         `;
                     }
-                    html += `</div>`; 
+                    html += `</div>`;
 
                     setTimeout(() => {
                         renderDiscChart('discChart1', l1);
                         renderDiscChart('discChart2', l2);
-                        renderDiscChart('discChart3', l3, true); 
+                        renderDiscChart('discChart3', l3, true);
                     }, 500);
                 }
 
@@ -926,8 +1036,10 @@
                             <span class="text-danger font-weight-bold">K:</span> ${ans.least_label || '-'}`;
                 } else if (engine === 'multiple_choice') {
                     let text = ans.option_label || '-';
-                    if(ans.is_benar == 1) text += ` <i class="fas fa-check-circle text-success" title="Benar"></i>`;
-                    else if(ans.is_benar == 0 && ans.option_label) text += ` <i class="fas fa-times-circle text-danger" title="Salah"></i>`;
+                    if (ans.is_benar == 1) text +=
+                    ` <i class="fas fa-check-circle text-success" title="Benar"></i>`;
+                    else if (ans.is_benar == 0 && ans.option_label) text +=
+                        ` <i class="fas fa-times-circle text-danger" title="Salah"></i>`;
                     return text;
                 } else if (engine === 'single_choice' || engine === 'likert' || engine === 'dual_scale') {
                     return ans.option_label || '-';
@@ -937,9 +1049,11 @@
 
             function renderDiscChart(canvasId, dataSkor, isLine3 = false) {
                 let canvas = document.getElementById(canvasId);
-                if(!canvas) return;
-                
-                if(window[canvasId] instanceof Chart) { window[canvasId].destroy(); }
+                if (!canvas) return;
+
+                if (window[canvasId] instanceof Chart) {
+                    window[canvasId].destroy();
+                }
 
                 let yMin = isLine3 ? -24 : 0;
                 let yMax = 24;
@@ -962,13 +1076,21 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        scales: { y: { min: yMin, max: yMax } },
-                        plugins: { legend: { display: false } }
+                        scales: {
+                            y: {
+                                min: yMin,
+                                max: yMax
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
                     }
                 });
             }
 
-            // --- JAVASCRIPT UNTUK FORM DATA DIRI (BAWAAN) ---
             function nextEvent() {
                 $('#btn-next').click(function(e) {
                     e.preventDefault();
