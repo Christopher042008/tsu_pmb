@@ -30,8 +30,9 @@
             text-align: center;
         }
 
-        /* Tambahan CSS untuk tombol navigasi test */
-        .test-nav-btn { width: 100px; }
+        .test-nav-btn {
+            width: 100px;
+        }
     </style>
 
 @endsection
@@ -63,11 +64,11 @@
                             <h5 class="card-title">Pengumuman Diterima</h5>
                         </div>
                         <div class="card-body">
-                            @if($datadaftar->jurusan_acc)
-                                <p class="text-bold">Diterima di Universitas Tiga Serangkai pada :</p>
-                                <p class="text-bold">Fakultas : {{ $datadaftar->jurusan_acc->fakultas->namafakultas }}</p>
-                                <p class="text-bold">Jurusan :
-                                    {{ $datadaftar->jurusan_acc->jenjang->jenjang }}-{{ $datadaftar->jurusan_acc->jurusan }}</p>
+                            @if ($datadaftar->jurusan_acc)
+                            <p class="text-bold">Diterima di Universitas Tiga Serangkai pada :</p>
+                            <p class="text-bold">Fakultas : {{ $datadaftar->jurusan_acc->fakultas->namafakultas }}</p>
+                            <p class="text-bold">Jurusan :
+                                {{ $datadaftar->jurusan_acc->jenjang->jenjang }}-{{ $datadaftar->jurusan_acc->jurusan }}</p>
                             @else
                                 <p class="text-bold">Belum Ada Pengumuman Diterima</p>
                             @endif
@@ -80,7 +81,8 @@
                         <div class="card-header">
                             <h5 class="card-title">Data Pendaftaran</h5>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                                        class="fas fa-plus"></i></button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -94,7 +96,8 @@
                                     </tr>
                                     <tr>
                                         <th>Batch Daftar</th>
-                                        <th>: {{ $datadaftar->batch->nama_batch }} {{ $datadaftar->batch->tahun_akademik }}</th>
+                                        <th>: {{ $datadaftar->batch->nama_batch }}
+                                            {{ $datadaftar->batch->tahun_akademik }}</th>
                                         <th>Tahun Lulus</th>
                                         <th>: {{ $datadaftar->tahun_lulus }}</th>
                                     </tr>
@@ -102,7 +105,9 @@
                                         <th>Jalur Daftar</th>
                                         <th>: {{ $datadaftar->jalur->jenis_pendaftaran }}</th>
                                         <th>Jurusan Sekolah</th>
-                                        <th>: {{ $datadaftar->jurusansekolah->sekolah }}/{{ $datadaftar->jurusansekolah->jurusan_sekolah }}</th>
+                                        <th>:
+                                            {{ $datadaftar->jurusansekolah->sekolah }}/{{ $datadaftar->jurusansekolah->jurusan_sekolah }}
+                                        </th>
                                     </tr>
                                     <tr>
                                         <th>Program Studi Pilihan 1</th>
@@ -136,7 +141,9 @@
                                         <th>Konfirmasi Daftar</th>
                                         <th>: {{ tglIndo($tglkonfirm[0]) }}</th>
                                         <th>Biaya Pendaftaran</th>
-                                        <th>: {{ $datadaftar->jalur->biaya_pendaftaran == '1' ? rupiah($datadaftar->jalur->jml_biaya_pendaftaran) : 'Gratis' }}</th>
+                                        <th>:
+                                            {{ $datadaftar->jalur->biaya_pendaftaran == '1' ? rupiah($datadaftar->jalur->jml_biaya_pendaftaran) : 'Gratis' }}
+                                        </th>
                                     </tr>
                                     <tr>
                                         <th>Tanggal Daftar</th>
@@ -163,7 +170,10 @@
                                             <code>*Khusus Beasiswa</code><br>Tingkat Kejuaraan
                                         </th>
                                         @php
-                                            $tingkat = $datadaftar->jenisbeasiswa == null ? '-' : $datadaftar->jenisbeasiswa->idtingkat;
+                                            $tingkat =
+                                                $datadaftar->jenisbeasiswa == null
+                                                    ? '-'
+                                                    : $datadaftar->jenisbeasiswa->idtingkat;
                                         @endphp
                                         <th>:
                                             @if ($tingkat == null || $tingkat == '-')
@@ -213,7 +223,8 @@
                                             @if ($berkas_khusus == null)
                                                 <span class="badge bg-warning">Non Beasiswa</span>
                                             @else
-                                                <a href="{{ $berkas_khusus }}" target="_blank"><span class="badge bg-success">{{ $datadaftar->berkas_khusus }}</span></a>
+                                                <a href="{{ $berkas_khusus }}" target="_blank"><span
+                                                        class="badge bg-success">{{ $datadaftar->berkas_khusus }}</span></a>
                                             @endif
                                         </th>
                                         <th>Rekomendator</th>
@@ -228,7 +239,8 @@
                         <div class="card-header">
                             <h5 class="card-title">Data Pembayaran</h5>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                                        class="fas fa-plus"></i></button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -263,19 +275,24 @@
                         <div class="card-header">
                             <h5 class="card-title">Hasil Assesment</h5>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                                        class="fas fa-plus"></i></button>
                             </div>
                         </div>
                         <div class="card-body">
-                            <div id="test-navigation" style="display: none;" class="justify-content-between align-items-center mb-3">
-                                <button type="button" id="btn-prev-test" class="btn btn-secondary btn-sm test-nav-btn"><i class="fas fa-chevron-left"></i> Previous</button>
+                            <div id="test-navigation" style="display: none;"
+                                class="justify-content-between align-items-center mb-3">
+                                <button type="button" id="btn-prev-test" class="btn btn-secondary btn-sm test-nav-btn"><i
+                                        class="fas fa-chevron-left"></i> Previous</button>
                                 <h5 id="test-indicator" class="font-weight-bold m-0 text-primary">Assesment 1 dari 3</h5>
-                                <button type="button" id="btn-next-test" class="btn btn-primary btn-sm test-nav-btn">Next <i class="fas fa-chevron-right"></i></button>
+                                <button type="button" id="btn-next-test" class="btn btn-primary btn-sm test-nav-btn">Next
+                                    <i class="fas fa-chevron-right"></i></button>
                             </div>
 
                             <div id="assessment-container">
                                 <div class="text-center py-4 text-muted">
-                                    <i class="fas fa-spinner fa-spin fa-2x mb-2 text-primary"></i><br>Memuat data assessment...
+                                    <i class="fas fa-spinner fa-spin fa-2x mb-2 text-primary"></i><br>Memuat data
+                                    assessment...
                                 </div>
                             </div>
                         </div>
@@ -611,15 +628,13 @@
 
             $('.select2').select2();
 
-            // Variabel untuk Form Biodata
             let no = 1;
             let maks = 4;
 
-            // Variabel untuk Data Test Online (Terintegrasi)
             let assessmentAttempts = [];
             let currentTestIndex = 0;
             let assessmentLoaded = false;
-            let kodeDaftar = '{{ encrypt($datadaftar->KodePendaftaran) }}'; // Mengambil ID dari blade
+            let kodeDaftar = '{{ encrypt($datadaftar->KodePendaftaran) }}';
 
             LoadEvent();
 
@@ -628,36 +643,36 @@
                 prevEvent();
                 handleTestNavigation();
 
-                // Load Test Data ketika Card Data Test Online di-expand
                 $('#card-assessment').on('expanded.lte.cardwidget', function() {
-                    if(!assessmentLoaded) {
+                    if (!assessmentLoaded) {
                         loadAssessmentData();
                     }
                 });
 
-                // Atau load langsung jika tidak ingin menunggu card di-expand
                 loadAssessmentData();
             }
 
-            // --- JAVASCRIPT UNTUK DATA TEST ONLINE (PERSIS SEPERTI DI HASIL ASSESMENT) ---
             function loadAssessmentData() {
                 $.ajax({
                     type: "GET",
-                    // Mengambil API yang sudah ada di TestAssesmentController
-                    url: '{!! url("admin/TestAssesment/DetailTestOnlinePMB") !!}/' + encodeURIComponent(kodeDaftar),
+                    url: '{!! url('admin/TestAssesment/DetailTestOnlinePMB') !!}/' + encodeURIComponent(kodeDaftar),
                     dataType: "JSON",
                     success: function(data) {
                         assessmentLoaded = true;
-                        if(data.hasil == 1 && data.attempts && data.attempts.length > 0) {
+                        if (data.hasil == 1 && data.attempts && data.attempts.length > 0) {
                             assessmentAttempts = data.attempts;
                             $('#test-navigation').addClass('d-flex').show();
                             renderTestContent(currentTestIndex);
                         } else {
-                            $('#assessment-container').html('<div class="alert alert-warning text-center m-3">Peserta belum menyelesaikan satupun Assessment.</div>');
+                            $('#assessment-container').html(
+                                '<div class="alert alert-warning text-center m-3">Peserta belum menyelesaikan satupun Assessment.</div>'
+                                );
                         }
                     },
                     error: function() {
-                        $('#assessment-container').html('<div class="alert alert-danger text-center m-3">Terjadi kesalahan saat memuat data Assessment.</div>');
+                        $('#assessment-container').html(
+                            '<div class="alert alert-danger text-center m-3">Terjadi kesalahan saat memuat data Assessment.</div>'
+                            );
                     }
                 });
             }
@@ -690,24 +705,32 @@
 
                 let statusIndo = 'Belum Mulai';
                 if (attempt.status === 'finished') statusIndo = 'Selesai';
-                else if (attempt.status === 'on_progress' || attempt.status === 'on progress') statusIndo = 'Sedang Dikerjakan';
+                else if (attempt.status === 'on_progress' || attempt.status === 'on progress') statusIndo =
+                    'Sedang Dikerjakan';
 
                 let summaryHtml = '';
                 let isHIP = (attempt.tipe_engine === 'single_choice' || attempt.tipe_engine === 'likert');
 
                 if (attempt.tipe_engine === 'multiple_choice') {
-                    let benar = 0, salah = 0;
-                    if(attempt.answers) {
-                        $.each(attempt.answers, function(i, a) { if(a.is_benar == 1) benar++; else salah++; });
+                    let benar = 0,
+                        salah = 0;
+                    if (attempt.answers) {
+                        $.each(attempt.answers, function(i, a) {
+                            if (a.is_benar == 1) benar++;
+                            else salah++;
+                        });
                     }
-                    summaryHtml = `<div class="alert alert-info py-2 mb-3"><strong>Ringkasan Assessment TPA:</strong> Benar: <span class="badge bg-success">${benar}</span> | Salah: <span class="badge bg-danger">${salah}</span> | Total Soal: ${attempt.answers ? attempt.answers.length : 0}</div>`;
+                    summaryHtml =
+                        `<div class="alert alert-info py-2 mb-3"><strong>Ringkasan Assessment TPA:</strong> Benar: <span class="badge bg-success">${benar}</span> | Salah: <span class="badge bg-danger">${salah}</span> | Total Soal: ${attempt.answers ? attempt.answers.length : 0}</div>`;
                 } else if (isHIP) {
-                    let ya = 0, tidak = 0;
-                    if(attempt.answers) {
+                    let ya = 0,
+                        tidak = 0;
+                    if (attempt.answers) {
                         $.each(attempt.answers, function(i, a) {
                             let jwb1 = (a.jawaban_1 || '').toString().toLowerCase().trim();
                             let optLbl = (a.option_label || '').toString().toLowerCase().trim();
-                            if (a.is_benar == 1 || a.is_benar === '1' || jwb1 === '1' || jwb1 === 'ya' || optLbl === '1' || optLbl === 'ya') {
+                            if (a.is_benar == 1 || a.is_benar === '1' || jwb1 === '1' || jwb1 === 'ya' ||
+                                optLbl === '1' || optLbl === 'ya') {
                                 ya++;
                             } else if (jwb1 !== '' && !isNaN(jwb1) && parseInt(jwb1) > 0) {
                                 ya++;
@@ -716,7 +739,8 @@
                             }
                         });
                     }
-                    summaryHtml = `<div class="alert alert-info py-2 mb-3"><strong>Ringkasan Minat Bakat:</strong> Mendapat Nilai: <span class="badge bg-success">${ya}</span> | Nilai 0: <span class="badge bg-secondary">${tidak}</span> | Total Soal: ${attempt.answers ? attempt.answers.length : 0}</div>`;
+                    summaryHtml =
+                        `<div class="alert alert-info py-2 mb-3"><strong>Ringkasan Minat Bakat:</strong> Mendapat Nilai: <span class="badge bg-success">${ya}</span> | Nilai 0: <span class="badge bg-secondary">${tidak}</span> | Total Soal: ${attempt.answers ? attempt.answers.length : 0}</div>`;
                 }
 
                 let html = `
@@ -769,17 +793,22 @@
                     `;
                 }
 
-                if(attempt.answers && attempt.answers.length > 0) {
+                if (attempt.answers && attempt.answers.length > 0) {
                     $.each(attempt.answers, function(i, ans) {
                         if (isHIP) {
                             let nilai = 0;
                             let jwb1 = (ans.jawaban_1 || '').toString().toLowerCase().trim();
                             let optLbl = (ans.option_label || '').toString().toLowerCase().trim();
 
-                            if (ans.is_benar == 1 || ans.is_benar === '1') { nilai = 1; }
-                            else if (jwb1 === '1' || jwb1 === 'ya' || jwb1 === 'benar') { nilai = 1; }
-                            else if (optLbl === '1' || optLbl === 'ya' || optLbl === 'benar') { nilai = 1; }
-                            else if (jwb1 !== '' && !isNaN(jwb1)) { nilai = parseInt(jwb1); }
+                            if (ans.is_benar == 1 || ans.is_benar === '1') {
+                                nilai = 1;
+                            } else if (jwb1 === '1' || jwb1 === 'ya' || jwb1 === 'benar') {
+                                nilai = 1;
+                            } else if (optLbl === '1' || optLbl === 'ya' || optLbl === 'benar') {
+                                nilai = 1;
+                            } else if (jwb1 !== '' && !isNaN(jwb1)) {
+                                nilai = parseInt(jwb1);
+                            }
 
                             let jwbAktual = ans.option_label || ans.jawaban_1 || '-';
 
@@ -803,27 +832,53 @@
                     });
                 } else {
                     let colSpan = isHIP ? 4 : 3;
-                    html += `<tr><td colspan="${colSpan}" class="text-center">Belum ada jawaban tersimpan.</td></tr>`;
+                    html +=
+                        `<tr><td colspan="${colSpan}" class="text-center">Belum ada jawaban tersimpan.</td></tr>`;
                 }
                 html += `</tbody></table></div>`;
 
                 if (attempt.tipe_engine === 'disc') {
                     let ans = attempt.answers || [];
-                    let l1 = {D:0, I:0, S:0, C:0, star:0};
-                    let l2 = {D:0, I:0, S:0, C:0, star:0};
+                    let l1 = {
+                        D: 0,
+                        I: 0,
+                        S: 0,
+                        C: 0,
+                        star: 0
+                    };
+                    let l2 = {
+                        D: 0,
+                        I: 0,
+                        S: 0,
+                        C: 0,
+                        star: 0
+                    };
 
                     ans.forEach(a => {
                         let m = a.most_disc ? a.most_disc.toUpperCase() : '';
                         let k = a.least_disc ? a.least_disc.toUpperCase() : '';
-                        if(m === 'D') l1.D++; else if(m === 'I') l1.I++; else if(m === 'S') l1.S++; else if(m === 'C') l1.C++; else if(m === '*') l1.star++;
-                        if(k === 'D') l2.D++; else if(k === 'I') l2.I++; else if(k === 'S') l2.S++; else if(k === 'C') l2.C++; else if(k === '*') l2.star++;
+                        if (m === 'D') l1.D++;
+                        else if (m === 'I') l1.I++;
+                        else if (m === 'S') l1.S++;
+                        else if (m === 'C') l1.C++;
+                        else if (m === '*') l1.star++;
+                        if (k === 'D') l2.D++;
+                        else if (k === 'I') l2.I++;
+                        else if (k === 'S') l2.S++;
+                        else if (k === 'C') l2.C++;
+                        else if (k === '*') l2.star++;
                     });
 
                     let tot1 = l1.D + l1.I + l1.S + l1.C + l1.star;
                     let tot2 = l2.D + l2.I + l2.S + l2.C + l2.star;
-                    let l3 = { D: l1.D - l2.D, I: l1.I - l2.I, S: l1.S - l2.S, C: l1.C - l2.C };
+                    let l3 = {
+                        D: l1.D - l2.D,
+                        I: l1.I - l2.I,
+                        S: l1.S - l2.S,
+                        C: l1.C - l2.C
+                    };
 
-                    let urlPdf = '{!! url("admin/TestAssesment/PrintDISC") !!}/' + attempt.id;
+                    let urlPdf = '{!! url('admin/TestAssesment/PrintDISC') !!}/' + attempt.id;
                     html += `
                         <div class="p-3 border-top bg-light">
                             <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
@@ -845,23 +900,26 @@
                                 <tbody>
                     `;
 
-                    for(let i=0; i<8; i++) {
+                    for (let i = 0; i < 8; i++) {
                         let col1 = ans[i] || {};
-                        let col2 = ans[i+8] || {};
-                        let col3 = ans[i+16] || {};
+                        let col2 = ans[i + 8] || {};
+                        let col3 = ans[i + 16] || {};
 
                         html += `<tr>`;
-                        html += `<td style="border-left: 2px solid #000;">${i+1}</td>
+                        html +=
+                            `<td style="border-left: 2px solid #000;">${i+1}</td>
                                  <td style="background:#fff9c4;">${col1.most_urutan || ''}</td>
                                  <td style="background:#a7f3d0;">${col1.least_urutan || ''}</td>
                                  <td style="background:#f3e8ff;">${col1.most_disc || ''}</td>
                                  <td style="background:#f3e8ff; border-right: 2px solid #000;">${col1.least_disc || ''}</td>`;
-                        html += `<td>${i+9}</td>
+                        html +=
+                            `<td>${i+9}</td>
                                  <td style="background:#fff9c4;">${col2.most_urutan || ''}</td>
                                  <td style="background:#a7f3d0;">${col2.least_urutan || ''}</td>
                                  <td style="background:#f3e8ff;">${col2.most_disc || ''}</td>
                                  <td style="background:#f3e8ff; border-right: 2px solid #000;">${col2.least_disc || ''}</td>`;
-                        html += `<td>${i+17}</td>
+                        html +=
+                            `<td>${i+17}</td>
                                  <td style="background:#fff9c4;">${col3.most_urutan || ''}</td>
                                  <td style="background:#a7f3d0;">${col3.least_urutan || ''}</td>
                                  <td style="background:#f3e8ff;">${col3.most_disc || ''}</td>
@@ -913,7 +971,7 @@
                     `;
 
                     let res = attempt.hasil_disc;
-                    if(res) {
+                    if (res) {
                         let safeTitle = (val) => {
                             if (!val) return '-';
                             if (typeof val === 'string') return val;
@@ -927,8 +985,10 @@
 
                         let safeList = (val) => {
                             if (!val) return '';
-                            let arr = Array.isArray(val) ? val : (typeof val === 'object' ? Object.values(val) : [val]);
-                            return arr.map(s => `<li>${typeof s === 'object' ? JSON.stringify(s) : s}</li>`).join('');
+                            let arr = Array.isArray(val) ? val : (typeof val === 'object' ? Object.values(val) :
+                                [val]);
+                            return arr.map(s => `<li>${typeof s === 'object' ? JSON.stringify(s) : s}</li>`)
+                                .join('');
                         };
 
                         html += `
@@ -976,8 +1036,10 @@
                             <span class="text-danger font-weight-bold">K:</span> ${ans.least_label || '-'}`;
                 } else if (engine === 'multiple_choice') {
                     let text = ans.option_label || '-';
-                    if(ans.is_benar == 1) text += ` <i class="fas fa-check-circle text-success" title="Benar"></i>`;
-                    else if(ans.is_benar == 0 && ans.option_label) text += ` <i class="fas fa-times-circle text-danger" title="Salah"></i>`;
+                    if (ans.is_benar == 1) text +=
+                    ` <i class="fas fa-check-circle text-success" title="Benar"></i>`;
+                    else if (ans.is_benar == 0 && ans.option_label) text +=
+                        ` <i class="fas fa-times-circle text-danger" title="Salah"></i>`;
                     return text;
                 } else if (engine === 'single_choice' || engine === 'likert' || engine === 'dual_scale') {
                     return ans.option_label || '-';
@@ -987,9 +1049,11 @@
 
             function renderDiscChart(canvasId, dataSkor, isLine3 = false) {
                 let canvas = document.getElementById(canvasId);
-                if(!canvas) return;
+                if (!canvas) return;
 
-                if(window[canvasId] instanceof Chart) { window[canvasId].destroy(); }
+                if (window[canvasId] instanceof Chart) {
+                    window[canvasId].destroy();
+                }
 
                 let yMin = isLine3 ? -24 : 0;
                 let yMax = 24;
@@ -1012,13 +1076,21 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        scales: { y: { min: yMin, max: yMax } },
-                        plugins: { legend: { display: false } }
+                        scales: {
+                            y: {
+                                min: yMin,
+                                max: yMax
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
                     }
                 });
             }
 
-            // --- JAVASCRIPT UNTUK FORM DATA DIRI (BAWAAN) ---
             function nextEvent() {
                 $('#btn-next').click(function(e) {
                     e.preventDefault();

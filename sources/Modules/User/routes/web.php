@@ -109,9 +109,9 @@ Route::prefix('')->group(function () {
                 Route::get('/', [HasilPMBController::class, 'index'])->name('HasilPMB');
             });
             Route::prefix('Assessment')->group(function () {
-
                 Route::get('/', [AssessmentController::class, 'index'])->name('assessment.index');
-                Route::post('/start', [AssessmentController::class, 'startTest'])->name('assessment.start');
+                Route::get('/prepare/{id}', [AssessmentController::class, 'prepareTest'])->name('assessment.prepare');
+                Route::post('/start-exam', [AssessmentController::class, 'startExam'])->name('assessment.start_exam');
                 Route::post('/save-answer', [AssessmentController::class, 'saveAnswer'])->name('assessment.save_answer');
                 Route::post('/finish', [AssessmentController::class, 'finishTest'])->name('assessment.finish');
             });

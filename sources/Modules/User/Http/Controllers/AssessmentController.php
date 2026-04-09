@@ -33,22 +33,32 @@ class AssessmentController extends Controller
             ->first();
 
         if ($activeAttempt) {
-            $selesai_at = \Carbon\Carbon::parse($activeAttempt->selesai_at);
-            $sekarang = \Carbon\Carbon::now();
-
-            // Cek apakah waktu sudah habis secara server-side
-            if ($sekarang >= $selesai_at) {
-                // Auto-submit via backend jika user me-refresh saat waktu habis
-                return $this->processFinishTest($activeAttempt->id);
-            }
-
-            // ==========================================
-            // BAGIAN INI YANG TERLEWAT DI KODE KAMU: 
-            // Hitung sisa detik berdasarkan waktu server
-            // ==========================================
-            $sisaWaktuDetik = $sekarang->diffInSeconds($selesai_at);
-
             $testInfo = Assessment_TipeTest::find($activeAttempt->tipe_test_id);
+
+            // ==========================================
+            // PENGECEKAN WAKTU DAN TIMER
+            // ==========================================
+            // Cek apakah timer BENAR-BENAR sudah dijalankan (selesai_at tidak null)
+            if ($activeAttempt->selesai_at) {
+                $selesai_at = \Carbon\Carbon::parse($activeAttempt->selesai_at);
+                $sekarang = \Carbon\Carbon::now();
+
+                // Cek apakah waktu sudah habis secara server-side
+                if ($sekarang >= $selesai_at) {
+                    // Auto-submit via backend jika user me-refresh saat waktu habis
+                    return $this->processFinishTest($activeAttempt->id);
+                }
+                
+                // Hitung sisa detik berdasarkan waktu server
+                $sisaWaktuDetik = $sekarang->diffInSeconds($selesai_at);
+                $isTimerStarted = true; // Tandai timer sudah jalan
+            } else {
+                // Jika belum mulai (masih baca peringatan), kasih waktu full tapi jangan jalankan perhitungan
+                $sisaWaktuDetik = $testInfo->durasi_menit * 60;
+                $isTimerStarted = false; // Tandai timer belum jalan
+            }
+            // ==========================================
+
 
             $questions = Assessment_Questions::where('tipe_test_id', $testInfo->id)
                 ->where('isactive', 1)->orderBy('urutan')->get();
@@ -73,7 +83,8 @@ class AssessmentController extends Controller
                 'questions' => $questions,
                 'saved_answers' => $savedAnswers,
                 'selesai_at' => $activeAttempt->selesai_at,
-                'sisa_waktu_detik' => $sisaWaktuDetik // <-- Jangan lupa lempar variabel ini ke view!
+                'sisa_waktu_detik' => $sisaWaktuDetik,
+                'is_timer_started' => $isTimerStarted // Variabel penanda untuk Javascript
             ]);
         }
 
@@ -85,6 +96,7 @@ class AssessmentController extends Controller
             ->first();
 
         $tests = Assessment_TipeTest::where('isactive', 1)->orderBy('urutan')->get();
+        
         // Cek attempt di dashboard juga pakai $kodePendaftaran
         $attempts = Assessment_Attempts::where('kodependaftaran', $kodePendaftaran)->get()->keyBy('tipe_test_id');
 
@@ -97,33 +109,75 @@ class AssessmentController extends Controller
         ]);
     }
 
-    // Method untuk Memulai Ujian
-    public function startTest(Request $request)
+    public function prepareTest($id)
+    {
+        $kodePendaftaran = $this->getKodePendaftaran();
+
+        $exists = Assessment_Attempts::where('kodependaftaran', $kodePendaftaran)
+            ->where('tipe_test_id', $id)
+            ->first();
+
+        if ($exists && $exists->status == 'finished') {
+            return redirect()->route('assessment.index')->with('error', 'Anda sudah menyelesaikan tes ini.');
+        }
+
+        if ($exists && $exists->status == 'in_progress') {
+            return redirect()->route('assessment.index');
+        }
+
+        $testInfo = Assessment_TipeTest::findOrFail($id);
+        $questions = Assessment_Questions::where('tipe_test_id', $testInfo->id)
+            ->where('isactive', 1)->orderBy('urutan')->get();
+
+        $questionIds = $questions->pluck('id')->toArray();
+        $allOptions = \DB::table('pmb_assessment_question_options')
+            ->whereIn('question_id', $questionIds)
+            ->orderBy('urutan')->get()->groupBy('question_id');
+
+        foreach ($questions as $q) {
+            $q->options = $allOptions->get($q->id, collect());
+        }
+
+        return view('user::user.assessment.index', [
+            'title' => 'Persiapan: ' . $testInfo->nama_test,
+            'menu' => 'Persiapan Ujian',
+            'is_preparing' => true,
+            'test_info' => $testInfo,
+            'questions' => $questions,
+            'saved_answers' => [], 
+            'sisa_waktu_detik' => $testInfo->durasi_menit * 60,
+            'is_timer_started' => false
+        ]);
+    }
+
+    public function startExam(Request $request)
     {
         $kodePendaftaran = $this->getKodePendaftaran();
         $tipeTestId = $request->tipe_test_id;
 
         $testInfo = Assessment_TipeTest::findOrFail($tipeTestId);
+        $durasi = $testInfo->durasi_menit;
 
-        $exists = Assessment_Attempts::where('kodependaftaran', $kodePendaftaran)
+        $attempt = Assessment_Attempts::where('kodependaftaran', $kodePendaftaran)
             ->where('tipe_test_id', $tipeTestId)
             ->first();
 
-        if ($exists && $exists->status == 'finished') {
-            return redirect()->back()->with('error', 'Anda sudah menyelesaikan tes ini.');
-        }
-
-        if (!$exists) {
-            Assessment_Attempts::create([
+        if (!$attempt) {
+            // Pencatatan Attempts Baru Dieksekusi Disini
+            $attempt = Assessment_Attempts::create([
                 'kodependaftaran' => $kodePendaftaran,
                 'tipe_test_id' => $tipeTestId,
                 'mulai_at' => Carbon::now(),
-                'selesai_at' => Carbon::now()->addMinutes($testInfo->durasi_menit),
+                'selesai_at' => Carbon::now()->addMinutes($durasi),
                 'status' => 'in_progress'
             ]);
-        }
+        } 
 
-        return redirect()->route('assessment.index');
+        return response()->json([
+            'status' => 'success',
+            'attempt_id' => $attempt->id,
+            'sisa_detik' => $durasi * 60
+        ]);
     }
 
 
@@ -248,3 +302,4 @@ class AssessmentController extends Controller
     }
     
 }
+
