@@ -64,11 +64,11 @@
                             <h5 class="card-title">Pengumuman Diterima</h5>
                         </div>
                         <div class="card-body">
-                            @if($datadaftar->jurusan_acc)
-                                <p class="text-bold">Diterima di Universitas Tiga Serangkai pada :</p>
-                                <p class="text-bold">Fakultas : {{ $datadaftar->jurusan_acc->fakultas->namafakultas }}</p>
-                                <p class="text-bold">Jurusan :
-                                    {{ $datadaftar->jurusan_acc->jenjang->jenjang }}-{{ $datadaftar->jurusan_acc->jurusan }}</p>
+                            @if ($datadaftar->jurusan_acc)
+                            <p class="text-bold">Diterima di Universitas Tiga Serangkai pada :</p>
+                            <p class="text-bold">Fakultas : {{ $datadaftar->jurusan_acc->fakultas->namafakultas }}</p>
+                            <p class="text-bold">Jurusan :
+                                {{ $datadaftar->jurusan_acc->jenjang->jenjang }}-{{ $datadaftar->jurusan_acc->jurusan }}</p>
                             @else
                                 <p class="text-bold">Belum Ada Pengumuman Diterima</p>
                             @endif
@@ -631,7 +631,6 @@
             let no = 1;
             let maks = 4;
 
-            // Variabel untuk Data Test Online (Terintegrasi)
             let assessmentAttempts = [];
             let currentTestIndex = 0;
             let assessmentLoaded = false;
@@ -644,14 +643,12 @@
                 prevEvent();
                 handleTestNavigation();
 
-                // Load Test Data ketika Card Data Test Online di-expand
                 $('#card-assessment').on('expanded.lte.cardwidget', function() {
                     if (!assessmentLoaded) {
                         loadAssessmentData();
                     }
                 });
 
-                // Atau load langsung jika tidak ingin menunggu card di-expand
                 loadAssessmentData();
             }
 
@@ -732,7 +729,8 @@
                         $.each(attempt.answers, function(i, a) {
                             let jwb1 = (a.jawaban_1 || '').toString().toLowerCase().trim();
                             let optLbl = (a.option_label || '').toString().toLowerCase().trim();
-                            if (a.is_benar == 1 || a.is_benar === '1' || jwb1 === '1' || jwb1 === 'ya' || optLbl === '1' || optLbl === 'ya') {
+                            if (a.is_benar == 1 || a.is_benar === '1' || jwb1 === '1' || jwb1 === 'ya' ||
+                                optLbl === '1' || optLbl === 'ya') {
                                 ya++;
                             } else if (jwb1 !== '' && !isNaN(jwb1) && parseInt(jwb1) > 0) {
                                 ya++;
@@ -802,10 +800,15 @@
                             let jwb1 = (ans.jawaban_1 || '').toString().toLowerCase().trim();
                             let optLbl = (ans.option_label || '').toString().toLowerCase().trim();
 
-                            if (ans.is_benar == 1 || ans.is_benar === '1') { nilai = 1; }
-                            else if (jwb1 === '1' || jwb1 === 'ya' || jwb1 === 'benar') { nilai = 1; }
-                            else if (optLbl === '1' || optLbl === 'ya' || optLbl === 'benar') { nilai = 1; }
-                            else if (jwb1 !== '' && !isNaN(jwb1)) { nilai = parseInt(jwb1); }
+                            if (ans.is_benar == 1 || ans.is_benar === '1') {
+                                nilai = 1;
+                            } else if (jwb1 === '1' || jwb1 === 'ya' || jwb1 === 'benar') {
+                                nilai = 1;
+                            } else if (optLbl === '1' || optLbl === 'ya' || optLbl === 'benar') {
+                                nilai = 1;
+                            } else if (jwb1 !== '' && !isNaN(jwb1)) {
+                                nilai = parseInt(jwb1);
+                            }
 
                             let jwbAktual = ans.option_label || ans.jawaban_1 || '-';
 
@@ -836,8 +839,20 @@
 
                 if (attempt.tipe_engine === 'disc') {
                     let ans = attempt.answers || [];
-                    let l1 = {D:0, I:0, S:0, C:0, star:0};
-                    let l2 = {D:0, I:0, S:0, C:0, star:0};
+                    let l1 = {
+                        D: 0,
+                        I: 0,
+                        S: 0,
+                        C: 0,
+                        star: 0
+                    };
+                    let l2 = {
+                        D: 0,
+                        I: 0,
+                        S: 0,
+                        C: 0,
+                        star: 0
+                    };
 
                     ans.forEach(a => {
                         let m = a.most_disc ? a.most_disc.toUpperCase() : '';
@@ -1034,9 +1049,11 @@
 
             function renderDiscChart(canvasId, dataSkor, isLine3 = false) {
                 let canvas = document.getElementById(canvasId);
-                if(!canvas) return;
+                if (!canvas) return;
 
-                if(window[canvasId] instanceof Chart) { window[canvasId].destroy(); }
+                if (window[canvasId] instanceof Chart) {
+                    window[canvasId].destroy();
+                }
 
                 let yMin = isLine3 ? -24 : 0;
                 let yMax = 24;
