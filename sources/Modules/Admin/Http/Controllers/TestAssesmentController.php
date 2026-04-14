@@ -119,7 +119,8 @@ class TestAssesmentController extends Controller
                 $id = encrypt($d->KodePendaftaran);
                 // Tombol detail selalu muncul (atau bisa dibatasi if $totalAttempts > 0)
                 $detail = '<a href="#" data-id="' . $id . '" class="btn_detail"><i title="Detail Test" class="fa fa-info-circle fa-lg"></i></a>';
-                return $detail;
+                $reset  = '<a href="#" data-id="' . $id . '" class="btn_reset ml-2"><i title="Reset Ujian" class="fa fa-sync-alt fa-lg text-warning"></i></a>';
+                return $detail . $reset;
             })
             ->rawColumns(['action', 'status', 'validator', 'hasil'])
             ->make(true);
@@ -261,6 +262,67 @@ class TestAssesmentController extends Controller
             return response()->json([
                 'hasil' => 0,
                 'message' => 'Terjadi kesalahan Sistem' 
+            ], 500);
+        }
+    }
+
+    public function reset_test(Request $request)
+    {
+        try {
+            $kodedaftar = decrypt($request->kodedaftar);
+            $jenis = $request->jenis;
+
+            DB::beginTransaction();
+
+            // 1. Cari attempt berdasarkan jenis test
+            $query = DB::table('pmb_assessment_attempts as a')
+                ->join('pmb_assessment_tipe_test as t', 'a.tipe_test_id', '=', 't.id')
+                ->where('a.kodependaftaran', $kodedaftar)
+                ->select('a.id');
+
+            if ($jenis == 'tpa') {
+                $query->where('t.tipe_engine', 'multiple_choice');
+            } elseif ($jenis == 'hip') {
+                $query->whereIn('t.tipe_engine', ['single_choice', 'likert', 'dual_scale']);
+            } elseif ($jenis == 'disc') {
+                $query->where('t.tipe_engine', 'disc');
+            }
+
+            $attempts = $query->pluck('id')->toArray();
+
+            if (!empty($attempts)) {
+                // 2. Hapus Jawaban
+                DB::table('pmb_assessment_answers')->whereIn('attempt_id', $attempts)->delete();
+                
+                // 3. Hapus Hasil (JSON DISC jika ada)
+                DB::table('pmb_assessment_test_results')->whereIn('attempt_id', $attempts)->delete();
+                
+                // 4. Hapus Riwayat Attempt agar bisa mulai dari awal
+                DB::table('pmb_assessment_attempts')->whereIn('id', $attempts)->delete();
+            }
+
+            // 5. REVISI: Reset Validasi dan kembalikan Current Step ke 6
+            Pendaftaran::where('KodePendaftaran', $kodedaftar)->update([
+                'validasi_test' => '0',
+                'jurusan_diterima' => null,
+                'keterangan' => null,
+                'current_step' => 6 // Peserta balik ke tahap sebelum validasi (pengerjaan ulang)
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'title' => 'Berhasil',
+                'message' => 'Data ujian berhasil direset.',
+                'status' => 'success'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'title' => 'Gagal',
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage(),
+                'status' => 'error'
             ], 500);
         }
     }

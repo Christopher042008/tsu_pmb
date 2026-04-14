@@ -130,6 +130,37 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modal-reset" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title font-weight-bold text-dark"><i class="fas fa-sync-alt"></i> Reset Ujian</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="bg-light p-2 mb-3 rounded border">
+                        <h6 class="font-weight-bold mb-1" id="reset-nama-peserta">-</h6>
+                        <span class="badge badge-info" id="reset-noreg-peserta">-</span>
+                    </div>
+                    
+                    <p class="mb-3 text-sm">Pilih ujian yang ingin direset:</p>
+                    <input type="hidden" id="reset-kodedaftar" value="">
+                    
+                    <div class="d-flex flex-column align-items-center">
+                        <button type="button" id="btn-reset-tpa" class="btn btn-primary btn-block mb-2 btn-aksi-reset" data-jenis="tpa">Reset TPA</button>
+                        <button type="button" id="btn-reset-hip" class="btn btn-info btn-block mb-2 btn-aksi-reset" data-jenis="hip">Reset HIP</button>
+                        <button type="button" id="btn-reset-disc" class="btn btn-secondary btn-block mb-2 btn-aksi-reset" data-jenis="disc">Reset DISC</button>
+                        
+                        <div id="divider-semua" class="w-100" style="display: none;"><hr class="mt-2 mb-2"></div>
+                        
+                        <button type="button" id="btn-reset-semua" class="btn btn-danger btn-block mb-2 btn-aksi-reset" data-jenis="semua">Reset SEMUA Ujian</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('script')
@@ -151,6 +182,145 @@
                 tabelTestPMB();
                 submitlolostest();
                 handleTestNavigation();
+
+                // 1. Membuka Modal Reset saat tombol warna kuning di klik (Logika Dinamis)
+                $('#example2').on('click', '.btn_reset', function(e) {
+                    e.preventDefault();
+                    let id = $(this).attr('data-id');
+                    $('#reset-kodedaftar').val(id);
+
+                    // Cek dulu ke database, ujian apa saja yang sudah dikerjakan
+                    $.ajax({
+                        type: "GET",
+                        url: '{!! url("admin/TestAssesment/DetailTestOnlinePMB") !!}/' + encodeURIComponent(id),
+                        dataType: "JSON",
+                        beforeSend: function() {
+                            $('#loading').show();
+                            // Kembalikan tulisan tombol ke default saat sedang loading
+                            $('#btn-reset-tpa').text('Reset TPA');
+                            $('#btn-reset-hip').text('Reset HIP');
+                            $('#btn-reset-disc').text('Reset DISC');
+                            $('#reset-nama-peserta').text('Loading...');
+                            $('#reset-noreg-peserta').text('-');
+                        },
+                        success: function(data) {
+                            $('#loading').hide();
+                            
+                            // Sembunyikan semua tombol di awal
+                            $('#btn-reset-tpa, #btn-reset-hip, #btn-reset-disc, #btn-reset-semua, #divider-semua').hide();
+
+                            if(data.hasil == 1 && data.attempts && data.attempts.length > 0) {
+                                
+                                // Tampilkan Nama dan No Registrasi ke dalam Modal
+                                let namaPeserta = data.daftar.biodata ? data.daftar.biodata.nama : 'Nama Tidak Ditemukan';
+                                $('#reset-nama-peserta').text(namaPeserta);
+                                $('#reset-noreg-peserta').text(data.daftar.KodePendaftaran);
+
+                                let hasTPA = false;
+                                let hasHIP = false;
+                                let hasDISC = false;
+
+                                // Deteksi ujian & Ubah Text tombol sesuai nama di database (tipe_test_nama)
+                                data.attempts.forEach(function(attempt) {
+                                    if (attempt.tipe_engine === 'multiple_choice') {
+                                        hasTPA = true;
+                                        $('#btn-reset-tpa').text('Reset ' + attempt.tipe_test_nama);
+                                    }
+                                    else if (['single_choice', 'likert', 'dual_scale'].includes(attempt.tipe_engine)) {
+                                        hasHIP = true;
+                                        $('#btn-reset-hip').text('Reset ' + attempt.tipe_test_nama);
+                                    }
+                                    else if (attempt.tipe_engine === 'disc') {
+                                        hasDISC = true;
+                                        $('#btn-reset-disc').text('Reset ' + attempt.tipe_test_nama);
+                                    }
+                                });
+
+                                // Tampilkan hanya tombol ujian yang ada
+                                if(hasTPA) $('#btn-reset-tpa').show();
+                                if(hasHIP) $('#btn-reset-hip').show();
+                                if(hasDISC) $('#btn-reset-disc').show();
+                                
+                                // Jika ada lebih dari 1 ujian, tampilkan tombol "Reset Semua"
+                                if(data.attempts.length > 1) {
+                                    $('#divider-semua').show();
+                                    $('#btn-reset-semua').show();
+                                }
+
+                                $('#modal-reset').modal('show');
+                            } else {
+                                // Jika belum ngerjain sama sekali
+                                Swal.fire('Information', 'Peserta ini belum memulai atau mengerjakan ujian apapun.', 'info');
+                            }
+                        },
+                        error: function() {
+                            $('#loading').hide();
+                            Swal.fire('Error', 'Gagal memuat riwayat ujian peserta', 'error');
+                        }
+                    });
+                });
+
+                // 2. Eksekusi Reset berdasarkan jenis ujian
+                $('.btn-aksi-reset').click(function(e) {
+                    e.preventDefault();
+                    let jenis = $(this).data('jenis');
+                    let id = $('#reset-kodedaftar').val();
+                    let label = $(this).text();
+
+                    Swal.fire({
+                        title: "Konfirmasi Reset",
+                        text: `Apakah Anda yakin ingin melakukan ${label}? Jawaban peserta sebelumnya akan terhapus permanen!`,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Ya, Reset!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: "{{ route('admin.testassesment.reset') }}", // Panggil route reset
+                                type: "POST",
+                                data: {
+                                    kodedaftar: id,
+                                    jenis: jenis
+                                },
+                                dataType: "JSON",
+                                beforeSend: function() { 
+                                    $('#loading').show(); 
+                                    $('#modal-reset').modal('hide');
+                                },
+                                success: function(res) {
+                                    $('#loading').hide();
+                                    Swal.fire(res.title, res.message, res.status).then(() => {
+                                        if(res.status == 'success') {
+                                            $('#example2').DataTable().ajax.reload(null, false);
+                                        }
+                                    });
+                                },
+                                error: function(xhr, status, error) {
+                                    $('#loading').hide();
+                                    
+                                    // --- MULAI CONSOLE LOG DEBUGGING ---
+                                    console.error("=== TERJADI ERROR AJAX ===");
+                                    console.log("Status:", status);
+                                    console.log("Error Message:", error);
+                                    console.log("Response Text (Pesan dari Laravel):", xhr.responseText);
+                                    // -----------------------------------
+
+                                    // Coba ambil pesan error spesifik dari JSON jika ada
+                                    let errorMsg = 'Gagal menghubungi server. Silakan cek tab Console di Inspect Element!';
+                                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                                        errorMsg = xhr.responseJSON.message;
+                                    } else if (xhr.responseJSON && xhr.responseJSON.title) {
+                                        errorMsg = xhr.responseJSON.title; // Kadang errornya ada di index title
+                                    }
+
+                                    Swal.fire('Error Sistem', errorMsg, 'error');
+                                }
+                            });
+                        }
+                    });
+                });
             }
 
             function tabelTestPMB() {
