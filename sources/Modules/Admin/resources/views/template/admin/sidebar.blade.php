@@ -44,91 +44,98 @@
                     $dttest = checkmenu('Test Online', 'Data Test Online');
                     $dtfinal = checkmenu('Final PMB', 'Data Final PMB');
                 @endphp
-                @if($dtbeasiswa+$dtnonbeasiswa>0)
-                <li class="nav-item"> {{-- menu-open --}}
-                    <a href="#" class="nav-link"> {{-- active --}}
-                        <i class="nav-icon fas fa-clipboard-list"></i>
-                        <p>Data Pendaftaran
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        @if ($dtbeasiswa>0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.databeasiswa.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Beasiswa
-                            </a>
-                        </li>
-                        @endif
-                        @if ($dtnonbeasiswa>0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.datanonbeasiswa.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Non Beasiswa
-                            </a>
-                        </li>
-                        @endif
-                    </ul>
-                </li>
+                @if ($dtbeasiswa + $dtnonbeasiswa > 0)
+                    <li class="nav-item"> {{-- menu-open --}}
+                        <a href="#" class="nav-link"> {{-- active --}}
+                            <i class="nav-icon fas fa-clipboard-list"></i>
+                            <p>Data Pendaftaran
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @if ($dtbeasiswa > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.databeasiswa.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Beasiswa
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($dtnonbeasiswa > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.datanonbeasiswa.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Non Beasiswa
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
                 @endif
-                @if ($dtberkasbeasiswa>0)
-                <li class="nav-item">
-                    <a href="{{route('admin.berkaspmb.show')}}" class="nav-link">
-                        <i class="nav-icon fas fa-file"></i>
-                        <p>Data Berkas PMB</p>
-                    </a>
-                </li>
+                @if ($dtberkasbeasiswa > 0)
+                    <li class="nav-item">
+                        <a href="{{ route('admin.berkaspmb.show') }}" class="nav-link">
+                            <i class="nav-icon fas fa-file"></i>
+                            <p>Data Berkas PMB</p>
+                        </a>
+                    </li>
                 @endif
-                @if ($pendaftaran+$ukt>0)
-                <li class="nav-item"> {{-- menu-open --}}
-                    <a href="#" class="nav-link"> {{-- active --}}
-                        <i class="nav-icon fas fa-money-check"></i>
-                        <p>Data Pembayaran PMB
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        @if ($pendaftaran>0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.pembayaranpmb.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Pendaftaran
-                            </a>
-                        </li>
-                        @endif
-                        @if ($ukt>0)
-                        <li class="nav-item">
-                            <a href="{{ route('admin.pembayaranukt.show') }}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                UKT
-                            </a>
-                        </li>
-                        @endif
-                    </ul>
-                </li>
+                @if ($pendaftaran + $ukt > 0)
+                    <li class="nav-item"> {{-- menu-open --}}
+                        <a href="#" class="nav-link"> {{-- active --}}
+                            <i class="nav-icon fas fa-money-check"></i>
+                            <p>Data Pembayaran PMB
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @if ($pendaftaran > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.pembayaranpmb.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Pendaftaran
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($ukt > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.pembayaranukt.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        UKT
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
                 @endif
-                @if ($dttest>0)
+                @if ($dttest > 0)
+                    <li class="nav-item" style="display: none;">
+                        <a href="{{ route('admin.testpmb.show') }}" class="nav-link">
+                            <i class="nav-icon fas fa-money-check"></i>
+                            <p>Data Test PMB</p>
+                        </a>
+                    </li>
+                @endif
                 <li class="nav-item" style="display: none;">
-                    <a href="{{route('admin.testpmb.show')}}" class="nav-link">
-                        <i class="nav-icon fas fa-money-check"></i>
-                        <p>Data Test PMB</p>
-                    </a>
-                </li>
-                @endif
-                <li class="nav-item" style="display: none;">
-                    <a href="{{route('admin.emailpmb.show')}}" class="nav-link">
+                    <a href="{{ route('admin.emailpmb.show') }}" class="nav-link">
                         <i class="nav-icon fas fa-envelope"></i>
                         <p>Send Email</p>
                     </a>
                 </li>
-                @if ($dtfinal>0)
                 <li class="nav-item">
-                    <a href="{{route('admin.finalpmb.show')}}" class="nav-link">
-                        <i class="nav-icon fas fa-user-check"></i>
-                        <p>Final PMB</p>
+                    <a href="{{ route('admin.nim.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.nim.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-id-card"></i>
+                        <p>Generate NIM</p>
                     </a>
                 </li>
+                @if ($dtfinal > 0)
+                    <li class="nav-item">
+                        <a href="{{ route('admin.finalpmb.show') }}" class="nav-link">
+                            <i class="nav-icon fas fa-user-check"></i>
+                            <p>Final PMB</p>
+                        </a>
+                    </li>
                 @endif
                 <li class="nav-item">
                     <a href="#" class="nav-link">
@@ -140,23 +147,23 @@
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
                             <a href="#" class="nav-link">
-                            <i class="fas fa-clipboard-list nav-icon"></i>
-                            <p>
-                                Master Data Assessment
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
+                                <i class="fas fa-clipboard-list nav-icon"></i>
+                                <p>
+                                    Master Data Assessment
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
                             </a>
                             <ul class="nav nav-treeview" style="display: none;">
                                 <li class="nav-item">
                                     <a href="{{ route('admin.mastertest.show') }}" class="nav-link">
-                                    <i class="far fa-dot-circle nav-icon"></i>
-                                    <p>Master Test</p>
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>Master Test</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('admin.mastersoal.show') }}" class="nav-link">
-                                    <i class="far fa-dot-circle nav-icon"></i>
-                                    <p>Master Soal</p>
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>Master Soal</p>
                                     </a>
                                 </li>
                             </ul>
@@ -165,23 +172,23 @@
                     <ul class="nav nav-treeview" style="display: none;">
                         <li class="nav-item">
                             <a href="#" class="nav-link">
-                            <i class="fa fa-list-alt nav-icon"></i>
-                            <p>
-                                Hasil & Monitoring
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
+                                <i class="fa fa-list-alt nav-icon"></i>
+                                <p>
+                                    Hasil & Monitoring
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
                             </a>
                             <ul class="nav nav-treeview" style="display: none;">
                                 <li class="nav-item">
                                     <a href="{{ route('admin.testassesment.show') }}" class="nav-link">
-                                    <i class="far fa-dot-circle nav-icon"></i>
-                                    <p>Hasil Test</p>
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>Hasil Test</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('admin.monitoringassesment.show') }}" class="nav-link">
-                                    <i class="far fa-dot-circle nav-icon"></i>
-                                    <p>Monitoring Test</p>
+                                        <i class="far fa-dot-circle nav-icon"></i>
+                                        <p>Monitoring Test</p>
                                     </a>
                                 </li>
                             </ul>
@@ -207,159 +214,177 @@
                     $kelurahan = checkmenu('Master Data', 'Master Kelurahan');
                     $jenisberkas = checkmenu('Master Data', 'Master Jenis Berkas');
                 @endphp
-                @if($fakultas+$jurusan+$jenisP+$jenjang+$jurusanS+$soal+$content+$batch+$berkas+$ukt+$beasiswa+$tingkatkejuaraan+$provinsi+$kabupaten+$kecamatan+$kelurahan+$jenisberkas>0)
-                <li class="nav-item"> {{-- menu-open --}}
-                    <a href="#" class="nav-link"> {{-- active --}}
-                        <i class="nav-icon fas fa-clipboard-list"></i>
-                        <p>Master Data PMB
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        @if ($batch > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.BatchPendaftaran.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Batch Pendaftaran
-                            </a>
-                        </li>
-                        @endif
-                        @if ($jenisP > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.JenisPendaftaran.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Jalur Pendaftaran
-                            </a>
-                        </li>
-                        @endif
-                        @if ($ukt > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.TarifUKT.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Tarif UKT
-                            </a>
-                        </li>
-                        @endif
-                        @if ($beasiswa > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.Beasiswa.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Beasiswa
-                            </a>
-                        </li>
-                        @endif
-                        @if ($tingkatkejuaraan > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.TingkatKejuaraan.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Tingkat Kejuaraan
-                            </a>
-                        </li>
-                        @endif
-                        @if ($provinsi > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.Provinsi.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Provinsi
-                            </a>
-                        </li>
-                        @endif
-                        @if ($kabupaten > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.Kabupaten.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Kabupaten/Kota
-                            </a>
-                        </li>
-                        @endif
-                        @if ($kecamatan > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.Kecamatan.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Kecamatan
-                            </a>
-                        </li>
-                        @endif
-                        @if ($kelurahan > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.Kelurahan.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Kelurahan
-                            </a>
-                        </li>
-                        @endif
-                        <li class="nav-item">
-                            <a href="{{route('admin.Rekomendator.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Rekomendator
-                            </a>
-                        </li>
-                        @if ($jenisberkas > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.JenisBerkas.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Jenis Berkas
-                            </a>
-                        </li>
-                        @endif
-                        @if ($berkas > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.Berkas.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Berkas
-                            </a>
-                        </li>
-                        @endif
-                        @if ($fakultas > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.fakultas.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Fakultas
-                            </a>
-                        </li>
-                        @endif
-                        @if ($jurusan > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.Jurusan.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Jurusan
-                            </a>
-                        </li>
-                        @endif
-                        @if ($jenjang > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.Jenjang.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Jenjang Pendidikan
-                            </a>
-                        </li>
-                        @endif
-                        @if ($jurusanS > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.JurusanSekolah.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Jurusan Sekolah
-                            </a>
-                        </li>
-                        @endif
-                        @if ($soal > 0)
-                        <li class="nav-item">
-                            <a href="{{route('admin.Test.show')}}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                Master Soal Test
-                            </a>
-                        </li>
-                        @endif
-                        @if ($content > 0)
-                        <li class="nav-item">
-                            <a href="{{ route('admin.content.show') }}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Master Content</p>
-                            </a>
-                        </li>
-                        @endif
-                    </ul>
-                </li>
+                @if (
+                    $fakultas +
+                        $jurusan +
+                        $jenisP +
+                        $jenjang +
+                        $jurusanS +
+                        $soal +
+                        $content +
+                        $batch +
+                        $berkas +
+                        $ukt +
+                        $beasiswa +
+                        $tingkatkejuaraan +
+                        $provinsi +
+                        $kabupaten +
+                        $kecamatan +
+                        $kelurahan +
+                        $jenisberkas >
+                        0)
+                    <li class="nav-item"> {{-- menu-open --}}
+                        <a href="#" class="nav-link"> {{-- active --}}
+                            <i class="nav-icon fas fa-clipboard-list"></i>
+                            <p>Master Data PMB
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @if ($batch > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.BatchPendaftaran.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Batch Pendaftaran
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($jenisP > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.JenisPendaftaran.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Jalur Pendaftaran
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($ukt > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.TarifUKT.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Tarif UKT
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($beasiswa > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.Beasiswa.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Beasiswa
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($tingkatkejuaraan > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.TingkatKejuaraan.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Tingkat Kejuaraan
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($provinsi > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.Provinsi.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Provinsi
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($kabupaten > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.Kabupaten.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Kabupaten/Kota
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($kecamatan > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.Kecamatan.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Kecamatan
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($kelurahan > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.Kelurahan.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Kelurahan
+                                    </a>
+                                </li>
+                            @endif
+                            <li class="nav-item">
+                                <a href="{{ route('admin.Rekomendator.show') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    Master Rekomendator
+                                </a>
+                            </li>
+                            @if ($jenisberkas > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.JenisBerkas.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Jenis Berkas
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($berkas > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.Berkas.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Berkas
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($fakultas > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.fakultas.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Fakultas
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($jurusan > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.Jurusan.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Jurusan
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($jenjang > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.Jenjang.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Jenjang Pendidikan
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($jurusanS > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.JurusanSekolah.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Jurusan Sekolah
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($soal > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.Test.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        Master Soal Test
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($content > 0)
+                                <li class="nav-item">
+                                    <a href="{{ route('admin.content.show') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Master Content</p>
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
                 @endif
                 @php
                     $changepassword = checkmenu('Tools', 'Change Password');
