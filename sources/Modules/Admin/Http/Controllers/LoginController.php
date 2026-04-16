@@ -80,7 +80,7 @@ class LoginController extends Controller
                 $groupuser = GroupUserModel::where('KodeGroupUser', $cek->privilege_pmb)->get();
                 $mastergroup = MasterGroupModel::where('KodeGroupUser', $cek->privilege_pmb)->first();
 
-                    $cek2 = PegawaiModel::where('nip', $cek->nik)->first();
+                    $cek2 = PegawaiModel::where('nik', $cek->nik)->first();
                     $nama = $cek2->nama;
                 if(Hash::check(defaultpassword(),$cek->password)){
                     $session = array(
@@ -214,7 +214,7 @@ class LoginController extends Controller
 
         $cekrole = MasterGroupModel::where('KodeGroupUser', $role)->first();
 
-        $cek1 = PegawaiModel::where('nip', $nik)->first();
+        $cek1 = PegawaiModel::where('nik', $nik)->first();
         $tgl = $cek1->tgl_lahir;
         if (strtotime($tgl) == strtotime($birthday)) {
             return '1';
@@ -252,7 +252,7 @@ class LoginController extends Controller
         if($cek){
             $email = $cek->email;
             $enc = encrypt($cek->nik);
-            $cek1 = PegawaiModel::where('nip',$cek->nik)->where('email_kampus',$email)->first();
+            $cek1 = PegawaiModel::where('nik',$cek->nik)->where('email_kampus',$email)->first();
             UserResetPasswordModel::insert([
                 'email'   => $cek->email,
                 'token'   => $post->_token,
@@ -264,7 +264,7 @@ class LoginController extends Controller
             // Kirim email
             // $email, $nama, $data, $jenis, $subject
             $nama = $cek1->nama;
-            $data = $nama.'##'.$cek1->nip.'##'.$resetLink.'##'.$login;
+            $data = $nama.'##'.$cek1->nik.'##'.$resetLink.'##'.$login;
             $jenis = 'Reset Password';
             $subject = 'Reset Password Admin PMB';
 
