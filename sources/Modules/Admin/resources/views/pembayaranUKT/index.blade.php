@@ -10,12 +10,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>{{$menu}}</h1>
+                    <h1>{{ $menu }}</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item active"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item active">{{$menu}}</li>
+                        <li class="breadcrumb-item active">{{ $menu }}</li>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
@@ -31,21 +31,23 @@
                 <div class="col-md-12">
                     <div class="card card-primary card-outline">
                         <div class="card-header">
-                            <h5 class="m-0">{{$menu}}</h5>
+                            <h5 class="m-0">{{ $menu }}</h5>
                         </div>
                         <div class="card-body">
                             <div class="row" style="display: none;">
                                 <div class="col-lg-2">
                                     <select class="form-control select2" id="kategori" name="kategori" required>
                                         <option value="" selected disabled>-- Pilih Jenis Pembayaran --</option>
-                                        <option value="{{encrypt('pendaftaran')}}">Pendaftaran</option>
-                                        <option value="{{encrypt('ukt')}}">UKT</option>
+                                        <option value="{{ encrypt('pendaftaran') }}">Pendaftaran</option>
+                                        <option value="{{ encrypt('ukt') }}">UKT</option>
                                     </select>
                                 </div>
                                 <!-- /.col-lg-6 -->
                                 <div class="btn-group">
-                                    <button type="button" id="btn-showpembayaran" class="btn btn-primary btn-sm" style="margin-top: 6px;margin-right: 10px;">Show Data</button>
-                                    <button type="button" class="btn btn-success btn-sm" style="margin-top: 6px;display:none;">Export Excel</button>
+                                    <button type="button" id="btn-showpembayaran" class="btn btn-primary btn-sm"
+                                        style="margin-top: 6px;margin-right: 10px;">Show Data</button>
+                                    <button type="button" class="btn btn-success btn-sm"
+                                        style="margin-top: 6px;display:none;">Export Excel</button>
                                     <!-- /input-group -->
                                 </div>
                                 <!-- /.col-lg-6 -->
@@ -91,7 +93,8 @@
                     <table id="tabel-detail" class="table" style="width: 100%;">
                         <thead>
                             <tr>
-                                <th colspan="4" class="text-center" style="background-color: rgb(0, 204, 255);">Data Pendaftaran Calon Mahasiswa Baru</th>
+                                <th colspan="4" class="text-center" style="background-color: rgb(0, 204, 255);">Data
+                                    Pendaftaran Calon Mahasiswa Baru</th>
                             </tr>
                             <tr>
                                 <th>No Registrasi</th>
@@ -114,14 +117,20 @@
                             <tr>
                                 <th>Program Studi Pilihan 1</th>
                                 <th id="o-prodi1" class="o-detaildaftar"></th>
-                                <th>Program Studi Pilihan 2</th>
-                                <th id="o-prodi2" class="o-detaildaftar"></th>
-                            </tr>
-                            <tr>
                                 <th>UKT Program Studi 1</th>
                                 <th id="o-uktprodi1" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Program Studi Pilihan 2</th>
+                                <th id="o-prodi2" class="o-detaildaftar"></th>
                                 <th>UKT Program Studi 2</th>
                                 <th id="o-uktprodi2" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Program Studi Pilihan 3</th>
+                                <th id="o-prodi3" class="o-detaildaftar"></th>
+                                <th>UKT Program Studi 3</th>
+                                <th id="o-uktprodi3" class="o-detaildaftar"></th>
                             </tr>
                             <tr>
                                 <th>Konfirmasi Daftar</th>
@@ -173,6 +182,10 @@
                                 </th>
                                 <th id="o-durasis1" class="o-detaildaftar"></th>
                             </tr>
+                            <tr>
+                                <th>Rekomendator</th>
+                                <th id="o-rekomendator" class="o-detaildaftar" colspan="3"></th>
+                            </tr>
                         </thead>
                         <tbody id="detail-bayar" class="o-detaildaftar">
 
@@ -204,17 +217,55 @@
                         @csrf
                         <input type="hidden" name="iddaftar" id="iddaftar" value="">
                         <label for="keterangan">Keterangan</label>
-                        <textarea name="keterangan" id="keterangan" class="form-control" rows="3" placeholder="Tambahkan Keterangan (Jika Ada Revisi)"></textarea>
+                        <textarea name="keterangan" id="keterangan" class="form-control" rows="3"
+                            placeholder="Tambahkan Keterangan (Jika Ada Revisi)"></textarea>
                     </form>
                 </div>
                 <div class="modal-footer justify-content-between">
-                    <button type="button" id="btn-closemodalberkas" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="btn-closemodalberkas" class="btn btn-default"
+                        data-dismiss="modal">Close</button>
                     <button type="button" id="btn-saverevisi" class="btn btn-success">Simpan</button>
                 </div>
             </div>
             <!-- /.modal-content -->
         </div>
         <!-- /.modal-dialog -->
+    </div>
+
+    <div class="modal fade" id="modalApproveUKT" tabindex="-1" role="dialog" aria-labelledby="modalApproveUKTLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success">
+                    <h5 class="modal-title" id="modalApproveUKTLabel">Approval Pembayaran UKT</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="formApproveUKT" action="{{ url('admin/PembayaranUKT/approve') }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <p class="text-danger">* Pastikan nominal pembayaran sudah sesuai dengan bukti yang dilampirkan.
+                        </p>
+
+                        <input type="hidden" name="iddaftar" id="approve_iddaftar">
+
+                        <div class="form-group">
+                            <label>Pilih Skema Pembayaran <span class="text-danger">*</span></label>
+                            <select class="form-control" name="skema_ukt" required>
+                                <option value="" selected disabled>-- Pilih Skema UKT --</option>
+                                <option value="lunas">Bayar Lunas (Sekaligus)</option>
+                                <option value="bulanan">Dicicil (Bulanan / 6 Bulan)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-success">Setujui & Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 @endsection
 @section('script')
@@ -229,28 +280,25 @@
 
             loadEvent()
 
-            function loadEvent()
-            {
+            function loadEvent() {
                 tabelPembayaran()
                 closemodal()
                 submit_notapprove()
             }
 
-            function ShowDataPembayaran()
-            {
-                $('#btn-showpembayaran').click(function (e) {
+            function ShowDataPembayaran() {
+                $('#btn-showpembayaran').click(function(e) {
                     e.preventDefault();
                     let params = $('#kategori').val()
-                    if(params==null||params==''){
-                        notifalert('Information','Jenis Pembayaran Harus Diisi','warning')
-                    }else{
+                    if (params == null || params == '') {
+                        notifalert('Information', 'Jenis Pembayaran Harus Diisi', 'warning')
+                    } else {
                         tabelPembayaran()
                     }
                 });
             }
 
-            function tabelPembayaran()
-            {
+            function tabelPembayaran() {
                 let params = $('#kategori').val()
                 let otable = $('#example2').DataTable({
                     destroy: true,
@@ -313,20 +361,23 @@
                 });
 
                 otable.on('draw', function(event) {
-                    $('[data-toggle="tooltip"]').tooltip({trigger: "hover"});
-                    $('[data-tooltip="tooltip"]').tooltip({trigger: "hover"});
+                    $('[data-toggle="tooltip"]').tooltip({
+                        trigger: "hover"
+                    });
+                    $('[data-tooltip="tooltip"]').tooltip({
+                        trigger: "hover"
+                    });
 
                 });
             }
 
-            function ShowDetail()
-            {
-                $('.btn_detail').click(function (e) {
+            function ShowDetail() {
+                $('.btn_detail').click(function(e) {
                     e.preventDefault();
                     let param = $(this).data('id')
                     $.ajax({
                         type: "GET",
-                        url: '{!! url('admin/PembayaranUKT/ShowPembayaranUKT') !!}'+'/'+param,
+                        url: '{!! url('admin/PembayaranUKT/ShowPembayaranUKT') !!}' + '/' + param,
                         dataType: "JSON",
                         beforeSend: function(response) {
                             $('#loading').show()
@@ -334,68 +385,93 @@
                         },
                         success: function(data) {
                             $('#loading').hide()
-                            if(data.hasil==0){
-                                notifalert('Information', 'Data Pembayaran Tidak Ditemukan','error')
-                            }else{
+                            if (data.hasil == 0) {
+                                notifalert('Information', 'Data Pembayaran Tidak Ditemukan',
+                                    'error')
+                            } else {
                                 $('#o-noregist').html(data.daftar.KodePendaftaran)
                                 $('#o-nama').html(data.daftar.biodata.nama)
-                                $('#o-batch').html(data.daftar.batch.nama_batch+' '+data.daftar.batch.tahun_akademik)
+                                $('#o-batch').html(data.daftar.batch.nama_batch + ' ' + data
+                                    .daftar.batch.tahun_akademik)
                                 $('#o-tahunlulus').html(data.daftar.tahun_lulus)
                                 $('#o-jalur').html(data.daftar.jalur.KodeJenis+'-'+data.daftar.jalur.jenis_pendaftaran)
                                 $('#o-jurusansekolah').html(data.daftar.jurusansekolah.sekolah+'/'+data.daftar.jurusansekolah.jurusan_sekolah)
-                                $('#o-prodi1').html(data.daftar.prodi1.jenjang.jenjang+'-'+data.daftar.prodi1.jurusan)
-                                $('#o-prodi2').html(data.daftar.prodi2.jenjang.jenjang+'-'+data.daftar.prodi2.jurusan)
-                                // let ukt1 = data.ukt1.biaya_ukt.replace(/\D/g, '')
-                                let ukt1 = new Intl.NumberFormat('id-ID').format(data.ukt1.biaya_ukt);
-                                $('#o-uktprodi1').html('Rp '+ukt1)
-                                let ukt2 = new Intl.NumberFormat('id-ID').format(data.ukt2.biaya_ukt);
-                                $('#o-uktprodi2').html('Rp '+ukt2)
+                                // PENGAMAN PRODI & UKT
+                                $('#o-prodi1').html(data.daftar.prodi1 && data.daftar.prodi1.jenjang ? data.daftar.prodi1.jenjang.jenjang + '-' + data.daftar.prodi1.jurusan : (data.daftar.prodi1 ? data.daftar.prodi1.jurusan : '-'));
+                                $('#o-prodi2').html(data.daftar.prodi2 && data.daftar.prodi2.jenjang ? data.daftar.prodi2.jenjang.jenjang + '-' + data.daftar.prodi2.jurusan : (data.daftar.prodi2 ? data.daftar.prodi2.jurusan : '-'));
+                                $('#o-prodi3').html(data.daftar.prodi3 && data.daftar.prodi3.jenjang ? data.daftar.prodi3.jenjang.jenjang + '-' + data.daftar.prodi3.jurusan : (data.daftar.prodi3 ? data.daftar.prodi3.jurusan : '-'));
+                                let ukt1 = data.ukt1 ? new Intl.NumberFormat('id-ID').format(data.ukt1.biaya_ukt) : '0';
+                                $('#o-uktprodi1').html('Rp ' + ukt1);                               
+                                let ukt2 = data.ukt2 ? new Intl.NumberFormat('id-ID').format(data.ukt2.biaya_ukt) : '0';
+                                $('#o-uktprodi2').html('Rp ' + ukt2);                              
+                                let ukt3 = data.ukt3 ? new Intl.NumberFormat('id-ID').format(data.ukt3.biaya_ukt) : '0';
+                                $('#o-uktprodi3').html('Rp ' + ukt3);
                                 let konfirmdaftar = data.daftar.konfirm_pendaftaran=='0' ? 'Belum Konfirmasi' : 'Sudah Konfirmasi';
+                                $('#o-rekomendator').html(data.rekomendator);
                                 $('#o-konfirmdaftar').html(konfirmdaftar)
-                                let biayadaftar = data.daftar.jalur.biaya_pendaftaran=='1' ? 'Rp '+new Intl.NumberFormat('id-ID').format(data.daftar.jalur.jml_biaya_pendaftaran) : 'Gratis';
+                                let biayadaftar = data.daftar.jalur.biaya_pendaftaran == '1' ?
+                                    'Rp ' + new Intl.NumberFormat('id-ID').format(data.daftar
+                                        .jalur.jml_biaya_pendaftaran) : 'Gratis';
                                 let statusdaftar = data.daftar.bayar
                                 let warna1 = 'warning'
                                 let nama1 = 'waiting'
                                 let warna2 = 'warning'
                                 let nama2 = 'waiting'
-                                for(i=0;i<statusdaftar.length;i++){
-                                    if(statusdaftar[i].kategori=='pendaftaran'){
+                                for (i = 0; i < statusdaftar.length; i++) {
+                                    if (statusdaftar[i].kategori == 'pendaftaran') {
                                         nama1 = statusdaftar[i].status
-                                        if(statusdaftar[i].status=='pending'||statusdaftar[i].status=='waiting'){
+                                        if (statusdaftar[i].status == 'pending' || statusdaftar[
+                                                i].status == 'waiting') {
                                             warna1 = 'warning'
-                                        }else if(statusdaftar[i].status=='paid'){
+                                        } else if (statusdaftar[i].status == 'paid') {
                                             warna1 = 'success'
-                                        }else{
+                                        } else {
                                             warna1 = 'danger'
                                         }
-                                    }else{
+                                    } else {
                                         nama2 = statusdaftar[i].status
-                                        if(statusdaftar[i].status=='pending'||statusdaftar[i].status=='waiting'){
+                                        if (statusdaftar[i].status == 'pending' || statusdaftar[
+                                                i].status == 'waiting') {
                                             warna2 = 'warning'
-                                        }else if(statusdaftar[i].status=='paid'){
+                                        } else if (statusdaftar[i].status == 'paid') {
                                             warna2 = 'success'
-                                        }else{
+                                        } else {
                                             warna2 = 'danger'
                                         }
                                     }
                                 }
-                                let showstatusdaftar = '<span class="badge bg-'+warna1+'">'+nama1+'</span>'
-                                let showstatusUKT = '<span class="badge bg-'+warna2+'">'+nama2+'</span>'
+                                let showstatusdaftar = '<span class="badge bg-' + warna1 +
+                                    '">' + nama1 + '</span>'
+                                let showstatusUKT = '<span class="badge bg-' + warna2 + '">' +
+                                    nama2 + '</span>'
 
-                                $('#o-biayadaftar').html(biayadaftar+' '+showstatusdaftar)
+                                $('#o-biayadaftar').html(biayadaftar + ' ' + showstatusdaftar)
                                 $('#o-tgldaftar').html(data.daftar.tgl_daftar)
                                 $('#o-waktukuliah').html(data.daftar.waktukuliah.waktu)
-                                let statusUkt = data.daftar.jalur.status_ukt=='0' ? 'Gratis '+showstatusUKT : 'Bayar '+showstatusUKT;
+                                let statusUkt = data.daftar.jalur.status_ukt == '0' ?
+                                    'Gratis ' + showstatusUKT : 'Bayar ' + showstatusUKT;
+                                if (nama2 === 'paid' && data.daftar.skema_ukt) {
+                                    statusUkt +=
+                                        '<br><small class="text-muted text-uppercase">' + data
+                                        .daftar.skema_ukt + '</small>';
+                                }
                                 $('#o-statusukt').html(statusUkt)
-                                let beasiswa = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.jenis_beasiswa
+                                $('#o-statusukt').html(statusUkt)
+                                let beasiswa = data.daftar.jenisbeasiswa == null ? '-' : data
+                                    .daftar.jenisbeasiswa.jenis_beasiswa
                                 $('#o-beasiswa').html(beasiswa)
-                                let tingkat = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.idtingkat;
-                                $('#o-juarabea').html(tingkat==null||tingkat=='-'?'-':data.daftar.jenisbeasiswa.tingkat.tingkat_kejuaraan)
-                                let ketbea = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.juara_ke
+                                let tingkat = data.daftar.jenisbeasiswa == null ? '-' : data
+                                    .daftar.jenisbeasiswa.idtingkat;
+                                $('#o-juarabea').html(tingkat == null || tingkat == '-' ? '-' :
+                                    data.daftar.jenisbeasiswa.tingkat.tingkat_kejuaraan)
+                                let ketbea = data.daftar.jenisbeasiswa == null ? '-' : data
+                                    .daftar.jenisbeasiswa.juara_ke
                                 $('#o-keteranganbea').html(ketbea)
-                                let durasid3 = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.durasi_d3+' Semester'
+                                let durasid3 = data.daftar.jenisbeasiswa == null ? '-' : data
+                                    .daftar.jenisbeasiswa.durasi_d3 + ' Semester'
                                 $('#o-durasid3').html(durasid3)
-                                let durasis1 = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.durasi_s1+' Semester'
+                                let durasis1 = data.daftar.jenisbeasiswa == null ? '-' : data
+                                    .daftar.jenisbeasiswa.durasi_s1 + ' Semester'
                                 $('#o-durasis1').html(durasis1)
 
                                 // let history = '<tr>'+
@@ -437,57 +513,81 @@
                 });
             }
 
-            function approve()
-            {
-                $('.approve-bayar').click(function (e) {
-                    e.preventDefault();
-                    let params = $(this).data('id')
-                    Swal.fire({
-                        title: "Information",
-                        text: "Konfirmasi Bukti Pembayaran Pendaftaran ?",
-                        icon: "question",
-                        showConfirmButton: true,
-                        showCancelButton: true,
-                    }).then((result) => {
-                        if(result.value){
-                            $.ajax({
-                                type: "GET",
-                                url: '{!! url('admin/PembayaranUKT/Approve') !!}' + '/' + params,
-                                dataType: "JSON",
-                                beforeSend: function(response) {
-                                    $('#loading').show()
-                                },
-                                success: function(data) {
-                                    $('#loading').hide()
-                                    if(data.status==false){
-                                        notifalert('Information',data.message,'warning');
-                                    }else{
-                                        notifalert('Information',data.message,'success');
-                                    }
-                                    $('#example2').DataTable().ajax.reload();
-                                },
-                                error: function(xhr, status, error) {
-                                    $('#loading').hide()
-                                    Swal.fire({
-                                        title: 'Gagal',
-                                        text: 'Silahkan Hubungi Tim IT !',
-                                        icon: 'error'
-                                    }).then((result) => {
-                                        $('#example2').DataTable().ajax.reload();
-                                    });
-                                    return;
-                                }
-                            });
-                        }else{
-                            return false;
-                        }
-                    });
+            function approve() {
+    // Gunakan .off('click').on('click') untuk mencegah event tereksekusi dobel saat datatable di-reload
+    $('.approve-bayar').off('click').on('click', function(e) {
+        e.preventDefault();
+        let params = $(this).data('id');
+
+        Swal.fire({
+            title: "Approval Pembayaran",
+            html: "<p style='font-size: 15px; color: #6c757d; margin-bottom: 10px;'>Silakan tentukan skema pembayaran UKT untuk pendaftar ini:</p>",
+            icon: "info", // Menggunakan info agar lebih elegan dari question
+            input: "radio", // Ubah dari select menjadi radio button
+            inputOptions: {
+                'lunas': '&nbsp; <b>Bayar Lunas</b> <br><span style="font-size:13px; color:#666; margin-left: 18px;">(Dibayar sekaligus 1 semester)</span>',
+                'bulanan': '&nbsp; <b>Dicicil</b> <br><span style="font-size:13px; color:#666; margin-left: 18px;">(Dibayar bulanan / 6 kali)</span>'
+            },
+            showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-check-circle"></i> Approve & Simpan',
+            cancelButtonText: '<i class="fas fa-times"></i> Batal',
+            confirmButtonColor: '#28a745', // Warna hijau sukses
+            cancelButtonColor: '#6c757d', // Warna abu-abu elegan untuk batal
+            customClass: {
+                radio: 'custom-swal-radio' // Tambahan class jika ingin styling CSS ekstra nanti
+            },
+            inputValidator: (value) => {
+                // Validasi agar admin tidak bisa klik Approve jika belum memilih skema
+                return new Promise((resolve) => {
+                    if (value) {
+                        resolve();
+                    } else {
+                        resolve('Anda harus memilih skema pembayaran terlebih dahulu!');
+                    }
                 });
             }
+        }).then((result) => {
+            // Jika tombol approve diklik dan skema sudah dipilih
+            if (result.isConfirmed && result.value) {
+                let skema_terpilih = result.value;
 
-            function notApprove()
-            {
-                $('.revisi-bayar').click(function (e) {
+                $.ajax({
+                    type: "GET",
+                    url: '{!! url("admin/PembayaranUKT/Approve") !!}' + '/' + params,
+                    data: {
+                        skema_ukt: skema_terpilih // Kirim data skema ke controller
+                    },
+                    dataType: "JSON",
+                    beforeSend: function(response) {
+                        $('#loading').show()
+                    },
+                    success: function(data) {
+                        $('#loading').hide()
+                        if (data.status == false) {
+                            notifalert('Information', data.message, 'warning');
+                        } else {
+                            notifalert('Information', data.message, 'success');
+                        }
+                        $('#example2').DataTable().ajax.reload(null, false); // Reload tabel tanpa mereset pagination
+                    },
+                    error: function(xhr, status, error) {
+                        $('#loading').hide()
+                        Swal.fire({
+                            title: 'Gagal',
+                            text: 'Silahkan Hubungi Tim IT !',
+                            icon: 'error'
+                        }).then((result) => {
+                            $('#example2').DataTable().ajax.reload(null, false);
+                        });
+                    }
+                });
+            }
+        });
+    });
+}
+
+            function notApprove() {
+                $('.revisi-bayar').click(function(e) {
                     e.preventDefault();
                     $('#modal-approval').modal('show')
                     let params = $(this).data('id')
@@ -495,13 +595,12 @@
                 });
             }
 
-            function submit_notapprove()
-            {
-                $('#btn-saverevisi').click(function (e) {
+            function submit_notapprove() {
+                $('#btn-saverevisi').click(function(e) {
                     e.preventDefault();
                     let ket = $('#keterangan').val();
                     let btn = $(this);
-                    if(ket){
+                    if (ket) {
                         Swal.fire({
                             title: "Information",
                             text: "Apakah Keterangan Revisi Bukti Pembayaran Sudah Benar ?",
@@ -509,21 +608,20 @@
                             showConfirmButton: true,
                             showCancelButton: true,
                         }).then((result) => {
-                            if(result.value){
-                                btn.prop('disabled',true)
+                            if (result.value) {
+                                btn.prop('disabled', true)
                                 $('#form-approval').submit();
-                            }else{
+                            } else {
                                 return false;
                             }
                         });
-                    }else{
-                        notifalert('Information','Keterangan Tidak Boleh Kosong','warning')
+                    } else {
+                        notifalert('Information', 'Keterangan Tidak Boleh Kosong', 'warning')
                     }
                 });
             }
 
-            function closemodal()
-            {
+            function closemodal() {
                 $('#modal-approval').on('hidden.bs.modal', function() {
                     $('#form-approval')[0].reset();
                 });

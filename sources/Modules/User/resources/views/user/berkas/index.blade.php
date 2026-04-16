@@ -41,35 +41,47 @@
                                     </li>
                                     <li>Jika Status sudah <span class="badge badge-success">OK / Sesuai</span>, berkas telah
                                         disetujui dan <strong>tidak bisa diganti</strong>.</li>
+                                    <li>Jika Status sudah <span class="badge bg-warning">Menunggu..</span>, berkas telah
+                                        lengkap dan <strong>menunggu validasi dari admin</strong>.</li>
                                     <li class="mt-2">
                                         <strong>Fungsi Tombol pada Tabel:</strong>
                                         <ul class="mt-2" style="list-style-type: none; padding-left: 0;">
                                             <li class="mb-2">
-                                                <button class="btn btn-info btn-sm"><i class="fas fa-list"></i></button> :
-                                                Untuk melihat detail pendaftaran dan memunculkan rincian berkas yang harus
-                                                diupload di tabel bawah.
+                                                <button class="btn btn-sm btn-outline-info"
+                                                    style="border-radius: 6px; padding: 4px 10px; cursor: default;"><i
+                                                        class="fa fa-info-circle"></i></button> :
+                                                Untuk melihat detail pendaftaran.
                                             </li>
                                             <li class="mb-2">
-                                                <button class="btn btn-success btn-sm"><i
-                                                        class="fas fa-upload"></i></button> : Untuk mengunggah berkas PDF
-                                                Anda pertama kali.
+                                                <button class="btn btn-sm btn-outline-success"
+                                                    style="border-radius: 6px; padding: 4px 10px; cursor: default;"><i
+                                                        class="fas fa-upload"></i></button> :
+                                                Untuk mengunggah berkas PDF Anda pertama kali.
                                             </li>
                                             <li class="mb-2">
-                                                <button class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></button>
-                                                : Muncul jika berkas Anda ditolak/revisi. Gunakan untuk mengunggah ulang
+                                                <button class="btn btn-sm btn-outline-warning"
+                                                    style="border-radius: 6px; padding: 4px 10px; cursor: default;"><i
+                                                        class="fas fa-edit"></i></button> :
+                                                Muncul jika berkas Anda ditolak/revisi. Gunakan untuk mengunggah ulang
                                                 perbaikan berkas.
                                             </li>
                                             <li class="mb-2">
-                                                <button class="btn btn-info btn-sm"><i class="fas fa-eye"></i></button> :
-                                                Untuk melihat kembali dokumen yang sudah berhasil Anda unggah.
+                                                <button class="btn btn-sm btn-outline-info"
+                                                    style="border-radius: 6px; padding: 4px 10px; cursor: default;"><i
+                                                        class="fas fa-eye"></i></button> :
+                                                Untuk melihat rincian berkas yang harus diupload.
                                             </li>
                                             <li class="mb-2">
-                                                <button class="btn btn-success btn-sm"><i class="fas fa-check"></i></button>
-                                                : Menyetujui untuk <strong>pindah ke Jalur Reguler</strong>.
+                                                <button class="btn btn-sm btn-outline-success"
+                                                    style="border-radius: 6px; padding: 4px 10px; cursor: default;"><i
+                                                        class="fas fa-check"></i></button> :
+                                                Menyetujui untuk <strong>pindah ke Jalur Reguler</strong>.
                                             </li>
                                             <li class="mb-2">
-                                                <button class="btn btn-danger btn-sm"><i class="fas fa-times"></i></button>
-                                                : Menolak pindah jalur <strong>(Perhatian: Anda akan dianggap mengundurkan
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                    style="border-radius: 6px; padding: 4px 10px; cursor: default;"><i
+                                                        class="fas fa-times"></i></button> :
+                                                Menolak pindah jalur <strong>(Perhatian: Anda akan dianggap mengundurkan
                                                     diri)</strong>.
                                             </li>
                                         </ul>
@@ -177,69 +189,73 @@
                                 <th>Jurusan Sekolah</th>
                                 <th id="o-jurusansekolah" class="o-detaildaftar"></th>
                             </tr>
-                            <tr>
+                           <tr>
                                 <th>Program Studi Pilihan 1</th>
                                 <th id="o-prodi1" class="o-detaildaftar"></th>
-                                <th>Program Studi Pilihan 2</th>
-                                <th id="o-prodi2" class="o-detaildaftar"></th>
+                                <th>Konfirmasi Daftar</th>
+                                <th id="o-konfirmdaftar" class="o-detaildaftar"></th>
                             </tr>
                             <tr>
                                 <th>UKT Program Studi 1</th>
                                 <th id="o-uktprodi1" class="o-detaildaftar"></th>
-                                <th>UKT Program Studi 2</th>
-                                <th id="o-uktprodi2" class="o-detaildaftar"></th>
-                            </tr>
-                            <tr>
-                                <th>Konfirmasi Daftar</th>
-                                <th id="o-konfirmdaftar" class="o-detaildaftar"></th>
                                 <th>Biaya Pendaftaran</th>
                                 <th id="o-biayadaftar" class="o-detaildaftar"></th>
                             </tr>
                             <tr>
+                                <th>Program Studi Pilihan 2</th>
+                                <th id="o-prodi2" class="o-detaildaftar"></th>
                                 <th>Tanggal Daftar</th>
                                 <th id="o-tgldaftar" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>UKT Program Studi 2</th>
+                                <th id="o-uktprodi2" class="o-detaildaftar"></th>
                                 <th>Waktu Kuliah</th>
                                 <th id="o-waktukuliah" class="o-detaildaftar"></th>
                             </tr>
+                            
                             <tr>
+                                <th>Program Studi Pilihan 3</th>
+                                <th id="o-prodi3" class="o-detaildaftar"></th>
                                 <th>Status UKT</th>
                                 <th id="o-statusukt" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>UKT Program Studi 3</th>
+                                <th id="o-uktprodi3" class="o-detaildaftar"></th>
                                 <th>
-                                    <code>*Khusus Beasiswa</code>
-                                    <br>
+                                    <code>*Khusus Beasiswa</code><br>
                                     Kategori Beasiswa
                                 </th>
                                 <th id="o-beasiswa" class="o-detaildaftar"></th>
                             </tr>
                             <tr>
                                 <th>
-                                    <code>*Khusus Beasiswa</code>
-                                    <br>
+                                    <code>*Khusus Beasiswa</code><br>
                                     Tingkat Kejuaraan
                                 </th>
                                 <th id="o-juarabea" class="o-detaildaftar"></th>
                                 <th>
-                                    <code>*Khusus Beasiswa</code>
-                                    <br>
+                                    <code>*Khusus Beasiswa</code><br>
                                     Keterangan
                                 </th>
                                 <th id="o-keteranganbea" class="o-detaildaftar"></th>
                             </tr>
                             <tr>
                                 <th>
-                                    <code>*Khusus Beasiswa</code>
-                                    <br>
+                                    <code>*Khusus Beasiswa</code><br>
                                     Durasi Beasiswa D3
                                 </th>
                                 <th id="o-durasid3" class="o-detaildaftar"></th>
                                 <th>
-                                    <code>*Khusus Beasiswa</code>
-                                    <br>
+                                    <code>*Khusus Beasiswa</code><br>
                                     Durasi Beasiswa S1
                                 </th>
                                 <th id="o-durasis1" class="o-detaildaftar"></th>
                             </tr>
                             <tr>
+                                <th>Rekomedator</th>
+                                <th id="o-rekomendator" class="o-detaildaftar"3></th>
                                 <th>Berkas Beasiswa</th>
                                 <th colspan="3" class="o-detaildaftar" id="o-berkasbeasiswa"></th>
                             </tr>
@@ -414,16 +430,16 @@
                                 if (b.is_uploaded) {
                                     let fileUrl = `{!! asset('sources/storage/app/FILE_KHUSUS/') !!}/${b.file_name}`;
                                     actionBtn +=
-                                        `<a href="${fileUrl}" target="_blank" class="btn btn-sm btn-info mr-1" title="Lihat"><i class="fas fa-eye"></i></a>`;
+                                        `<a href="${fileUrl}" target="_blank" class="btn btn-sm btn-outline-info mr-1" style="border-radius: 6px; padding: 4px 10px;" title="Lihat"><i class="fas fa-eye"></i></a>`;
 
                                     // Jika belum disetujui (1), boleh edit/upload ulang
                                     if (b.status_angka != 1) {
                                         actionBtn +=
-                                            `<button class="btn btn-sm btn-warning btn-upload-modal" data-idberkas="${b.id_berkas}" data-kodeberkas="${b.kode_berkas}" data-namaberkas="${b.nama_berkas}" data-kodedaftar="${response.kode_daftar}"><i class="fas fa-edit"></i></button>`;
+                                            `<button class="btn btn-sm btn-outline-warning btn-upload-modal" style="border-radius: 6px; padding: 4px 10px;" data-idberkas="${b.id_berkas}" data-kodeberkas="${b.kode_berkas}" data-namaberkas="${b.nama_berkas}" data-kodedaftar="${response.kode_daftar}"><i class="fas fa-edit"></i></button>`;
                                     }
                                 } else {
                                     actionBtn +=
-                                        `<button class="btn btn-sm btn-success btn-upload-modal" data-idberkas="${b.id_berkas}" data-kodeberkas="${b.kode_berkas}" data-namaberkas="${b.nama_berkas}" data-kodedaftar="${response.kode_daftar}"><i class="fas fa-upload"></i></button>`;
+                                        `<button class="btn btn-sm btn-outline-success btn-upload-modal" style="border-radius: 6px; padding: 4px 10px;" data-idberkas="${b.id_berkas}" data-kodeberkas="${b.kode_berkas}" data-namaberkas="${b.nama_berkas}" data-kodedaftar="${response.kode_daftar}"><i class="fas fa-upload"></i></button>`;
                                 }
 
                                 html += `<tr>
@@ -503,7 +519,7 @@
                                     data.daftar.prodi1.jurusan);
                                 $('#o-prodi2').html(data.daftar.prodi2.jenjang.jenjang + '-' +
                                     data.daftar.prodi2.jurusan);
-
+                                $('#o-prodi3').html(data.daftar.prodi3 ? data.daftar.prodi3.jenjang.jenjang + '-' + data.daftar.prodi3.jurusan : '-');
                                 let ukt1 = new Intl.NumberFormat('id-ID').format(data.ukt1
                                     .biaya_ukt);
                                 $('#o-uktprodi1').html('Rp ' + ukt1);
@@ -511,6 +527,9 @@
                                 let ukt2 = new Intl.NumberFormat('id-ID').format(data.ukt2
                                     .biaya_ukt);
                                 $('#o-uktprodi2').html('Rp ' + ukt2);
+                                
+                                let ukt3 = data.ukt3 ? new Intl.NumberFormat('id-ID').format(data.ukt3.biaya_ukt) : '0';
+                                $('#o-uktprodi3').html('Rp ' + ukt3);
 
                                 let konfirmdaftar = data.daftar.konfirm_pendaftaran == '0' ?
                                     'Belum Konfirmasi' : 'Sudah Konfirmasi';
@@ -523,6 +542,8 @@
 
                                 $('#o-tgldaftar').html(data.daftar.tgl_daftar);
                                 $('#o-waktukuliah').html(data.daftar.waktukuliah.waktu);
+
+                                $('#o-rekomendator').html(data.rekomendator);
 
                                 let statusUkt = data.daftar.jalur.status_ukt == '0' ? 'Gratis' :
                                     'Bayar';
@@ -655,7 +676,7 @@
                                         $('#loading').hide();
                                         Swal.fire({
                                             title: 'Gagal Menyimpan Data',
-                                            text: 'Periksa koneksi atau error di server (cek console).',
+                                            text: 'Periksa koneksi atau coba lagi.',
                                             icon: 'error'
                                         });
                                         console.log(xhr
@@ -801,18 +822,18 @@
                 });
 
                 // 5. Listener Tombol DETAIL (Ikon List)
-                $('#example2').on('click', '.btn-detail', function(e) {
-                    e.preventDefault();
-                    let id = $(this).data('id');
+                // $('#example2').on('click', '.btn-detail', function(e) {
+                //     e.preventDefault();
+                //     let id = $(this).data('id');
 
-                    // --- PILIH SALAH SATU DI BAWAH INI ---
+                //     // --- PILIH SALAH SATU DI BAWAH INI ---
 
-                    // OPSI A: Jika ingin pindah halaman (Redirect)
-                    // window.location.href = "{{ url('user/berkas/detail') }}/" + id;
+                //     // OPSI A: Jika ingin pindah halaman (Redirect)
+                //     // window.location.href = "{{ url('user/berkas/detail') }}/" + id;
 
-                    // OPSI B: Jika ingin munculkan pesan/alert saja dulu buat ngetes
-                    // alert("Kamu menekan tombol detail untuk ID: " + id);
-                });
+                //     // OPSI B: Jika ingin munculkan pesan/alert saja dulu buat ngetes
+                //     // alert("Kamu menekan tombol detail untuk ID: " + id);
+                // });
             });
 
         });

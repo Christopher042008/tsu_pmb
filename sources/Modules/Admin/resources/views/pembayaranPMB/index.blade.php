@@ -114,30 +114,46 @@
                             <tr>
                                 <th>Program Studi Pilihan 1</th>
                                 <th id="o-prodi1" class="o-detaildaftar"></th>
-                                <th>Program Studi Pilihan 2</th>
-                                <th id="o-prodi2" class="o-detaildaftar"></th>
+                                <th>Konfirmasi Daftar</th>
+                                <th id="o-konfirmdaftar" class="o-detaildaftar"></th>
+                                {{-- <th>Program Studi Pilihan 2</th>
+                                <th id="o-prodi2" class="o-detaildaftar"></th> --}}
+                                {{-- <th>Program Studi Pilihan 3</th>
+                                <th id="o-prodi3" class="o-detaildaftar"></th> --}}
                             </tr>
                             <tr>
                                 <th>UKT Program Studi 1</th>
                                 <th id="o-uktprodi1" class="o-detaildaftar"></th>
-                                <th>UKT Program Studi 2</th>
-                                <th id="o-uktprodi2" class="o-detaildaftar"></th>
-                            </tr>
-                            <tr>
-                                <th>Konfirmasi Daftar</th>
-                                <th id="o-konfirmdaftar" class="o-detaildaftar"></th>
                                 <th>Biaya Pendaftaran</th>
-                                <th id="o-biayadaftar" class="o-detaildaftar"></th>
+                                <th id="o-biayadaftar" class="o-detaildaftar"></th> 
+                                {{-- <th>UKT Program Studi 2</th>
+                                <th id="o-uktprodi2" class="o-detaildaftar"></th> --}}
+                                {{-- <th>UKT Program Studi 3</th>
+                                <th id="o-uktprodi3" class="o-detaildaftar"></th> --}}
                             </tr>
                             <tr>
+                                <th>Program Studi Pilihan 2</th>
+                                <th id="o-prodi2" class="o-detaildaftar"></th>
                                 <th>Tanggal Daftar</th>
                                 <th id="o-tgldaftar" class="o-detaildaftar"></th>
+                                {{-- <th>Konfirmasi Daftar</th>
+                                <th id="o-konfirmdaftar" class="o-detaildaftar"></th> --}}
+                                {{-- <th>Biaya Pendaftaran</th>
+                                <th id="o-biayadaftar" class="o-detaildaftar"></th> --}}
+                            </tr>
+                            <tr>
+                                <th>UKT Program Studi 2</th>
+                                <th id="o-uktprodi2" class="o-detaildaftar"></th>
+                                {{-- <th>Tanggal Daftar</th>
+                                <th id="o-tgldaftar" class="o-detaildaftar"></th> --}}
                                 <th>Waktu Kuliah</th>
                                 <th id="o-waktukuliah" class="o-detaildaftar"></th>
                             </tr>
                             <tr>
-                                <th>Status UKT</th>
-                                <th id="o-statusukt" class="o-detaildaftar"></th>
+                                <th>Program Studi Pilihan 3</th>
+                                <th id="o-prodi3" class="o-detaildaftar"></th>
+                                {{-- <th>Status UKT</th>
+                                <th id="o-statusukt" class="o-detaildaftar"></th> --}}
                                 <th>
                                     <code>*Khusus Beasiswa</code>
                                     <br>
@@ -146,12 +162,14 @@
                                 <th id="o-beasiswa" class="o-detaildaftar"></th>
                             </tr>
                             <tr>
-                                <th>
+                                <th>UKT Program Studi 3</th>
+                                <th id="o-uktprodi3" class="o-detaildaftar"></th>
+                                {{-- <th>
                                     <code>*Khusus Beasiswa</code>
                                     <br>
                                     Tingkat Kejuaraan
                                 </th>
-                                <th id="o-juarabea" class="o-detaildaftar"></th>
+                                <th id="o-juarabea" class="o-detaildaftar"></th> --}}
                                 <th>
                                     <code>*Khusus Beasiswa</code>
                                     <br>
@@ -172,6 +190,20 @@
                                     Durasi Beasiswa S1
                                 </th>
                                 <th id="o-durasis1" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Status UKT</th>
+                                <th id="o-statusukt" class="o-detaildaftar"></th>
+                                <th>
+                                    <code>*Khusus Beasiswa</code>
+                                    <br>
+                                    Tingkat Kejuaraan
+                                </th>
+                                <th id="o-juarabea" class="o-detaildaftar"></th>
+                            </tr>
+                            <tr>
+                                <th>Rekomendator</th>
+                                <th id="o-rekomendator" class="o-detaildaftar" colspan="3"></th>
                             </tr>
                         </thead>
                         <tbody id="detail-bayar" class="o-detaildaftar">
@@ -251,7 +283,8 @@
 
             function tabelPembayaran()
             {
-                let params = $('#kategori').val()
+                let params = $('#kategori').val();
+                
                 let otable = $('#example2').DataTable({
                     destroy: true,
                     processing: true,
@@ -264,43 +297,20 @@
                     responsive: true,
                     order: [],
                     ajax: {
-                        url: '{!! url('admin/PembayaranPMB/TabelPembayaranPMB') !!}', //+'/'+params,
+                        url: '{!! url('admin/PembayaranPMB/TabelPembayaranPMB') !!}',
                         type: 'GET',
                     },
-                    columns: [{
-                            data: 'DT_RowIndex',
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: 'nama'
-                        },
-                        {
-                            data: 'noreg'
-                        },
-                        {
-                            data: 'kodetx'
-                        },
-                        {
-                            data: 'jenis'
-                        },
-                        {
-                            data: 'nominal'
-                        },
-                        {
-                            data: 'status'
-                        },
-                        {
-                            data: 'keterangan'
-                        },
-                        {
-                            data: 'approve'
-                        },
-                        {
-                            data: 'action',
-                            orderable: false,
-                            searchable: false
-                        },
+                    columns: [
+                        { data: 'DT_RowIndex', orderable: false, searchable: false },
+                        { data: 'nama' },
+                        { data: 'noreg' },
+                        { data: 'kodetx' },
+                        { data: 'jenis' },
+                        { data: 'nominal' },
+                        { data: 'status' },
+                        { data: 'keterangan' },
+                        { data: 'approve' },
+                        { data: 'action', orderable: false, searchable: false },
                     ],
                     language: {
                         processing: '<i class="fa fa-spinner fa-lg fa-spin"></i>'
@@ -315,7 +325,6 @@
                 otable.on('draw', function(event) {
                     $('[data-toggle="tooltip"]').tooltip({trigger: "hover"});
                     $('[data-tooltip="tooltip"]').tooltip({trigger: "hover"});
-
                 });
             }
 
@@ -345,11 +354,15 @@
                                 $('#o-jurusansekolah').html(data.daftar.jurusansekolah.sekolah+'/'+data.daftar.jurusansekolah.jurusan_sekolah)
                                 $('#o-prodi1').html(data.daftar.prodi1.jenjang.jenjang+'-'+data.daftar.prodi1.jurusan)
                                 $('#o-prodi2').html(data.daftar.prodi2.jenjang.jenjang+'-'+data.daftar.prodi2.jurusan)
+                                let txtProdi3 = data.daftar.prodi3 ? data.daftar.prodi3.jenjang.jenjang+'-'+data.daftar.prodi3.jurusan : '-';
+                                $('#o-prodi3').html(txtProdi3);
                                 // let ukt1 = data.ukt1.biaya_ukt.replace(/\D/g, '')
                                 let ukt1 = new Intl.NumberFormat('id-ID').format(data.ukt1.biaya_ukt);
                                 $('#o-uktprodi1').html('Rp '+ukt1)
                                 let ukt2 = new Intl.NumberFormat('id-ID').format(data.ukt2.biaya_ukt);
                                 $('#o-uktprodi2').html('Rp '+ukt2)
+                                let ukt3 = data.ukt3 ? new Intl.NumberFormat('id-ID').format(data.ukt3.biaya_ukt) : '0';
+                                $('#o-uktprodi3').html('Rp '+ukt3)
                                 let konfirmdaftar = data.daftar.konfirm_pendaftaran=='0' ? 'Belum Konfirmasi' : 'Sudah Konfirmasi';
                                 $('#o-konfirmdaftar').html(konfirmdaftar)
                                 let biayadaftar = data.daftar.jalur.biaya_pendaftaran=='1' ? 'Rp '+new Intl.NumberFormat('id-ID').format(data.daftar.jalur.jml_biaya_pendaftaran) : 'Gratis';
@@ -385,6 +398,7 @@
                                 $('#o-biayadaftar').html(biayadaftar+' '+showstatusdaftar)
                                 $('#o-tgldaftar').html(data.daftar.tgl_daftar)
                                 $('#o-waktukuliah').html(data.daftar.waktukuliah.waktu)
+                                $('#o-rekomendator').html(data.rekomendator)
                                 let statusUkt = data.daftar.jalur.status_ukt=='0' ? 'Gratis '+showstatusUKT : 'Bayar '+showstatusUKT;
                                 $('#o-statusukt').html(statusUkt)
                                 let beasiswa = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.jenis_beasiswa

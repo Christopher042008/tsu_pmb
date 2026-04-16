@@ -17,6 +17,7 @@
                         <li><a href="{{ route('program_studi') }}">Program Studi</a></li>
                         <li><a href="{{ route('pengumuman') }}">Pengumuman</a></li>
                         <li><a href="{{ route('informasi_pendaftaran') }}">Informasi Pendaftaran</a></li>
+                        <li><a href="{{ route('daftarrekomendator.index') }}">Daftar Rekomendator</a></li>
                     </ul>
                 </li>
                 <li>

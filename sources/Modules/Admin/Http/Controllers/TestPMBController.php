@@ -147,6 +147,9 @@ class TestPMBController extends Controller
                 'prodi2'=>function($q){
                     $q->with('jenjang');
                 },
+                'prodi3'=>function($q){
+                    $q->with('jenjang');
+                },
                 'jurusan_acc'=>function($q){
                     $q->with('jenjang');
                 },
@@ -171,10 +174,23 @@ class TestPMBController extends Controller
             $mhs = Pendaftaran::where('KodePendaftaran',$id)->first();
             $jurusan = array();
             // $jurusan = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan1)->orwhere('KodeJurusan',$mhs->pilihan2)->with('jenjang')->get();
-            $jurusan1 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan1)->with('jenjang')->first();
-            array_push($jurusan,$jurusan1);
-            $jurusan2 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan2)->with('jenjang')->first();
-            array_push($jurusan,$jurusan2);
+           // Pilihan 1
+            if ($mhs->pilihan1 != null) {
+                $jurusan1 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan1)->with('jenjang')->first();
+                if ($jurusan1) array_push($jurusan, $jurusan1);
+            }
+            
+            // Pilihan 2
+            if ($mhs->pilihan2 != null) {
+                $jurusan2 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan2)->with('jenjang')->first();
+                if ($jurusan2) array_push($jurusan, $jurusan2);
+            }
+
+            // Pilihan 3 
+            if ($mhs->pilihan3 != null) {
+                $jurusan3 = Master_JurusanKuliah::where('KodeJurusan',$mhs->pilihan3)->with('jenjang')->first();
+                if ($jurusan3) array_push($jurusan, $jurusan3);
+            }
             $data['hasil'] = 1;
             $data['jurusan'] = $jurusan;
         }
@@ -212,7 +228,6 @@ class TestPMBController extends Controller
             $kode = 'UKT-'.$id.'-'.date('YmdHis');
             $jurusan = Master_JurusanKuliah::where('KodeJurusan',$post->jurusan_diterima)->first();
             $biaya = Master_TarifUKT::where('idbatch',$cek->batch_daftar)->where('idjalur',$cek->jalur_daftar)->where('idjurusan',$jurusan->id)->first();
-
             $transaksi = Transaksi::insert([
                 'user_id' => $cek->biodata_id,
                 'kategori' => 'ukt',

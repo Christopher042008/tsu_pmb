@@ -253,10 +253,10 @@
                             if($daftar!=null){
                             if($daftar->current_step==6){
                             $step6 = 'active';
-                            $link6 = route('test');
+                            $link6 = route('assessment.index');
                             }elseif($daftar->current_step==7&&$daftar->current_step!=$daftar->stop_step){
                             $step6 = 'validating';
-                            $link6 = route('test');
+                            $link6 = route('assessment.index');
                             }elseif($daftar->current_step>7){
                             $step6 = 'completed';
                             $link6 = 'javascript:void(0)';
@@ -379,7 +379,7 @@
                                     <i class="bi bi-whatsapp"></i> 0895705354767
                                 </a> via Whatsapp </code></span><br>
                         <span class="text-bold"><code>10. Jika ingin melanjutkan ke tahap selanjutnya, click step yang berwarna <span class="badge bg-primary">biru</span></code></span><br><br>
-                        
+
                         <span class="text-bold">Good Luck 😊</span>
                     </div>
                 </div>

@@ -15,30 +15,21 @@
     table-layout: auto;
 }
 </style>
-    <!-- Content Header (Page header) -->
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1>{{ $menu }}</h1>
-                </div><!-- /.col -->
-                <div class="col-sm-6">
+                </div><div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item active"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item active">Master Data</li>
                         <li class="breadcrumb-item active">{{ $menu }}</li>
                     </ol>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content-header -->
-
-    <!-- Main content -->
+                </div></div></div></div>
     <div class="content">
         <div class="container-fluid">
             <div class="row">
-                <!-- /.col-md-6 -->
                 <div class="col-md-12">
                     <div class="card card-primary card-outline">
                         <div class="card-header">
@@ -46,8 +37,7 @@
                         </div>
                         <div class="card-body">
                             <div class="row justify-content-center">
-                                <div class="col-md-6"> <!-- Ubah lebar form di sini -->
-                                    <form id="form-fakultas" method="POST" action="#">
+                                <div class="col-md-6"> <form id="form-fakultas" method="POST" action="#">
                                         @csrf
                                         <input type="hidden" id="IdJenis" name="IdJenis" value="">
                                         <div class="form-group mb-3">
@@ -115,11 +105,15 @@
                                         </div>
 
                                         <div class="form-group mb-3">
+                                            <label for="format_nim">Format NIM</label>
+                                            <input type="text" id="format_nim" name="format_nim" placeholder="Contoh: 4 (Max 5 Karakter)" class="form-control" maxlength="5">
+                                        </div>
+
+                                        <div class="form-group mb-3">
                                             <label for="tahun">Deskripsi</label>
                                             <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" placeholder="Deskripsi Jalur"></textarea>
                                         </div>
 
-                                        <!-- Buttons -->
                                         <div class="form-group">
                                             <button type="button" id="submit-jalur" class="btn btn-success float-right" style="margin-left:10px;"> <i class="fas fa-paper-plane"></i> Submit</button>
                                             <button id="btn-reset" class="btn btn-warning float-right">Reset</button>
@@ -136,7 +130,7 @@
                                             <th>Kode Jalur</th>
                                             <th>Nama Jalur</th>
                                             <th>Jenis</th>
-                                            <th>Biaya Pendaftaran</th>
+                                            <th>Format NIM</th> <th>Biaya Pendaftaran</th>
                                             <th>Status UKT</th>
                                             <th>Berkas Umum</th>
                                             <th>Berkas Khusus</th>
@@ -152,13 +146,9 @@
                         </div>
                     </div>
                 </div>
-                <!-- /.col-md-6 -->
-            </div>
-            <!-- /.row -->
-        </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content -->
-@endsection
+                </div>
+            </div></div>
+    @endsection
 
 @section('script')
     <script>
@@ -211,6 +201,10 @@
                         },
                         {
                             data: 'status'
+                        },
+                        // TAMBAHAN KOLOM FORMAT NIM
+                        {
+                            data: 'format_nim'
                         },
                         {
                             data: 'biaya_daftar'
@@ -378,6 +372,8 @@
                                 $('#kode').val(data.jenis.KodeJenis)
                                 $('#namajalur').val(data.jenis.jenis_pendaftaran)
                                 $('#jenisjalur').val(data.jenis.is_beasiswa).trigger('change')
+                                // TAMBAHAN SET VALUE FORMAT NIM
+                                $('#format_nim').val(data.jenis.format_nim) 
                                 if(data.jenis.biaya_pendaftaran==1){
                                     $('#check_daftar').val(data.jenis.biaya_pendaftaran)
                                     $('#check_daftar').prop('checked',true).trigger('change')

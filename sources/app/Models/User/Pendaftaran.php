@@ -21,6 +21,8 @@ class Pendaftaran extends Model
     protected $table = 'pmb_pendaftaran';
     protected $primaryKey = 'KodePendaftaran';
     protected $keyType = 'string';
+
+    protected $guarded = [];
     // protected $fillable = [
     //     'nik',
     //     'role_access',
@@ -56,6 +58,10 @@ class Pendaftaran extends Model
 
     public function prodi2(){
         return $this->hasOne('App\Models\MasterData\Master_JurusanKuliah', 'KodeJurusan','pilihan2');
+    }
+
+    public function prodi3(){
+        return $this->hasOne('App\Models\MasterData\Master_JurusanKuliah', 'KodeJurusan','pilihan3');
     }
 
     public function waktukuliah(){

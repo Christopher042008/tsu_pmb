@@ -51,6 +51,10 @@ class JenisPendaftaranController extends Controller
             $show = '<span class="badge bg-'.$warna.'">'.$role.'</span>';
             return $show;
         })
+        // TAMBAHAN: Kolom format_nim
+        ->addColumn('format_nim', function ($d) {
+            return $d->format_nim ?? '-';
+        })
         ->addColumn('biaya_daftar', function ($d) {
             if($d->biaya_pendaftaran==1){
                 $role = 'Bayar';
@@ -119,13 +123,12 @@ class JenisPendaftaranController extends Controller
 
     public function StoreJalur(Request $post)
     {
-        // dd($post);
         $cek = Master_JenisPendaftaran::where('isactive',1)
         ->where('KodeJenis',$post->kode)
         ->where('jenis_pendaftaran',$post->namajalur)
         ->first();
         $alert = null;
-        if($cek){
+        if($cek && $post->IdJenis == null){ // Hanya cek duplikat jika sedang Create Baru
             $alert = array(
                 'title' => 'Gagal!',
                 'message' => 'Kode Jalur atau Nama Jalur Pendaftaran Tidak Boleh Sama !',
@@ -139,39 +142,41 @@ class JenisPendaftaranController extends Controller
             }
         }
         return response()->json($alert, Response::HTTP_OK);
-        // return redirect()->route('admin.JenisPendaftaran.show')->with('alert',$alert);
-
     }
 
     public function Save($post)
     {
         $up = array(
-            'KodeJenis' => $post->kode,
-            'jenis_pendaftaran' => $post->namajalur,
-            'is_beasiswa' => $post->jenisjalur,
-            'biaya_pendaftaran' => isset($post->check_daftar) ? $post->check_daftar : '0',
+            'KodeJenis'             => $post->kode,
+            'jenis_pendaftaran'     => $post->namajalur,
+            'is_beasiswa'           => $post->jenisjalur,
+            'biaya_pendaftaran'     => isset($post->check_daftar) ? $post->check_daftar : '0',
             'jml_biaya_pendaftaran' => $post->biaya_daftar,
-            'status_ukt' => $post->statusukt,
-            'berkas' => $post->berkas,
-            'deskripsi' => $post->deskripsi,
-            'created_at'   => date('Y-m-d H:i:s'),
-            'created_by'   => session('session')->nip,
+            'status_ukt'            => $post->statusukt,
+            // 'berkas' => $post->berkas, <--- BARIS INI SUDAH DIHAPUS
+            'berkas_umum'           => $post->berkasumum,
+            'berkas_khusus'         => $post->berkaskhusus,
+            'format_nim'            => $post->format_nim,      
+            'deskripsi'             => $post->deskripsi,
+            'created_at'            => date('Y-m-d H:i:s'),
+            'created_by'            => optional(session('session'))->nip ?? 'System',
         );
+
         DB::beginTransaction();
-        $save = Master_JenisPendaftaran::insert($up);
-        if($save){
+        try {
+            $save = Master_JenisPendaftaran::insert($up);
             DB::commit();
             $alert = array(
-                'title' => 'Berhasil!',
+                'title'   => 'Berhasil!',
                 'message' => 'Data Jenis Pendaftaran Tersimpan !',
-                'status' => 'success'
+                'status'  => 'success'
             );
-        }else{
+        } catch (\Throwable $e) {
             DB::rollback();
             $alert = array(
-                'title' => 'Gagal!',
-                'message' => 'Data Jenis Pendaftaran Gagal Disimpan !',
-                'status' => 'error'
+                'title'   => 'Gagal!',
+                'message' => 'Data Jenis Pendaftaran Gagal Disimpan ! ',
+                'status'  => 'error'
             );
         }
         return $alert;
@@ -180,7 +185,6 @@ class JenisPendaftaranController extends Controller
     public function ShowJalur($params)
     {
         $id = decrypt($params);
-        // dd($id);
         $check = Master_JenisPendaftaran::where('id',$id)->first();
 
         if($check){
@@ -198,35 +202,37 @@ class JenisPendaftaranController extends Controller
     public function Update($post)
     {
         $id = decrypt($post->IdJenis);
-        // dd($id);
 
         $up = array(
-            'KodeJenis' => $post->kode,
-            'jenis_pendaftaran' => $post->namajalur,
-            'is_beasiswa' => $post->jenisjalur,
-            'biaya_pendaftaran' => isset($post->check_daftar) ? $post->check_daftar : 0,
+            'KodeJenis'             => $post->kode,
+            'jenis_pendaftaran'     => $post->namajalur,
+            'is_beasiswa'           => $post->jenisjalur,
+            'biaya_pendaftaran'     => isset($post->check_daftar) ? $post->check_daftar : '0',
             'jml_biaya_pendaftaran' => $post->biaya_daftar,
-            'status_ukt' => $post->statusukt,
-            'berkas' => $post->berkas,
-            'deskripsi' => $post->deskripsi,
-            'updated_at'   => date('Y-m-d H:i:s'),
-            'updated_by'   => session('session')->nip,
+            'status_ukt'            => $post->statusukt,
+            'berkas_umum'           => $post->berkasumum,     
+            'berkas_khusus'         => $post->berkaskhusus, 
+            'format_nim'            => $post->format_nim,      
+            'deskripsi'             => $post->deskripsi,
+            'updated_at'            => date('Y-m-d H:i:s'),
+            'updated_by'            => optional(session('session'))->nip ?? 'System',
         );
+
         DB::beginTransaction();
-        $update = Master_JenisPendaftaran::where('id',$id)->update($up);
-        if($update){
+        try {
+            $update = Master_JenisPendaftaran::where('id',$id)->update($up);
             DB::commit();
             $alert = array(
-                'title' => 'Berhasil!',
+                'title'   => 'Berhasil!',
                 'message' => 'Data Jenis Pendaftaran Diperbarui !',
-                'status' => 'success'
+                'status'  => 'success'
             );
-        }else{
+        } catch (\Throwable $e) {
             DB::rollback();
             $alert = array(
-                'title' => 'Gagal!',
-                'message' => 'Data Jenis Pendaftaran Gagal Diperbarui !',
-                'status' => 'error'
+                'title'   => 'Gagal!',
+                'message' => 'Data Jenis Pendaftaran Gagal Diperbarui ! ',
+                'status'  => 'error'
             );
         }
         return $alert;
@@ -236,10 +242,9 @@ class JenisPendaftaranController extends Controller
     {
         $id = decrypt($params1);
         $aktif = decrypt($params2);
-        $cek = Pendaftaran::where('jenis_daftar',$id)->first();
+        $cek = Pendaftaran::where('jalur_daftar',$id)->first(); // Perbaikan: Ganti jenis_daftar jadi jalur_daftar (sesuai struktur tabel Pendaftaran)
         if($cek){
             $alert = ['title' => 'Gagal','message' => 'Jenis Pendaftaran Sudah ada yang mendaftar !','status' => 'error'];
-            // return redirect()->route('admin.JenisPendaftaran.show')->with('alert',$alert);
         }else{
             DB::beginTransaction();
             $up = array(
@@ -252,10 +257,10 @@ class JenisPendaftaranController extends Controller
 
             if($update){
                 DB::commit();
-                $alert = ['title' => 'Berhasil','message' => 'Jalur Pendaftaran Berhasil Dihapus','status' => 'success'];
+                $alert = ['title' => 'Berhasil','message' => 'Status Jalur Pendaftaran Berhasil Diubah','status' => 'success'];
             }else{
                 DB::rollback();
-                $alert = ['title' => 'Gagal','message' => 'Gagal Menghapus Jalur Pendaftaran','status' => 'error'];
+                $alert = ['title' => 'Gagal','message' => 'Gagal Mengubah Status Jalur Pendaftaran','status' => 'error'];
             }
         }
         return response()->json($alert, Response::HTTP_OK);

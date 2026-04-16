@@ -48,6 +48,7 @@
                                         <th>Kategori Beasiswa</th>
                                         <th>Prodi Pilihan 1</th>
                                         <th>Prodi Pilihan 2</th>
+                                        <th>Prodi Pilihan 3</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -102,14 +103,22 @@
                             <tr>
                                 <th>Program Studi Pilihan 1</th>
                                 <th id="o-prodi1" class="o-detaildaftar"></th>
-                                <th>Program Studi Pilihan 2</th>
-                                <th id="o-prodi2" class="o-detaildaftar"></th>
-                            </tr>
-                            <tr>
                                 <th>UKT Program Studi 1</th>
                                 <th id="o-uktprodi1" class="o-detaildaftar"></th>
+                            </tr>
+
+                            <tr>
+                                <th>Program Studi Pilihan 2</th>
+                                <th id="o-prodi2" class="o-detaildaftar"></th>
                                 <th>UKT Program Studi 2</th>
                                 <th id="o-uktprodi2" class="o-detaildaftar"></th>
+                            </tr>
+
+                            <tr>
+                                <th>Program Studi Pilihan 3</th>
+                                <th id="o-prodi3" class="o-detaildaftar"></th>
+                                <th>UKT Program Studi 3</th>
+                                <th id="o-uktprodi3" class="o-detaildaftar"></th>
                             </tr>
                             <tr>
                                 <th>Konfirmasi Daftar</th>
@@ -162,6 +171,10 @@
                                 <th id="o-durasis1" class="o-detaildaftar"></th>
                             </tr>
                             <tr>
+                                <th>Rekomendator</th>
+                                <th id="o-rekomendator" class="o-detaildaftar" colspan="3"></th>
+                            </tr>
+                            <tr>
                                 <th colspan="4" style="background-color: rgb(251, 255, 0);"><code>*Berkas yang diperlukan</code></th>
                             </tr>
                         </thead>
@@ -177,6 +190,44 @@
             <!-- /.modal-content -->
         </div>
         <!-- /.modal-dialog -->
+    </div>
+    <div class="modal fade" id="modal-edit-rekomendator">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Data Rekomendator</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <h6 class="text-muted mb-2">Rekomendator Saat Ini:</h6>
+                        <h4 id="teks_rekomendator_saatini" class="text-bold text-primary">-</h4>
+
+                        <button type="button" id="btn-tampil-form-edit" class="btn btn-sm btn-outline-warning mt-3">
+                            <i class="fas fa-edit"></i> Ubah / Tambah Rekomendator
+                        </button>
+                    </div>
+
+                    <div id="wadah-form-rekomendator" style="display: none; border-top: 1px solid #eee; padding-top: 15px;">
+                        <form id="form-edit-rekomendator">
+                            <input type="hidden" id="edit_id_daftar" name="id_daftar">
+                            <div class="form-group">
+                                <label>Cari & Pilih Rekomendator Baru</label>
+                                <select class="form-control" id="select_rekomendator" name="kode_rekomendator" style="width: 100%;">
+                                    <option value="" selected disabled>-- Ketik Nama Rekomendator --</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="btn-save-rekomendator" class="btn btn-success" style="display: none;"><i class="fas fa-save"></i> Simpan</button>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 @section('script')
@@ -240,6 +291,9 @@
                             data: 'prodi2'
                         },
                         {
+                            data: 'prodi3'
+                        },
+                        {
                             data: 'status'
                         },
                         {
@@ -290,17 +344,21 @@
                                 $('#o-jurusansekolah').html(data.daftar.jurusansekolah.sekolah+'/'+data.daftar.jurusansekolah.jurusan_sekolah)
                                 $('#o-prodi1').html(data.daftar.prodi1.jenjang.jenjang+'-'+data.daftar.prodi1.jurusan)
                                 $('#o-prodi2').html(data.daftar.prodi2.jenjang.jenjang+'-'+data.daftar.prodi2.jurusan)
+                                $('#o-prodi3').html(data.daftar.prodi3 ? data.daftar.prodi3.jenjang.jenjang+'-'+data.daftar.prodi3.jurusan : '-');
                                 // let ukt1 = data.ukt1.biaya_ukt.replace(/\D/g, '')
                                 let ukt1 = new Intl.NumberFormat('id-ID').format(data.ukt1.biaya_ukt);
                                 $('#o-uktprodi1').html('Rp '+ukt1)
                                 let ukt2 = new Intl.NumberFormat('id-ID').format(data.ukt2.biaya_ukt);
                                 $('#o-uktprodi2').html('Rp '+ukt2)
+                                let ukt3 = data.ukt3 ? new Intl.NumberFormat('id-ID').format(data.ukt3.biaya_ukt) : '0';
+                                $('#o-uktprodi3').html('Rp '+ukt3);
                                 let konfirmdaftar = data.daftar.konfirm_pendaftaran=='0' ? 'Belum Konfirmasi' : 'Sudah Konfirmasi';
                                 $('#o-konfirmdaftar').html(konfirmdaftar)
                                 let biayadaftar = data.daftar.jalur.biaya_pendaftaran=='1' ? 'Rp '+new Intl.NumberFormat('id-ID').format(data.daftar.jalur.jml_biaya_pendaftaran) : 'Gratis';
                                 $('#o-biayadaftar').html(biayadaftar)
                                 $('#o-tgldaftar').html(data.daftar.tgl_daftar)
                                 $('#o-waktukuliah').html(data.daftar.waktukuliah.waktu)
+                                $('#o-rekomendator').html(data.rekomendator);
                                 let statusUkt = data.daftar.jalur.status_ukt=='0' ? 'Gratis' : 'Bayar';
                                 $('#o-statusukt').html(statusUkt)
                                 let beasiswa = data.daftar.jenisbeasiswa==null ? '-' : data.daftar.jenisbeasiswa.jenis_beasiswa
@@ -385,5 +443,107 @@
             }
 
         });
+        $('#example2').on('click', '.btn_edit_rekomendator', function(e) {
+                e.preventDefault();
+                let id = $(this).data('id');
+
+                // MENGGUNAKAN .attr() AGAR DATA SELALU TERBACA AKURAT DARI DOM
+                let rek_saatini = $(this).attr('data-rek');
+
+                $('#edit_id_daftar').val(id);
+
+                // Tampilkan Teks Rekomendator Saat Ini
+                if(rek_saatini && rek_saatini !== '-' && rek_saatini !== '') {
+                    $('#teks_rekomendator_saatini').text(rek_saatini);
+                } else {
+                    $('#teks_rekomendator_saatini').text('-');
+                }
+
+                // Sembunyikan form dropdown pencarian & tombol simpan
+                $('#wadah-form-rekomendator').hide();
+                $('#btn-save-rekomendator').hide();
+                // Munculkan tombol pemancing edit
+                $('#btn-tampil-form-edit').show();
+
+                // Kosongkan Select2
+                $('#select_rekomendator').empty().append('<option value="" selected disabled>-- Ketik Nama Rekomendator --</option>');
+
+                $('#modal-edit-rekomendator').modal('show');
+            });
+
+            // 2. EVENT KETIKA TOMBOL "UBAH / TAMBAH" DI DALAM MODAL DIKLIK
+            $('#btn-tampil-form-edit').click(function(e){
+                e.preventDefault();
+                $(this).hide(); // Sembunyikan tombol "Ubah"
+                $('#wadah-form-rekomendator').slideDown('fast'); // Tampilkan form Select2
+                $('#btn-save-rekomendator').fadeIn('fast'); // Tampilkan tombol "Simpan"
+            });
+
+            // SETUP SELECT2 UNTUK PENCARIAN NAMA REKOMENDATOR SAJA
+            $('#select_rekomendator').select2({
+                dropdownParent: $('#modal-edit-rekomendator'),
+                theme: 'bootstrap4',
+                placeholder: '-- Ketik Nama Rekomendator --',
+                allowClear: true,
+                minimumInputLength: 2,
+                ajax: {
+                    url: '{!! route('admin.databeasiswa.carirekomendator') !!}', // Pastikan route ini dapat diakses admin juga
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return { q: params.term };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: $.map(data, function(item) {
+                                return {
+                                    text: item.kode_rekomendator+' - '+item.nama_rekomendator,
+                                    id: item.kode_rekomendator
+                                }
+                            })
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            // EVENT SIMPAN PERUBAHAN REKOMENDATOR
+            $('#btn-save-rekomendator').click(function(e) {
+                e.preventDefault();
+                let id_daftar = $('#edit_id_daftar').val();
+                let kode_rek = $('#select_rekomendator').val();
+
+                if (!kode_rek) {
+                    notifalert('Information', 'Pilih Rekomendator terlebih dahulu!', 'warning');
+                    return;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: '{!! route('admin.databeasiswa.updaterekomendator') !!}',
+                    data: {
+                        id_daftar: id_daftar,
+                        kode_rekomendator: kode_rek
+                    },
+                    dataType: "JSON",
+                    beforeSend: function() {
+                        $('#loading').show();
+                    },
+                    success: function(response) {
+                        $('#loading').hide();
+                        if (response.status == 'success') {
+                            $('#modal-edit-rekomendator').modal('hide');
+                            notifalert('Berhasil', response.message, 'success');
+                            $('#example2').DataTable().ajax.reload();
+                        } else {
+                            notifalert('Gagal', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        $('#loading').hide();
+                        Swal.fire('Error', 'Terjadi kesalahan pada server', 'error');
+                    }
+                });
+            });
     </script>
 @endsection

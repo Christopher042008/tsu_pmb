@@ -20,4 +20,16 @@ class Assessment_TipeTest extends Model
      */
     protected $table = 'pmb_assessment_tipe_test';
     protected $primaryKey = 'id';
+    protected $fillable = [
+        'nama_test',
+        'kode_test',
+        'tipe_engine',
+        'durasi_menit',
+        'urutan',
+        'created_at',
+        'created_by',
+        'updated_at',
+        'updated_by',
+        'isactive',
+    ];
 }
