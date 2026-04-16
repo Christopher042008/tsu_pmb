@@ -14,7 +14,7 @@ if (!function_exists('defaultpassword')) {
 if (!function_exists('namaku')) {
     function namaku($nip)
     {
-        $cek = PegawaiModel::where('nip',$nip)->select('nama')->first();
+        $cek = PegawaiModel::where('nik',$nip)->select('nama')->first();
         $nama = '-';
         if($cek){
             $nama = $cek->nama;

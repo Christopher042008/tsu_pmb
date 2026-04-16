@@ -211,11 +211,10 @@ class LoginController extends Controller
         $birthday = $get->birthday;
         $nik      = $get->nik;
         $role     = $get->role;
-
         $cekrole = MasterGroupModel::where('KodeGroupUser', $role)->first();
 
         $cek1 = PegawaiModel::where('nik', $nik)->first();
-        $tgl = $cek1->tgl_lahir;
+        $tgl = $cek1->tanggallahir;
         if (strtotime($tgl) == strtotime($birthday)) {
             return '1';
         } else {
