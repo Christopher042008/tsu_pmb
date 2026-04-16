@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\User\Http\Controllers\AssessmentController;
 use Modules\User\Http\Controllers\BiodataController;
+use Modules\User\Http\Controllers\DaftarRekomendatorController;
 use Modules\User\Http\Controllers\HasilPMBController;
 use Modules\User\Http\Controllers\LoginController;
 use Modules\User\Http\Controllers\OnlineTestController;
@@ -42,6 +43,10 @@ Route::prefix('')->group(function () {
         Route::post('/LoginAction', [UserController::class, 'LoginAction'])->name('login.action');
         Route::get('/ResetPassword', [UserController::class, 'ResetPassword'])->name('ResetPassword');
         Route::post('/ResetPasswordAction', [UserController::class, 'ResetPasswordAction'])->name('ResetPasswordAction');
+
+        //Daftar Rekomendator
+        Route::get('/Daftar-Rekomendator', [DaftarRekomendatorController::class, 'index'])->name('daftarrekomendator.index');
+        Route::post('/Save-Rekomendator', [DaftarRekomendatorController::class, 'save'])->name('daftarrekomendator.save');
 
         // Route yang butuh user login
         Route::middleware(['checkuser'])->group(function () {

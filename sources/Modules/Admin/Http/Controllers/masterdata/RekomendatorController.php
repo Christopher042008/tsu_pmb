@@ -35,13 +35,12 @@ class RekomendatorController extends Controller
             ->select('pmb_master_rekomendator.*', 'pmb_master_kategori_rekomendator.kategori_rekomendator as nama_kategori')
             ->orderBy('pmb_master_rekomendator.id', 'desc')
             ->get();
-
         return DataTables::of($data)
             ->addIndexColumn()
             // TAMBAHAN: Kolom baru khusus untuk menampilkan Nama Kategori di tabel
             ->addColumn('nama_kategori', function ($d) {
                 // Jika data join ditemukan tampilkan namanya, jika tidak tampilkan data mentahnya
-                return $d->nama_kategori ?? $d->kategori; 
+                return $d->nama_kategori ?? $d->kategori;
             })
             ->addColumn('aktif', function ($d) {
                 if ($d->isactive == 1) {
@@ -53,15 +52,15 @@ class RekomendatorController extends Controller
             ->addColumn('action', function ($d) {
                 $id = encrypt($d->id);
                 $edit = '<a href="#" data-id="'.$id.'" class="btn_edit"><i title="Edit" class="fa fa-edit text-orange"></i></a>';
-                
+
                 if ($d->isactive == 1) {
                     $aktif = '<a href="#" class="btn_status" data-id="'.$id.'" data-status="'.encrypt('0').'" style="margin-left: 5px;"><i title="Nonaktifkan" class="fa fa-times text-warning"></i></a>';
                 } else {
                     $aktif = '<a href="#" class="btn_status" data-id="'.$id.'" data-status="'.encrypt('1').'" style="margin-left: 5px;"><i title="Aktifkan" class="fa fa-check text-green"></i></a>';
                 }
-                
+
                 $hapus = '<a href="#" data-id="'.$id.'" class="btn_destroy" style="margin-left: 5px;"><i title="Hapus Permanen" class="fa fa-trash text-red"></i></a>';
-                
+
                 return $edit . ' ' . $aktif . ' ' . $hapus;
             })
             ->rawColumns(['action', 'aktif'])
@@ -73,13 +72,13 @@ class RekomendatorController extends Controller
     private function generateKodeRekomendator($kodeKategori)
     {
         $kategori = DB::table('pmb_master_kategori_rekomendator')->where('kode_kategori', $kodeKategori)->first();
-        
+
         if (!$kategori) {
-            return 'UNKNOWN0001'; 
+            return 'UNKNOWN0001';
         }
 
-        $prefix = $kategori->kode_kategori; 
-        
+        $prefix = $kategori->kode_kategori;
+
         // PERBAIKAN: Cari murni berdasarkan awalan kode_rekomendator-nya saja (mengabaikan kolom kategori)
         // dan urutkan berdasarkan kodenya secara menurun (Z-A) agar dapat angka terbesar
         $lastData = Master_Rekomendator::where('kode_rekomendator', 'like', $prefix . '%')
@@ -109,7 +108,7 @@ class RekomendatorController extends Controller
         } else {
             // Logika Update
             $id = decrypt($post->IdRekomendator);
-            
+
             $oldData = Master_Rekomendator::find($id);
             $kodeRekomendator = $post->kode_rekomendator;
 
@@ -120,7 +119,7 @@ class RekomendatorController extends Controller
 
             $post->merge(['kode_rekomendator' => $kodeRekomendator]);
 
-            // PERBAIKAN: Hapus pengecekan 'isactive' agar sistem mendeteksi kode yang kembar 
+            // PERBAIKAN: Hapus pengecekan 'isactive' agar sistem mendeteksi kode yang kembar
             // baik di data yang aktif maupun yang sudah dinonaktifkan
             $cek = Master_Rekomendator::where('id', '!=', $id)
                 ->where('kode_rekomendator', $post->kode_rekomendator)
@@ -128,8 +127,8 @@ class RekomendatorController extends Controller
 
             if ($cek) {
                 return [
-                    'title' => 'Information', 
-                    'status' => 'warning', 
+                    'title' => 'Information',
+                    'status' => 'warning',
                     'message' => 'Kode Rekomendator ('.$post->kode_rekomendator.') Sudah Digunakan!'
                 ];
             }

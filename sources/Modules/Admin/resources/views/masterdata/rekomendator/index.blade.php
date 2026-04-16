@@ -128,11 +128,12 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Kode</th>
+                                            <th>Kode Rekomendator</th>
                                             <th>Nama Rekomendator</th>
                                             <th>Kategori</th>
                                             <th>Pekerjaan</th>
                                             <th>No. HP</th>
+                                            <th>No Rekening</th>
                                             <th>Bank</th>
                                             <th>Status</th>
                                             <th>Action</th>
@@ -237,15 +238,18 @@
                         // PERUBAHAN DI SINI: Render selalu mengembalikan string kosong
                         {
                             data: 'nama_kategori',
-                            render: function(data, type, row) {
-                                return ''; // Dikosongkan sesuai permintaan
-                            }
+                            // render: function(data, type, row) {
+                            //     return ''; // Dikosongkan sesuai permintaan
+                            // }
                         },
                         {
                             data: 'pekerjaan'
                         },
                         {
                             data: 'no_hp'
+                        },
+                        {
+                            data: 'no_rekening'
                         },
                         {
                             data: 'nama_bank'
