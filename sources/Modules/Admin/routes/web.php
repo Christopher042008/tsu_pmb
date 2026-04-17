@@ -191,6 +191,7 @@
                         Route::post('/UploadExcel', [RekomendatorController::class, 'importExcel'])->name('admin.Rekomendator.UploadExcel');
                         Route::get('/TemplateExcel', [RekomendatorController::class, 'downloadTemplate'])->name('admin.Rekomendator.TemplateExcel');
                         Route::get('/MigrationTemplateExcel', [RekomendatorController::class, 'downloadMigrationTemplate'])->name('admin.Rekomendator.MigrationTemplateExcel');
+                        Route::get('/KirimEmail/{params}', [RekomendatorController::class, 'kirimemail'])->name('admin.Rekomendator.KirimEmail');
                     });
                     Route::prefix('Kabupaten')->group(function () {
                         Route::get('/', [KabupatenController::class, 'index'])->name('admin.Kabupaten.show');
