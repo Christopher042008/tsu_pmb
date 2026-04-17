@@ -122,25 +122,30 @@
                                 </div>
                             </div>
 
-                            <div class="table-responsive" style="margin-top: 20px;">
-                                <table id="tabel-rekomendator" class="table table-bordered table-hover"
-                                    style="width: 100%;">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Kode Rekomendator</th>
-                                            <th>Nama Rekomendator</th>
-                                            <th>Kategori</th>
-                                            <th>Pekerjaan</th>
-                                            <th>No. HP</th>
-                                            <th>No Rekening</th>
-                                            <th>Bank</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                </table>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="table-responsive" style="margin-top: 20px;">
+                                        <table id="tabel-rekomendator" class="table table-bordered table-hover"style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Kode Rekomendator</th>
+                                                    <th>Nama Rekomendator</th>
+                                                    <th>Kategori</th>
+                                                    <th>Pekerjaan</th>
+                                                    <th>No. HP</th>
+                                                    <th>No Rekening</th>
+                                                    <th>Bank</th>
+                                                    <th>Email</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -255,6 +260,9 @@
                             data: 'nama_bank'
                         },
                         {
+                            data: 'email'
+                        },
+                        {
                             data: 'aktif'
                         },
                         {
@@ -267,6 +275,7 @@
                         EditRekomendator();
                         StatusRekomendator();
                         DestroyRekomendator();
+                        KirimEmailRekomendator();
                     }
                 });
             }
@@ -458,6 +467,46 @@
                                     $('#loading').hide();
                                     Swal.fire('Error',
                                         'Terjadi kesalahan sistem saat menghapus data.',
+                                        'error');
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            function KirimEmailRekomendator() {
+                $('.btn_email').click(function(e) {
+                    e.preventDefault();
+                    let params = $(this).data('id');
+
+                    Swal.fire({
+                        title: 'Konfirmasi',
+                        text: 'Apakah Yakin Mengirim Email ?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        showCancelButton: true,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                type: "GET",
+                                url: '{!! url('admin/MasterData/Rekomendator/KirimEmail') !!}/' + params,
+                                dataType: "JSON",
+                                beforeSend: function() {
+                                    $('#loading').show(); // Tampilkan Loading
+                                },
+                                success: function(data) {
+                                    $('#loading').hide(); // Sembunyikan Loading
+                                    Swal.fire(data.title, data.message, data.status)
+                                        .then(() => {
+                                            $("#tabel-rekomendator").DataTable()
+                                                .ajax.reload();
+                                        });
+                                },
+                                error: function() {
+                                    $('#loading').hide();
+                                    Swal.fire('Error',
+                                        'Terjadi kesalahan sistem saat mengirim email.',
                                         'error');
                                 }
                             });

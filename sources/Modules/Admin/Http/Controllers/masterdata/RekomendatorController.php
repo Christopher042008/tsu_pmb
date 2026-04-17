@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use Modules\Admin\resources\views\masterdata\rekomendator\RekomendatorImport;
 use Modules\Admin\resources\views\masterdata\rekomendator\RekomendatorTemplateExport;
@@ -51,17 +52,22 @@ class RekomendatorController extends Controller
             })
             ->addColumn('action', function ($d) {
                 $id = encrypt($d->id);
-                $edit = '<a href="#" data-id="'.$id.'" class="btn_edit"><i title="Edit" class="fa fa-edit text-orange"></i></a>';
+                $edit = '<a href="#" data-id="' . $id . '" class="btn_edit mr-2"><i title="Edit" class="fa fa-edit text-orange"></i></a>';
 
                 if ($d->isactive == 1) {
-                    $aktif = '<a href="#" class="btn_status" data-id="'.$id.'" data-status="'.encrypt('0').'" style="margin-left: 5px;"><i title="Nonaktifkan" class="fa fa-times text-warning"></i></a>';
+                    $aktif = '<a href="#" class="btn_status mr-2" data-id="' . $id . '" data-status="' . encrypt('0') . '"><i title="Nonaktifkan" class="fa fa-times text-warning"></i></a>';
                 } else {
-                    $aktif = '<a href="#" class="btn_status" data-id="'.$id.'" data-status="'.encrypt('1').'" style="margin-left: 5px;"><i title="Aktifkan" class="fa fa-check text-green"></i></a>';
+                    $aktif = '<a href="#" class="btn_status mr-2" data-id="' . $id . '" data-status="' . encrypt('1') . '"><i title="Aktifkan" class="fa fa-check text-green"></i></a>';
                 }
 
-                $hapus = '<a href="#" data-id="'.$id.'" class="btn_destroy" style="margin-left: 5px;"><i title="Hapus Permanen" class="fa fa-trash text-red"></i></a>';
+                $hapus = '<a href="#" data-id="' . $id . '" class="btn_destroy mr-2"><i title="Hapus Permanen" class="fa fa-trash text-red"></i></a>';
 
-                return $edit . ' ' . $aktif . ' ' . $hapus;
+                $email = '';
+                if ($d->email != NULL) {
+                    $email = '<a href="#" data-id="' . $id . '" class="btn_email"><i title="Kirim Email" class="fa fa-envelope text-primary"></i></a>';
+                }
+
+                return $edit  . $aktif  . $hapus  .  $email;
             })
             ->rawColumns(['action', 'aktif'])
             ->make(true);
@@ -82,8 +88,8 @@ class RekomendatorController extends Controller
         // PERBAIKAN: Cari murni berdasarkan awalan kode_rekomendator-nya saja (mengabaikan kolom kategori)
         // dan urutkan berdasarkan kodenya secara menurun (Z-A) agar dapat angka terbesar
         $lastData = Master_Rekomendator::where('kode_rekomendator', 'like', $prefix . '%')
-                        ->orderBy('kode_rekomendator', 'desc')
-                        ->first();
+            ->orderBy('kode_rekomendator', 'desc')
+            ->first();
 
         if (!$lastData || empty($lastData->kode_rekomendator)) {
             $newNumber = 1;
@@ -129,7 +135,7 @@ class RekomendatorController extends Controller
                 return [
                     'title' => 'Information',
                     'status' => 'warning',
-                    'message' => 'Kode Rekomendator ('.$post->kode_rekomendator.') Sudah Digunakan!'
+                    'message' => 'Kode Rekomendator (' . $post->kode_rekomendator . ') Sudah Digunakan!'
                 ];
             }
 
@@ -290,6 +296,30 @@ class RekomendatorController extends Controller
         }
     }
 
+    public function kirimemail($params)
+    {
+        try {
+            $id = decrypt($params);
+            DB::beginTransaction();
+
+            $getdata = Master_Rekomendator::where('id', $id)->select('email', 'nama_rekomendator', 'kode_rekomendator')->first();
+            RekomendatorController::sendEmail($getdata->email, $getdata->nama_rekomendator, $getdata->kode_rekomendator, "Notifikasi Kode Rekomendator");
+            DB::commit();
+            return response()->json([
+                'title' => 'Berhasil',
+                'status' => 'success',
+                'message' => 'Email Rekomendator Berhasil Terkirim'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'title' => 'Gagal',
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     public function downloadTemplate()
     {
         return Excel::download(new RekomendatorTemplateExport, 'Template_Import_Rekomendator.xlsx');
@@ -298,5 +328,20 @@ class RekomendatorController extends Controller
     public function downloadMigrationTemplate()
     {
         return Excel::download(new RekomendatorMigrationExport, 'Template_Migrasi_Rekomendator.xlsx');
+    }
+
+    public static function sendEmail($email, $nama, $kode, $subject)
+    {
+        // dd($email, $nama, $kode, $subject);
+        try {
+            Mail::send('user::login/rekomendator_email', ['nama' => $nama, 'kode' => $kode], function ($message) use ($subject, $email) {
+                // dd($subject, $email, $message);
+                $message->subject($subject);
+                $message->to($email);
+            });
+            return 1;
+        } catch (\Exception $e) {
+            return 0;
+        }
     }
 }
